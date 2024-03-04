@@ -115,6 +115,8 @@ io.on("connection", (socket) => {
                 console.log("player wasnt registered on database");
             } else {
                 console.log(`the player with socket ${socket.id} has been disconnected`);
+                const i = 2;
+                console.log(i);
             }
         });
     });
