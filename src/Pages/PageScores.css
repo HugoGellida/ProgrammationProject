@@ -1,0 +1,55 @@
+body{
+    background-image: url('./images/Arrière-plan-cartes.jpg');
+}
+
+#Retour{
+    display: flex;
+      position: absolute;
+      top: 5%;
+      left: 10%;
+  }
+
+#J6QP{
+    display: flex;
+    position: absolute;
+    top: 20%;
+    left: 22%;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 75px;
+  height: 200px;
+  min-width: 200px;
+  padding: 50px;
+  text-align: center;
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 15px;
+  margin-bottom: 100%;
+  border:9px inset rgb(90, 15, 15);
+  background-color:transparent;
+}
+
+#Bataille{
+  display: flex;
+    position: absolute;
+    top: 20%;
+    left: 60%;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 75px;
+  height: 200px;
+  min-width: 200px;
+  padding: 50px;
+  text-align: center;
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 15px;
+  margin-bottom: 100%;
+  border:9px inset rgb(90, 15, 15);
+  background-color:transparent;
+
+}

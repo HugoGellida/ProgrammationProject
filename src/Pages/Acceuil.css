@@ -1,0 +1,50 @@
+/**
+ * Reset
+ */
+
+
+/**
+ * Eléments génériques
+ */
+
+ body {
+    --color-primary: #5e82f7;
+    --color-secondary: #5186e9;
+    --color-tertiary: #ffeee6;    
+  }
+  
+  
+  
+  
+  
+  /**
+  * Eléments principaux
+  */
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif; 
+  }
+  
+  
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 200px;
+    padding: 50px;
+    text-align: center;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 30px;
+    background-color: var(--color-secondary);
+    margin-top: 130%;
+  
+  }
+  

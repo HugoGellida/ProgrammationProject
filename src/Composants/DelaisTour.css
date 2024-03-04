@@ -1,0 +1,14 @@
+#DelaisTour {
+    width: 50px; /* Ajustez la largeur selon vos besoins */
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px; /* Ajoute une marge à droite pour l'espacement */
+  }
+  
+  #DelaisTour:focus {
+    outline: none; /* Supprime la bordure bleue lorsqu'il est sélectionné */
+    border-color: #ffffff; /* Couleur de la bordure lorsqu'il est sélectionné */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Effet d'ombre lorsqu'il est sélectionné */
+  }

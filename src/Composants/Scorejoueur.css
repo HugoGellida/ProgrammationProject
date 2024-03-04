@@ -1,0 +1,20 @@
+#Scorejoueur{
+    display: none;
+    top: 70%;
+    left: 2%;
+    width: 30px;
+    height: 5%;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    float: left;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    background: linear-gradient(rgb(7, 7, 7),rgb(90, 15, 15));
+    border:2px inset rgb(90, 15, 15);
+}

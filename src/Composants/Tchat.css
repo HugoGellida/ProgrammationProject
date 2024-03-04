@@ -1,0 +1,70 @@
+/* Tchat.css */
+.tchat {
+ background-color: rgb(187, 177, 32,0);;
+ border: 1px solid red;
+ padding: 20px;
+ border-radius: 8px;
+ width: 15%;
+ height: 45%;
+ margin: 20px;
+float: left;
+position: absolute;
+  top: 0;
+  left: 0%;
+}
+
+
+#Message{
+    width: 100%;
+    height: 65%;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid red;
+    border-radius: 2px;
+    background-color: rgb(187, 177, 32,0);;
+    margin-top: 0%;
+    overflow-y: scroll;
+    color: #ffffff;
+}
+
+
+
+
+.messageAuteur{
+  margin-top: 10px;
+  background-color: rgb(187, 177, 32,0);;
+  display: block;
+  border-radius: 4px;
+  color: red;
+  float: left ;
+  word-wrap: break-word; 
+  white-space: pre-line;
+}
+
+.messageAutres{
+  margin-top: 10px;
+  background-color: rgb(187, 177, 32,0);;
+  border-radius: 4px;
+  color: #ffffff;
+  float: right;
+  display: block;
+  word-wrap: break-word; 
+  white-space: pre-line;
+}
+
+
+
+#message {
+ width: 96%;
+ height: 10%;
+ margin-top: 25px;
+ padding: 5px;
+ border: 1px solid red;
+ border-radius: 8px;
+ font-size: 15px;
+}
+#Btn{
+  margin-top: 5%;
+}
+

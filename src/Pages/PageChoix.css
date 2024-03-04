@@ -1,0 +1,74 @@
+
+/**
+* Eléments génériques
+*/
+
+
+ /*
+ main {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   align-items: center;
+   width: 100%;
+   min-width: 200px;
+   padding: 50px;
+   text-align: center;
+   color: white;
+   font-size: 17px;
+   font-weight: 500;
+   border-radius: 30px;
+   background-color: hsl(72, 12%, 92%);
+   margin-top: 50%;
+ 
+ }*/
+ .contenu-partie{
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   align-items: center;
+   
+   padding: 50px;
+   text-align: center;
+   color: white;
+   font-size: 13px;
+   font-weight: 500;
+   border-radius: 30px;
+   background-color: transparent;
+   margin-top: 10%;
+ }
+ .Select{
+  margin-top: 10%;
+  width: 100%;
+  padding: 10px;
+  font-size: 11.6px;
+  border: .3em inset #e91e1e;
+  border-radius: 4px;
+  background-color: rgba(214, 82, 82, 0.1);
+  box-shadow: 0 2px 4px rgba(214, 82, 82, 0.1);
+  color: #ccc6c6;
+  outline: none; /* Supprime la bordure de mise au point par défaut */
+}
+
+/* Style pour les options du select */
+.Select option {
+  font-size: 13px;
+  background-color: rgba(214, 82, 82, 0.1);
+  font-style: italic;
+  color: #030303; /* Couleur grise pour indiquer que c'est un texte de placeholder */
+}
+h5 {
+  margin: 10px;
+  font-size: 32px;
+  font-weight: 900;
+  color: #0a0909;
+  margin-top: 20%;
+  text-shadow:0 0 4px #FF0000,0 0 50px #FF0000,0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;color:#0f0f0d;
+  background-color:transparent;
+  }
+  #Scores{
+    display: flex;
+    position: absolute;
+    top: 10%;
+    right: 10%;
+  }

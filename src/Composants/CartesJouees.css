@@ -1,0 +1,203 @@
+
+
+
+#CartesJ {
+    position: absolute;
+    top:35%;
+    left: 92%;
+    width: auto;
+    height: 6%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    display: none;
+    background-color: rgba(255, 0, 0, 0);
+}
+
+
+#Cartes8 {
+    position: absolute;
+    left: 20%;
+    top:35%;
+    width: auto;
+    height: 6%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    display: none;
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes6 {
+    position: absolute;
+    left: 28%;
+    top:35%;
+    width: auto;
+    height: 6%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    display: none;
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes4 {
+    position: absolute;
+    left: 36%;
+    width: auto;
+    top:35%;
+    height: 6%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    display: none;
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes2 {
+    position: absolute;
+    left: 44%;
+    width: auto;
+    height: 6%;
+    top:35%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    display: none;
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes1 {
+    position: absolute;
+    left: 54%;
+    width: auto;
+    height: 6%;
+    top:35%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    display: none;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes3 {
+    position: absolute;
+    left: 60%;
+    width: auto;
+    height: 6%;
+    top:35%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    display: none;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes5 {
+    position: absolute;
+    left: 68%;
+    width: auto;
+    height: 6%;
+    padding: 50px;
+    top:35%;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    display: none;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes7 {
+    position: absolute;
+    left: 76%;
+    width: auto;
+    top:35%;
+    height: 6%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    display: none;
+    background-size: cover;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    background-color: rgba(255, 0, 0, 0);
+}
+
+#Cartes9 {
+    position: absolute;
+    left: 84%;
+    width: auto;
+    top:35%;
+    height: 6%;
+    padding: 50px;
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 0.5px solid red;
+    background-size: cover;
+    display: none;
+    background-image: url("./../Pages/images/Verso-Cartes.png");
+    background-color: rgba(255, 0, 0, 0);
+}

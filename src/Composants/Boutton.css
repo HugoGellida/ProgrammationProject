@@ -1,0 +1,14 @@
+button {
+	appearance: none;
+	border: .3em inset #e91e1e;
+	background: black;
+	padding: .85em 1.5em;
+	color: #f8f1f1;
+	border-radius: 2em;
+	transition: 1s;
+  }
+  
+  button:hover, button:focus, button:active {
+	background: #e90d0d;
+	color: #fff;
+  }

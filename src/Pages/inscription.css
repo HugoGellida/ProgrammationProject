@@ -1,0 +1,27 @@
+body {
+ 
+  background:url("./images/Arrière-plan-cartes.jpg");
+  width: auto;
+  height: auto;
+  background-size: 16.5% auto;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   align-items: center;
+   min-height: 100vh;
+   font-family: 'Roboto', sans-serif; 
+ }
+ a:link, a:visited {
+  appearance: none;
+border: .3em inset #e91e1e;
+background: black;
+padding: .50em 1em;
+color: #f8f1f1;
+border-radius: 2em;
+transition: 0.5s;
+}
+
+a:hover, a:active {
+  background: #e90d0d;
+color: #fff;
+}
