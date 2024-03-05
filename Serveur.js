@@ -111,13 +111,8 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         db.run(`UPDATE User SET isConnected = false WHERE socketid = '${socket.id}'`, (err) => {
-            if (err) {
-                console.log("player wasnt registered on database");
-            } else {
-                console.log(`the player with socket ${socket.id} has been disconnected`);
-                const i = 2;
-                console.log(i);
-            }
+            console.log(`the player with socket ${socket.id} has been disconnected`);
+            //TODO: Get the game id room of socket, analyse the type of game, and change database.
         });
     });
 
@@ -170,7 +165,7 @@ io.on("connection", (socket) => {
         let idParties = [];
         let nombredeJoueurs = [];
         let types = [];
-        for (let i = 0; i < gameList.length; i++){
+        for (let i = 0; i < gameList.length; i++) {
             idParties.push(gameList[i].idGame);
             nombredeJoueurs.push(gameList[i].playerAmount);
             const type = getStringOfGame(gameList[i]);
@@ -416,7 +411,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         let currentPlayer = game.currentPlayer();
         console.log(`the player ${currentPlayer.username} chose a ${cardChosen.value} of ${cardChosen.type}`);
-        if (game.lastCardPlayed.value == 1 && (cardChosen.vaule != 1 || cardChosen.value != 8) && currentPlayer.needPlay){
+        if (game.lastCardPlayed.value == 1 && (cardChosen.vaule != 1 || cardChosen.value != 8) && currentPlayer.needPlay) {
             currentPlayer.pickAce();
             currentPlayer.needPlay = false;
         }
@@ -475,8 +470,8 @@ io.on("connection", (socket) => {
             console.log(`the last card played was a ${game.getLastCard().value} of ${game.getLastCard().type}`);
             if (!currentPlayer.canPlay()) {
                 const cardPicked = currentPlayer.pickCard();
-                if (cardPicked){
-                    if (cardPicked.value == game.lastCardPlayed.value || cardPicked.type == game.lastCardPlayed.type){
+                if (cardPicked) {
+                    if (cardPicked.value == game.lastCardPlayed.value || cardPicked.type == game.lastCardPlayed.type) {
                         socket.emit("placeOrPickCrazy8", card);
                         return;
                     }
@@ -751,9 +746,9 @@ io.on("connection", (socket) => {
             return false;
         });
         let gamesInformations = [];
-        for (let i = 0; i < games.length; i++){
+        for (let i = 0; i < games.length; i++) {
             let stringType = getStringOfGame(games[i]);
-            gamesInformations.push({idGame: games[i].idGame, playerAmount: games[i].playerAmount, timer: games[i].timer, typeOfGame: stringType});
+            gamesInformations.push({ idGame: games[i].idGame, playerAmount: games[i].playerAmount, timer: games[i].timer, typeOfGame: stringType });
         }
         socket.emit("demandePartiePause", gamesInformations);
     });
@@ -1186,11 +1181,11 @@ function comptePts6quiprend(x) { // Fonction 6 qui prend
 
 
 
-function getGameById(idGame){
+function getGameById(idGame) {
     return gameList.filter(g => g.idGame == idGame)[0];
 }
 
-function getStringOfGame(game){
+function getStringOfGame(game) {
     if (game instanceof WarGame) return "jeu-de-bataille";
     else if (game instanceof Take6Game) return "6-qui-prend";
     else if (game instanceof Crazy8Game) return "crazy8";
