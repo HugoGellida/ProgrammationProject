@@ -697,7 +697,6 @@ function PageDeJeu() {
         messageElement.textContent = `Vous: ${message}`;
         divP.appendChild(messageElement);
         divP.innerHTML += "</br></br>";
-        // Faire défiler vers le bas pour afficher le dernier message
         divP.scrollTop = divP.scrollHeight;
       }
       else {
@@ -705,7 +704,6 @@ function PageDeJeu() {
         messageElement.textContent = `${username}: ${message}`;
         divP.appendChild(messageElement);
         divP.innerHTML += "</br></br>";
-        // Faire défiler vers le bas pour afficher le dernier message
         divP.scrollTop = divP.scrollHeight;
       }
     }
