@@ -6,7 +6,7 @@ import Boutton from './../Composants/Boutton';
 
 function PageChoix() {
 
-  socket.on("loadGame", (allGameID, allGamePlayerAmount, allGameType) => {
+  socket.on("loadGame", (allGameID, allGamePlayerAmount, allGameType, actualPlayerAmounts) => {
     let div = document.getElementById("contenu-Parties");
     div.innerHTML = "";
     for (let i = 0; i < allGameID.length; i++) {
@@ -16,7 +16,7 @@ function PageChoix() {
         sessionStorage.setItem("idPartie", allGameID[i]);
         return navigate("/PageDeJeu");
       });
-      b.innerText = `Rejoinde Partie${allGameID[i]}| Nombre de joueur: ${allGamePlayerAmount[i]}| Type de jeu: ${allGameType[i]}`;
+      b.innerText = `Game ${allGameID[i]}\n${actualPlayerAmounts[i]}/${allGamePlayerAmount[i]}\n${allGameType[i]}`;
       div.appendChild(b);
     }
   });

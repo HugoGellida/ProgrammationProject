@@ -202,7 +202,7 @@ io.on("connection", (socket) => {
         });
     });
     //Page CreationPartie
-    socket.on("createGame", (playerAmount, typeOfGame, username, timer) => { // data = [nbJoueur, typedejeu, username, delai]
+    socket.on("createGame", (playerAmount, typeOfGame, username, timer) => {
         let newIdGame = 1;
         for (let i = 0; i < gameList.length; i++){
             if (gameList[i].idGame == newIdGame) newIdGame ++;
@@ -218,23 +218,24 @@ io.on("connection", (socket) => {
         }
         gameList.push(newGame);
         rooms[newIdGame] = [];
-        io.to('lobby').emit("refreshGameList");
         affectPlayer(newIdGame, username, true);
     });
     //Page Choix
     socket.on("loadGame", () => {
-        let idParties = [];
-        let nombredeJoueurs = [];
+        let idGames = [];
+        let playerAmounts = [];
         let types = [];
+        let actualPlayerAmounts = [];
         for (let i = 0; i < gameList.length; i++) {
             if (gameList[i].playerAmount != rooms[gameList[i].idGame].length){
-                idParties.push(gameList[i].idGame);
-                nombredeJoueurs.push(gameList[i].playerAmount);
+                idGames.push(gameList[i].idGame);
+                playerAmounts.push(gameList[i].playerAmount);
+                actualPlayerAmounts.push(gameList[i].playerList.length);
                 const type = getStringOfGame(gameList[i]);
                 types.push(type);
             }
         }
-        socket.emit("loadGame", idParties, nombredeJoueurs, types);
+        socket.emit("loadGame", idGames, playerAmounts, types, actualPlayerAmounts);
     });
 
     socket.on("createPlayer", (idGame, username) => {
@@ -252,7 +253,6 @@ io.on("connection", (socket) => {
     //Page de jeu
     socket.on("launchGame", idGame => {
         const game = getGameById(idGame);
-        game.isLaunched = true;
         const playerAmountInRoom = io.sockets.adapter.rooms.get(parseInt(idGame)).size;
         if (game.isPaused && game.playerAmount == playerAmountInRoom) {
             game.isPaused = false;
@@ -273,13 +273,12 @@ io.on("connection", (socket) => {
                 }
             }
         } else if (game.playerAmount == game.playerList.length) {
+            game.isLaunched = true;
             console.log(`the game ${idGame} has been launched`);
             if (game instanceof WarGame) {
                 prepareWar(idGame);
-                //preparationBataille(data, row.delai);
             } else if (game instanceof Take6Game) {
                 prepareTake6(idGame);
-                //preparation6QP(data, row.delai);
             } else {
                 console.log(`its a game of crazy8`);
                 prepareCrazy8(idGame);
@@ -722,9 +721,7 @@ io.on("connection", (socket) => {
         socket.join(parseInt(idGame));
     });
 
-    //! FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS
-
-
+//! Function Part
     function affectPlayer(idGame, username, isPlayerCreator) { // Fonction générale
         socket.leave('lobby');
         socket.join(idGame);
@@ -740,9 +737,7 @@ io.on("connection", (socket) => {
             io.to(newPlayer.socketid).emit("teleportCreator", idGame);
         }
         game.addPlayer(newPlayer);
-        if (game.playerList.length == game.playerAmount) {
-            io.to('lobby').emit("refreshGameList");
-        }
+        io.to('lobby').emit("refreshGameList");
         console.log(`user ${username} is now a player of ${idGame}`);
     }
 

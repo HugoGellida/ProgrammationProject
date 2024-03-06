@@ -688,7 +688,6 @@ function PageDeJeu() {
     navigate('/PageChoix');
   });
 
-
   socket.on("messageReceived", (idGame, message, username) => {
     if (idGame == sessionStorage.getItem("idPartie")) {
       let divP = document.getElementById("Message");
@@ -697,7 +696,7 @@ function PageDeJeu() {
         messageElement.className = 'messageAuteur';
         messageElement.textContent = `Vous: ${message}`;
         divP.appendChild(messageElement);
-        divP.innerText += "</br></br>";
+        divP.innerHTML += "</br></br>";
         // Faire défiler vers le bas pour afficher le dernier message
         divP.scrollTop = divP.scrollHeight;
       }
@@ -705,7 +704,7 @@ function PageDeJeu() {
         messageElement.className = 'messageAutres';
         messageElement.textContent = `${username}: ${message}`;
         divP.appendChild(messageElement);
-        divP.innerText += "</br></br>";
+        divP.innerHTML += "</br></br>";
         // Faire défiler vers le bas pour afficher le dernier message
         divP.scrollTop = divP.scrollHeight;
       }
