@@ -154,7 +154,7 @@ io.on("connection", (socket) => {
                 } else {
                     if (game.playerList.length == 1) {
                         gameList = gameList.filter(g => g.idGame != game.idGame);
-                        io.to("lobby").emit("refreshGameList");
+                        console.log(`game ${game.idGame} has been removed`);
                     } else {
                         io.to(game.idGame).emit("messageReceived", game.idGame, `The player ${playerSocket.username} has left`, "SERVER");
                         game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
@@ -163,6 +163,7 @@ io.on("connection", (socket) => {
                             io.to(game.playerList[0].socketid).emit("showLaunchButton");
                         }
                     }
+                    io.to("lobby").emit("refreshGameList");
                 }
             }
         });
@@ -207,7 +208,6 @@ io.on("connection", (socket) => {
             if (gameList[i].idGame == newIdGame) newIdGame ++;
             else if (gameList[i].idGame > newIdGame) break;
         }
-        //* New model
         let newGame = null;
         if (typeOfGame == "crazy8") {
             newGame = new Crazy8Game(playerAmount, timer, newIdGame);
@@ -217,7 +217,6 @@ io.on("connection", (socket) => {
             newGame = new Take6Game(playerAmount, timer, newIdGame);
         }
         gameList.push(newGame);
-        //*
         rooms[newIdGame] = [];
         io.to('lobby').emit("refreshGameList");
         affectPlayer(newIdGame, username, true);
@@ -722,7 +721,6 @@ io.on("connection", (socket) => {
         socket.leave('lobby');
         socket.join(parseInt(idGame));
     });
-});
 
     //! FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS
 
@@ -757,3 +755,5 @@ function getStringOfGame(game) {
     else if (game instanceof Take6Game) return "6-qui-prend";
     else if (game instanceof Crazy8Game) return "crazy8";
 }
+
+});

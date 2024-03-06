@@ -36,11 +36,6 @@ function Connexion() {
                 {Formulaire("Connexion", DemandeConnexion)}
                 <label> Don't have an account? </label><br></br><Link id="lcl" to="/">Inscription</Link>
             </main>
-            <div className='test'>
-                <TextZone name="username" id="pseudo"/>
-                <TextZone name="password" id="motdepasse"/>
-                <Button name="button" id="button" innerText="button" functionCalled={testing}/>
-            </div>
         </div>
     );
 }
