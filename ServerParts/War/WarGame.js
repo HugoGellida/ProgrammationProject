@@ -6,6 +6,7 @@ class WarGame extends Game {
         super(playerAmount, timer, idGame);
         this.winableCards = [];
         this.fightingPlayers = [];
+        this.isHidden = false;
     }
 
     getLockedPlayers() {

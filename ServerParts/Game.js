@@ -6,14 +6,11 @@ class Game {
         this.idGame = idGame;
         this.isPaused = false;
         this.creator = null;
-        this.isJoinable = true;
+        this.isLaunched = false;
     }
 
     addPlayer(player){
         this.playerList.push(player);
-        if (this.playerAmount == this.playerList.length){
-            this.isJoinable = false;
-        }
     }
 
     getPlayerByUsername(username){

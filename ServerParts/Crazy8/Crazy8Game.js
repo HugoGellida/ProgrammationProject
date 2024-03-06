@@ -13,6 +13,12 @@ class Crazy8Game extends Game{
         this.card1InARow = 0;
     }
 
+    eliminatePlayer(player){
+        this.cardPickList.push(...player.handCard);
+        this.playerList = this.playerList.filter(p => p.username != player.username);
+        this.playerAmount--;
+    }
+
     getNextPlayer(){ // Donne le prochain joueur
         let count = -1;
         if (this.direction == "+"){

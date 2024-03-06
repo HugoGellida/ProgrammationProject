@@ -7,6 +7,11 @@ class Take6Game extends Game {
         this.cardBoard = {1: [], 2:[], 3:[], 4:[]};
     }
 
+    eliminatePlayer(player){
+        this.playerList = this.playerList.filter(p => p.username != player.username);
+        this.playerAmount--;
+    }
+
     placeCard(player, card){
         let lineNumberToPlace = this.getMinimalLine(card);
         if (lineNumberToPlace){

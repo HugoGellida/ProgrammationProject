@@ -103,15 +103,56 @@ server.listen(3001, () => {
 });
 
 
+const rooms = {"preLobby": [], "lobby": []};
 
 io.on("connection", (socket) => {
 
     socket.join('preLobby');
     socket.emit("goToPreLobby");
+    rooms["preLobby"].push(socket.id);
 
     socket.on("disconnect", () => {
         db.run(`UPDATE User SET isConnected = false WHERE socketid = '${socket.id}'`, (err) => {
             console.log(`the player with socket ${socket.id} has been disconnected`);
+            const roomKeys = Object.keys(rooms)
+            const socketLastRoom = roomKeys.filter(key => rooms[key].includes(socket.id))[0];
+            socket.leave(socketLastRoom);
+            rooms[socketLastRoom] = rooms[socketLastRoom].filter(socketid => socketid != socket.id);
+            const game = getGameById(socketLastRoom);
+            if (game){
+                if (game.isLaunched){
+                    const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
+                    io.to(parseInt(game.idGame)).emit("messageReceived", game.idGame, `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER");
+                    game.eliminatePlayer(playerSocket);
+                    if (game instanceof WarGame){
+                        db.get(`SELECT * FROM StatWar WHERE username = '${playerSocket.username}'`, (err, row) => {
+                            db.run(`UPDATE StatWar SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${playerSocket.username}'`);
+                        });
+                        if (game.allPlayed()){
+                            if (game.isHidden) return hiddenCardAnalyseWar(game);
+                            else return cardAnalyseWar(game);
+                        }
+                    } else if (game instanceof Take6Game){
+                        db.get(`SELECT * FROM StatTake6 WHERE username = '${playerSocket.username}'`, (err, row) => {
+                            const average = (((row.loseAmount + row.winAmount) * row.average) + 66)/(row.loseAmount + row.winAmount + 1);
+                            db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, average = ${average} WHERE username = '${playerSocket.username}'`);
+                        });
+                        if (game.allPlayed()){
+                            game.sortPlayerList();
+                            launchCardAnalyseTake6(game.playerList, game);
+                        }
+                    } else if (game instanceof Crazy8Game){
+                        db.get(`SELECT * FROM StatCrazy8 WHERE username = '${playerSocket.username}'`, (err, row) => {
+                            db.run(`UPDATE StatCrazy8 SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${playerSocket.username}'`);
+                            if (game.currentPlayer().username == playerSocket.username){
+                                game.changeTurn();
+                                currentPlayer = game.currentPlayer();
+                                boardAnalyseCrazy8(game, currentPlayer);
+                            }
+                        });
+                    }
+                }
+            }
             //TODO: Get the game id room of socket, analyse the type of game, and change database.
         });
     });
@@ -123,6 +164,8 @@ io.on("connection", (socket) => {
                 console.log(`connection allowed for user ${username}`);
                 socket.leave('preLobby')
                 socket.join('lobby');
+                rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
+                rooms["lobby"].push(socket.id);
                 db.run(`UPDATE User SET isConnected = true, socketid = '${socket.id}' WHERE username = '${username}'`);
                 socket.emit("connectionAllowed");
             }
@@ -132,7 +175,10 @@ io.on("connection", (socket) => {
     socket.on("registrationAttempt", (username, password) => {
         db.get(`SELECT * FROM User WHERE username = '${username}'`, (err, row) => {
             if (!row) {
-                socket.join('choichePage');
+                socket.leave('preLobby');
+                socket.join('lobby');
+                rooms["lobby"].push(socket.id);
+                rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
                 db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}')`, (err) => {
                     db.run(`INSERT INTO StatTake6 VALUES('${username}', 0, 0, -1, -1)`);
                     db.run(`INSERT INTO StatWar VALUES('${username}', 0, 0, 0)`);
@@ -158,6 +204,7 @@ io.on("connection", (socket) => {
         }
         gameList.push(newGame);
         //*
+        rooms[newIdGame] = [];
         affectPlayer(newIdGame, username, true);
     });
     //Page Choix
@@ -189,6 +236,7 @@ io.on("connection", (socket) => {
     //Page de jeu
     socket.on("launchGame", idGame => {
         const game = getGameById(idGame);
+        game.isLaunched = true;
         const playerAmountInRoom = io.sockets.adapter.rooms.get(parseInt(idGame)).size;
         if (game.isPaused && game.playerAmount == playerAmountInRoom) {
             game.isPaused = false;
@@ -231,7 +279,7 @@ io.on("connection", (socket) => {
         if (player.isCreator) {
             socket.emit("showLaunchButton");
         }
-    })
+    });
 
     socket.on("messageSent", (idGame, message, username) => { // data = [idPartie, Message, username]
         io.to(parseInt(idGame)).emit("messageReceived", idGame, message, username);
@@ -239,7 +287,10 @@ io.on("connection", (socket) => {
 
     socket.on("askPause", idGame => {
         const game = getGameById(idGame);
+        game.isLaunched = false;
         game.isPaused = true;
+        rooms[idGame] = [];
+        rooms["lobby"].push(...game.playerList);
         io.to(parseInt(idGame)).emit("pauseAllowed");
     });
 
@@ -411,7 +462,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         let currentPlayer = game.currentPlayer();
         console.log(`the player ${currentPlayer.username} chose a ${cardChosen.value} of ${cardChosen.type}`);
-        if (game.lastCardPlayed.value == 1 && (cardChosen.vaule != 1 || cardChosen.value != 8) && currentPlayer.needPlay) {
+        if (game.getLastCard().value == 1 && (cardChosen.vaule != 1 || cardChosen.value != 8) && currentPlayer.needPlay) {
             currentPlayer.pickAce();
             currentPlayer.needPlay = false;
         }
@@ -465,14 +516,15 @@ io.on("connection", (socket) => {
     function boardAnalyseCrazy8(game, currentPlayer) {
         setTimeout(() => {
             for (let i = 0; i < game.playerAmount; i++) {
+                let handCard = currentPlayer.handCard.map(card => ({ value: card.value, type: card.type }));
                 io.to(game.playerList[i].socketid).emit("refreshHandCardCrazy8", handCard);
             }
             console.log(`the last card played was a ${game.getLastCard().value} of ${game.getLastCard().type}`);
             if (!currentPlayer.canPlay()) {
                 const cardPicked = currentPlayer.pickCard();
                 if (cardPicked) {
-                    if (cardPicked.value == game.lastCardPlayed.value || cardPicked.type == game.lastCardPlayed.type) {
-                        socket.emit("placeOrPickCrazy8", card);
+                    if (cardPicked.value == game.getLastCard().value || cardPicked.type == game.getLastCard().type) {
+                        socket.emit("placeOrPickCrazy8", cardPicked);
                         return;
                     }
                 }
@@ -529,25 +581,29 @@ io.on("connection", (socket) => {
         playerConcerned.playCard(card);
         socket.broadcast.to(parseInt(idGame)).emit("refreshOponnentCardWar", username);
         if (game.allPlayed()) {
-            game.resetAllCardPlayed();
-            game.updatePlayerStatus();
-            game.updateFightingPlayers();
-            if (game.isLocked()) {
-                tieWar();
-            } else if (game.isWarLocked()) {
-                console.log("the fighting players are all locked in war, we must change fighting players")
-                game.resetFightingPlayers();
-                game.updateFightingPlayers();
-                cardAnalyseWar();
-            } else {
-                for (let i = 0; i < game.fightingPlayers.length; i++) {
-                    const player = game.fightingPlayers[i];
-                    const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-                    io.to(player.socketid).emit("playerTurnWar", handCard, game.timer);
-                }
-            }
+            hiddenCardAnalyseWar(game);
         }
     });
+
+    function hiddenCardAnalyseWar(game){
+        game.resetAllCardPlayed();
+        game.updatePlayerStatus();
+        game.updateFightingPlayers();
+        if (game.isLocked()) {
+            tieWar();
+        } else if (game.isWarLocked()) {
+            console.log("the fighting players are all locked in war, we must change fighting players")
+            game.resetFightingPlayers();
+            game.updateFightingPlayers();
+            cardAnalyseWar(game);
+        } else {
+            for (let i = 0; i < game.fightingPlayers.length; i++) {
+                const player = game.fightingPlayers[i];
+                const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+                io.to(player.socketid).emit("playerTurnWar", handCard, game.timer);
+            }
+        }
+    }
 
     socket.on("chooseCardWar", (idGame, card, username) => {
         const game = getGameById(idGame);
@@ -589,6 +645,7 @@ io.on("connection", (socket) => {
     }
     function cardAnalyseWar(game) {
         if (game.isWarTime()) {
+            game.isHidden = true;
             game.updatePlayerStatus();
             game.updateFightingPlayers();
             console.log(`the players ${game.fightingPlayers.map(player => player.username)} are in a war`);
@@ -608,6 +665,7 @@ io.on("connection", (socket) => {
                 }
             }
         } else {
+            game.isHidden = false;
             const playerWinnerRound = game.fightingPlayers.filter(player => player.cardPlayed.value == game.getHighestCardValue())[0];
             console.log(`the player ${playerWinnerRound.username} won ${game.winableCards.length} cards`);
             game.winCard(playerWinnerRound);
@@ -768,6 +826,8 @@ io.on("connection", (socket) => {
     function affectPlayer(idGame, username, isPlayerCreator) { // Fonction générale
         socket.leave('lobby');
         socket.join(idGame);
+        rooms[idGame].push(socket.id);
+        rooms["lobby"] = rooms["lobby"].filter(socketid => socketid != socket.id);
         const game = getGameById(idGame);
         let newPlayer = null
         if (game instanceof Take6Game) {
