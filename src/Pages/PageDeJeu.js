@@ -446,31 +446,30 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
     navigate('/PageChoix');
   })
 
-  socket.on("Message", data => {
-    if (data[0] == sessionStorage.getItem("idPartie")) {
+  socket.on("messageReceived", (idGame, message, username) => {
+    if (idGame == sessionStorage.getItem("idPartie")) {
       let divP = document.getElementById("Message");
       let messageElement = document.createElement('div');
-      if (data[1] == sessionStorage.getItem("pseudo")) {
+      if (message == sessionStorage.getItem("pseudo")) {
         messageElement.className = 'messageAuteur';
-        messageElement.textContent = "Vous: " + data[2] + " ";
+        messageElement.textContent = `Vous: ${username}`;
         divP.appendChild(messageElement);
-        divP.innerText += "</br></br>";
+        divP.innerHTML += "</br></br>";
         // Faire défiler vers le bas pour afficher le dernier message
         divP.scrollTop = divP.scrollHeight;
       }
       else {
-
         messageElement.className = 'messageAutres';
-        messageElement.textContent = data[1] + ": " + data[2] + " ";
+        messageElement.textContent = `${message}: ${username}`;
         divP.appendChild(messageElement);
-        divP.innerText += "</br></br>";
+        divP.innerHTML += "</br></br>";
         // Faire défiler vers le bas pour afficher le dernier message
         divP.scrollTop = divP.scrollHeight;
       }
     }
   })
 
-  socket.on("EtatBoutton", data => {
+  socket.on("showLaunchButton", () => {
     let Div = document.getElementById("Boutton");
     Div.style.display = "flex";
     let Div2 = document.getElementById("Enregistrer");
