@@ -4,12 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { socket } from './socket';
 import Boutton from './../Composants/Boutton';
 
-let listeTypes = [];
-
 function PageChoix() {
 
   socket.on("loadGame", (allGameID, allGamePlayerAmount, allGameType) => {
-    listeTypes = [];
     let div = document.getElementById("contenu-Parties");
     div.innerHTML = "";
     for (let i = 0; i < allGameID.length; i++) {
@@ -21,11 +18,10 @@ function PageChoix() {
       });
       b.innerText = `Rejoinde Partie${allGameID[i]}| Nombre de joueur: ${allGamePlayerAmount[i]}| Type de jeu: ${allGameType[i]}`;
       div.appendChild(b);
-      listeTypes.push(allGameType[i]);
     }
   });
 
-  socket.on("gameUnableToJoin", () => {
+  socket.on("refreshGameList", () => {
     socket.emit("loadGame");
   })
 
@@ -35,20 +31,6 @@ function PageChoix() {
   function Choix() {
     return navigate('/CreationPartie');
   }
-
-  socket.on("gameCreated", (idGame, playerAmount, typeOfGame) => {
-    let div = document.getElementById("contenu-Parties");
-    div.innerHTML = "";
-    let b = document.createElement("button");
-    b.addEventListener("click", (event) => {
-      socket.emit("createPlayer", idGame, sessionStorage.getItem("pseudo"));
-      sessionStorage.setItem("idPartie", idGame);
-      return navigate("/PageDeJeu");
-    });
-    b.innerText = `Rejoinde Partie${idGame}| Nombre de joueur: ${playerAmount}| Type de jeu: ${typeOfGame}`;
-    div.appendChild(b);
-    listeTypes.push(typeOfGame);
-  });
 
   function RejoindrePartieParID() {
     let id = document.getElementById("zoneIDPartiePrivée").value;

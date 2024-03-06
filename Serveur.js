@@ -120,8 +120,8 @@ io.on("connection", (socket) => {
             rooms[socketLastRoom] = rooms[socketLastRoom].filter(socketid => socketid != socket.id);
             const game = getGameById(socketLastRoom);
             if (game){
+                const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
                 if (game.isLaunched){
-                    const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
                     io.to(parseInt(game.idGame)).emit("messageReceived", game.idGame, `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER");
                     game.eliminatePlayer(playerSocket);
                     if (game instanceof WarGame){
@@ -151,9 +151,20 @@ io.on("connection", (socket) => {
                             }
                         });
                     }
+                } else {
+                    if (game.playerList.length == 1) {
+                        gameList = gameList.filter(g => g.idGame != game.idGame);
+                        io.to("lobby").emit("refreshGameList");
+                    } else {
+                        io.to(game.idGame).emit("messageReceived", game.idGame, `The player ${playerSocket.username} has left`, "SERVER");
+                        game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
+                        if (playerSocket.isCreator){
+                            game.playerList[0].isCreator = true;
+                            io.to(game.playerList[0].socketid).emit("showLaunchButton");
+                        }
+                    }
                 }
             }
-            //TODO: Get the game id room of socket, analyse the type of game, and change database.
         });
     });
 
@@ -191,8 +202,11 @@ io.on("connection", (socket) => {
     });
     //Page CreationPartie
     socket.on("createGame", (playerAmount, typeOfGame, username, timer) => { // data = [nbJoueur, typedejeu, username, delai]
-        const newIdGame = gameList.length + 1;
-        io.to('lobby').emit("gameCreated", newIdGame, playerAmount, typeOfGame);
+        let newIdGame = 1;
+        for (let i = 0; i < gameList.length; i++){
+            if (gameList[i].idGame == newIdGame) newIdGame ++;
+            else if (gameList[i].idGame > newIdGame) break;
+        }
         //* New model
         let newGame = null;
         if (typeOfGame == "crazy8") {
@@ -205,6 +219,7 @@ io.on("connection", (socket) => {
         gameList.push(newGame);
         //*
         rooms[newIdGame] = [];
+        io.to('lobby').emit("refreshGameList");
         affectPlayer(newIdGame, username, true);
     });
     //Page Choix
@@ -213,10 +228,12 @@ io.on("connection", (socket) => {
         let nombredeJoueurs = [];
         let types = [];
         for (let i = 0; i < gameList.length; i++) {
-            idParties.push(gameList[i].idGame);
-            nombredeJoueurs.push(gameList[i].playerAmount);
-            const type = getStringOfGame(gameList[i]);
-            types.push(type);
+            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length){
+                idParties.push(gameList[i].idGame);
+                nombredeJoueurs.push(gameList[i].playerAmount);
+                const type = getStringOfGame(gameList[i]);
+                types.push(type);
+            }
         }
         socket.emit("loadGame", idParties, nombredeJoueurs, types);
     });
@@ -294,108 +311,7 @@ io.on("connection", (socket) => {
         io.to(parseInt(idGame)).emit("pauseAllowed");
     });
 
-    socket.on("joueCarteBataille", data => { // data = [num carte jouée, id partie, username]
-        for (let i = 0; i < listeJ.length; i++) {
-            if (listeJ[i].username == data[2]) {
-                listeJ[i].carteJouee.push(data[0]);
-                listeJ[i].listeCarte = listeJ[i].listeCarte.filter(carte => carte != data[0]);
-            }
-        }
-        let joueurs = listeJ.filter(joueur => joueur.concerne == true && joueur.idGame == data[1]);
-        let x = true;
-        for (let i = 0; i < joueurs.length; i++) {
-            if (joueurs[i].listeCarte.length == 0) {
-                joueurs[i].listeCarte = joueurs[i].cartePioche;
-                joueurs[i].cartePioche = [];
-            }
-            if (joueurs[0].carteJouee.length != joueurs[i].carteJouee.length) {
-                x = false;
-                break;
-            }
-        }
-        io.to(parseInt(data[1])).emit("joueCarteBataille", data[2]);
-        if (x) {
-            let dico = {};
-            for (let i = 0; i < joueurs.length; i++) {
-                dico[joueurs[i].username] = joueurs[i].carteJouee;
-            }
-            io.to(parseInt(data[1])).emit("retourneCarteBataille", dico);
-            joueurs.sort((a, b) => valeurCarteBataille(b.carteJouee[b.carteJouee.length - 1]) - valeurCarteBataille(a.carteJouee[a.carteJouee.length - 1]));
-            lancementTourBataille(data[1], joueurs);
-        }
-    })
-
-    socket.on("joueCarteCacheeBataille", data => { // data = [num carte jouée, id partie, username]
-        for (let i = 0; i < listeJ.length; i++) {
-            if (listeJ[i].username == data[2]) {
-                listeJ[i].carteJouee.push(data[0]);
-                listeJ[i].listeCarte = listeJ[i].listeCarte.filter(carte => carte != data[0]);
-                break;
-            }
-        }
-        console.log(data[2] + " joue la carte cachée " + data[0]);
-        let joueurs = listeJ.filter(joueur => joueur.concerne == true && joueur.bloque == false && joueur.idGame == data[1]);
-        let x = true;
-        for (let i = 0; i < joueurs.length; i++) {
-            if (joueurs[0].carteJouee.length != joueurs[i].carteJouee.length) {
-                x = false;
-                break;
-            }
-        }
-        io.to(parseInt(data[1])).emit("joueCarteCacheeBataille", data[2]);
-        let joueurEvent = joueurs.filter(joueur => joueur.username == data[2]);
-        if (joueurEvent[0].cartePioche.length == 0 && joueurEvent[0].listeCarte.length == 0) {
-            joueurEvent[0].concerne = false;
-            joueurEvent[0].bloque = true;
-            joueurs = joueurs.filter(joueur => joueur != joueurs[i]);
-        } else if (joueurEvent[0].listeCarte.length == 0) { // Il a encore des cartes dans sa pioche
-            joueurEvent[0].listeCarte = joueurEvent[0].cartePioche;
-            joueurEvent[0].cartePioche = [];
-        }
-        if (x) {
-            for (let i = 0; i < joueurs.length; i++) {
-                io.to(joueurs[i].socketid).emit("retourInitialBataille", joueurs[i].listeCarte);
-            }
-        }
-    })
-
-    socket.on("joueCarte6quiprend", data => { // data = [num carte jouée, id partie, username]
-        // Completion
-        for (let i = 0; i < listeJ.length; i++) {
-            if (listeJ[i].username == data[2]) {
-                listeJ[i].carteJouee = data[0];
-                listeJ[i].listeCarte = listeJ[i].listeCarte.filter(carte => carte != data[0]);
-            }
-        }
-        //
-        // Verfification
-
-        db.get("SELECT nbJoueur FROM Partie WHERE idGame = " + data[1], (err, row) => {
-            let nbJoueurMax = row.nbJoueur;
-            let x = 0;
-            for (let i = 0; i < listeJ.length; i++) {
-                if (listeJ[i].idGame == data[1] && listeJ[i].carteJouee != null) {
-                    x++;
-                }
-            }
-            io.to(parseInt(data[1])).emit("joueCarte6quiprend", data[2]);
-            if (x == nbJoueurMax) {
-                let dico = {};
-                for (let i = 0; i < listeJ.length; i++) {
-                    if (listeJ[i].idGame == data[1]) {
-                        dico[listeJ[i].username] = listeJ[i].carteJouee;
-                    }
-                }
-                io.to(parseInt(data[1])).emit("retourneCarte6quiprend", dico);
-                const joueursRestants = listeJ.filter(joueur => joueur.idGame == data[1]);
-                joueursRestants.sort((a, b) => a.carteJouee - b.carteJouee);
-                lancementTour6QP(data[1], joueursRestants);
-            }
-        });
-    });
-
-    //* Nouveau modele
-
+//* Crazy8
     socket.on("pickCardCrazy8", idGame => {
         const game = getGameById(idGame);
         const currentPlayer = game.currentPlayer();
@@ -567,13 +483,7 @@ io.on("connection", (socket) => {
         io.to(playerConcerned.socketid).emit("refreshHandCardCrazy8", handCard);
     });
 
-
-
-
-
-
-
-
+//* War
     socket.on("chooseHiddenCardWar", (idGame, card, username) => {
         console.log(`the player ${username} chose a ${card.value} of ${card.type} for hidden`);
         const game = getGameById(idGame);
@@ -703,11 +613,7 @@ io.on("connection", (socket) => {
         }
     }
 
-
-
-
-
-
+//* Take6
     socket.on("chooseCardTake6", (idGame, card, username) => {
         const game = getGameById(idGame);
         const playerConcerned = game.getPlayerByUsername(username);
@@ -779,8 +685,6 @@ io.on("connection", (socket) => {
         }
     }
 
-    //*
-
     //Page statistique
     socket.on("askStat", username => {
         db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, row) => {
@@ -818,7 +722,7 @@ io.on("connection", (socket) => {
         socket.leave('lobby');
         socket.join(parseInt(idGame));
     });
-
+});
 
     //! FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS FONCTIONS
 
@@ -829,417 +733,20 @@ io.on("connection", (socket) => {
         rooms[idGame].push(socket.id);
         rooms["lobby"] = rooms["lobby"].filter(socketid => socketid != socket.id);
         const game = getGameById(idGame);
-        let newPlayer = null
-        if (game instanceof Take6Game) {
-            //* Testing
-            newPlayer = new Take6Player(username, game, socket.id);
-            //let newPlayer = new Joueur6quiprend(username, idGame, socket.id);
-            //listeJ.push(newPlayer);
-            //*
-        } else if (game instanceof WarGame) {
-            //* Testing
-            newPlayer = new WarPlayer(username, game, socket.id);
-            //let newPlayer = new JoueurBataille(username, idGame, socket.id);
-            //listeJ.push(newPlayer);
-            //*
-        } else if (game instanceof Crazy8Game) {
-            newPlayer = new Crazy8Player(username, game, socket.id);
-        }
+        let newPlayer = null;
+        if (game instanceof Take6Game) newPlayer = new Take6Player(username, game, socket.id);
+        else if (game instanceof WarGame) newPlayer = new WarPlayer(username, game, socket.id);
+        else if (game instanceof Crazy8Game) newPlayer = new Crazy8Player(username, game, socket.id);
         if (isPlayerCreator) {
             newPlayer.isCreator = true;
-            socket.emit("teleportCreator", idGame);
+            io.to(newPlayer.socketid).emit("teleportCreator", idGame);
         }
         game.addPlayer(newPlayer);
         if (game.playerList.length == game.playerAmount) {
-            io.to('lobby').emit("gameUnableToJoin");
+            io.to('lobby').emit("refreshGameList");
         }
         console.log(`user ${username} is now a player of ${idGame}`);
     }
-
-    function preparationBataille(idGame, delai) { // Fonction Bataille (1 seul appel par partie)
-        //Creation cartes + mélange
-        let listeCarte = [];
-        for (let i = 1; i < 53; i++) {
-            listeCarte.push(i);
-        }
-
-        listeCarte.sort(() => {
-            return Math.random() - 0.5;
-        });
-        //
-        //Distribution des cartes
-        let joueurs = listeJ.filter(joueur => joueur.idGame == idGame);
-        let reste = 52 % joueurs.length;
-        let nbCarteSansReste = Math.floor(52 / joueurs.length);
-        let numCarte = 0;
-        for (let i = 0; i < joueurs.length; i++) {
-            let carteJoueur = [];
-            for (let j = 0 + numCarte; j < nbCarteSansReste + numCarte; j++) {
-                carteJoueur.push(listeCarte[j]);
-            }
-            if (reste != 0) {
-                numCarte += nbCarteSansReste + 1;
-                carteJoueur.push(listeCarte[numCarte - 1]);
-                reste--;
-            } else {
-                numCarte += nbCarteSansReste;
-            }
-            let listePseudo = [];
-            for (let j = 0; j < joueurs.length; j++) {
-                listePseudo.push(joueurs[j].username);
-            }
-            joueurs[i].listeCarte = carteJoueur;
-            io.to(joueurs[i].socketid).emit("PrepaBataille", [carteJoueur, listePseudo, delai]);
-        }
-    }
-
-    function lancementTourBataille(idGame, joueurs) {
-        setTimeout(async () => {
-
-            let joueurCarteMax = joueurs.filter(joueur => valeurCarteBataille(joueurs[0].carteJouee[joueurs[0].carteJouee.length - 1]) == valeurCarteBataille(joueur.carteJouee[joueur.carteJouee.length - 1]));
-            console.log("valeur de la carte à battre:", valeurCarteBataille(joueurs[0].carteJouee[joueurs[0].carteJouee.length - 1]));
-            console.dir(joueurs.map(joueur => [joueur.username, joueur.listeCarte.length + joueur.cartePioche.length, joueur.carteJouee[joueur.carteJouee.length - 1]]));
-            if (joueurCarteMax.length == 1) { // Cas 1 gagnant (!bataille)
-                joueurs = listeJ.filter(joueur => joueur.idGame == idGame);
-                let remainingPlayers = joueurs;
-                for (let i = 0; i < joueurs.length; i++) { // Don des cartes au gagnant
-                    for (let j = 0; j < joueurs[i].carteJouee.length; j++) {
-                        joueurCarteMax[0].cartePioche.push(joueurs[i].carteJouee[j]);
-                    }
-                    joueurs[i].carteJouee = [];
-                    joueurs[i].concerne = true;
-                    joueurs[i].bloque = false;
-                    if (joueurs[i].listeCarte.length == 0 && joueurs[i].cartePioche.length == 0) { //Cartes total advesaire = 0 => elimination
-                        listeJ = listeJ.filter(joueur => joueur.username != joueurs[i].username);
-                        db.get("SELECT * FROM StatBataille WHERE username = '" + joueurs[i].username + "'", (err, row) => {
-                            db.run("UPDATE StatBataille SET nbPerdueBataille = " + (row.nbPerdueBataille + 1) + " WHERE username = '" + joueurs[i].username + "'");
-                            db.run("DELETE FROM JoueurPartie WHERE idPartie = " + idGame + " AND pseudoJoueur = '" + joueurs[i].username + "'");
-                            db.run("UPDATE Partie SET nbJoueur = " + (joueurs.length - 1) + " WHERE idGame = " + idGame);
-                        });
-                        const socket = await io.in(joueurs[i].socketid).fetchSockets();
-                        console.log(joueurs[i].username + " éliminé");
-                        socket[0].leave(parseInt(idGame));
-                        socket[0].join('');
-                        socket[0].emit("perduBataille");
-                        remainingPlayers.filter(joueur => joueur != joueurs[i]);
-                    }
-                }
-                if (remainingPlayers.length == 1) {
-                    io.to(remainingPlayers[0].socketid).emit("victoireBataille");
-                    return;
-                }
-                for (let i = 0; i < remainingPlayers.length; i++) {
-                    io.to(remainingPlayers[i].socketid).emit("retourInitialBataille", remainingPlayers[i].listeCarte);
-                }
-
-                return;
-            } else { // Cas gagnant multiples (bataille)
-                console.log("BATAILLE!");
-                let joueursC = joueurs.filter(joueur => {
-                    if (valeurCarteBataille(joueur.carteJouee[joueur.carteJouee.length - 1]) != valeurCarteBataille(joueurs[0].carteJouee[joueurs[0].carteJouee.length - 1])) {
-                        joueur.concerne = false;
-                        return false;
-                    } else {
-                        return true;
-                    }
-                });
-                for (let i = 0; i < joueursC.length; i++) {
-                    if (joueursC[i].cartePioche.length == 0 && joueursC[i].listeCarte.length == 0) { // carteTotal = 0 => !(completer bataille) => !(concerné)
-                        joueursC[i].concerne = false;
-                        joueursC[i].bloque = true;
-                        joueursC.filter(joueur => joueur != joueursC[i]);
-                    }
-                }
-                if (joueursC.length == 0) {
-                    console.log("joueursC bloques");
-                    let carteABattre = valeurCarteBataille(joueurs[0].carteJouee[joueurs[0].carteJouee.length - 1]);
-                    joueursC = listeJ.filter(joueur => {
-                        if (!joueur.concerne && !joueur.bloque && joueur.listeCarte.length != 0 && joueur.cartePioche.length != 0) {
-                            joueur.conerne = true;
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    });
-                    let carteMax = valeurCarteBataille(Math.max(...joueursC.map(joueur => Math.max(...joueur.listeCarte, ...joueur.cartePioche))));
-                    if (carteMax <= carteABattre || carteMax == Infinity) {
-                        for (let i = 0; i < joueurs.length; i++) {
-                            io.to(joueurs[i].socketid).emit("egaliteBataille");//////////
-                            db.get(`SELECT nbNulBataille FROM StatBataille WHERE username = '${joueurs[i].username}`, (err, row) => {
-                                db.run(`UPDATE StatBataille SET nbNulBataille = ${row.nbNulBataille + 1} WHERE username = ${joueurs[i].username}`)
-                            });
-                            io.to(joueurs[i].socketid).join('');
-                            io.to(joueurs[i].socketid).leave(parseInt(idGame));
-                        }
-                        listeJ.filter(joueur => joueur.idGame != idGame);
-                    } else {
-                        return lancementTourBataille(idGame, joueurs);
-                    }
-                }
-                for (let i = 0; i < joueurs.length; i++) {
-                    if (joueurs[i].listeCarte.length == 0) {
-                        joueurs[i].listeCarte = joueurs[i].cartePioche;
-                        joueurs[i].cartePioche = [];
-                    }
-                }
-                let listePseudoC = [];
-                for (let i = 0; i < joueursC.length; i++) {
-                    listePseudoC.push(joueursC[i]);
-                    io.to(joueursC[i].socketid).emit("choixCarteCacheeBataille", joueursC[i].listeCarte);//////////
-                }
-                io.to(parseInt(idGame)).emit("Bataille!", listePseudoC);//////////
-            }
-        }, joueurs.length * 1500);
-    }
-
-    function preparation6QP(data, Delais) { // Fonction 6 qui prend
-        //Creation cartes + mélange
-        let listeCarte = [];
-        for (let i = 1; i < 105; i++) {
-            listeCarte.push(i);
-        }
-
-        listeCarte.sort(() => {
-            return Math.random() - 0.5;
-        });
-        //
-        //Distribution des cartes
-        let cartePlateau = [];
-        for (let i = 0; i < 4; i++) {
-            cartePlateau.push(listeCarte[i]);
-        }
-        let p = new Partie6quiprend([[cartePlateau[0]], [cartePlateau[1]], [cartePlateau[2]], [cartePlateau[3]]], data);
-        listeP.push(p);
-
-        let personnes = io.sockets.adapter.rooms.get(parseInt(data));
-
-        let numJoueur = 0;
-        personnes.forEach(socketid => {
-            let carteJoueur = [];
-            const joueur = listeJ.filter(joueur => joueur.idGame == data && socketid == joueur.socketid);
-            for (let i = 4 + numJoueur * 10; i < 14 + numJoueur * 10; i++) {
-                carteJoueur.push(listeCarte[i]);
-            }
-            db.all("SELECT pseudoJoueur FROM JoueurPartie WHERE idPartie = " + data, (err, rows) => {
-                let listePseudo = [];
-                rows.forEach(row => {
-                    listePseudo.push(row.pseudoJoueur);
-                });
-                joueur[0].listeCarte = carteJoueur;
-                io.to(socketid).emit("Prepa6quiprend", [carteJoueur, listePseudo, cartePlateau, joueur[0].score, Delais]);
-            });
-            numJoueur++;
-        });
-        return;
-    }
-
-    function lancementTour6QP(idGame, joueursRestants) { // Fonction 6 qui prend
-        setTimeout(() => {
-            1
-            //Recuperation de la partie
-            let partie;
-            for (let i = 0; i < listeP.length; i++) {
-                if (listeP[i].idGame == idGame) {
-                    partie = listeP[i];
-                }
-            }
-            //
-            //Recuperation des dernieres cartes de chaque ligne
-            let Lcarte = [];
-            for (let j = 0; j < 4; j++) {
-                Lcarte.push(partie.liste[j][partie.liste[j].length - 1]);
-            }
-            //
-            let joueur = joueursRestants[0];
-            let listeEcart = [parseInt(joueur.carteJouee) - Lcarte[0], parseInt(joueur.carteJouee) - Lcarte[1], parseInt(joueur.carteJouee) - Lcarte[2], parseInt(joueur.carteJouee) - Lcarte[3]];
-            let ligneEcartMin = -1;
-            let min = 104;
-            for (let j = 0; j < 4; j++) {
-                if (listeEcart[j] > 0 && min > listeEcart[j]) {
-                    ligneEcartMin = j + 1;
-                    min = listeEcart[j];
-                }
-            }
-            if (ligneEcartMin == -1) {
-                let Lpts = [0, 0, 0, 0];
-                let ligne = -1;
-                let L = partie.liste;
-                //Calcul de la ligne avec le moins de points
-                for (let j = 0; j < 4; j++) {
-                    for (let k = 0; k < L[j].length; k++) {
-                        Lpts[j] += comptePts6quiprend(L[j][k]);
-                    }
-                }
-                for (let j = 0; j < 4; j++) {
-                    if (min > Lpts[j]) {
-                        ligne = j + 1;
-                        min = Lpts[j];
-                    }
-                }
-                //
-                partie.liste[ligne - 1] = [parseInt(joueur.carteJouee)];
-                joueur.score += min;
-                io.to(parseInt(idGame)).emit("casAnormal6quiprend", [ligne, parseInt(joueur.carteJouee), joueur.username, joueur.score]);
-                if (joueur.score >= 66) {
-                    return fin6quiprend(idGame);
-                }
-                joueursRestants[0].carteJouee = null;
-                let joueurs = joueursRestants.filter(joueur => joueur.username != joueursRestants[0].username);
-                if (joueurs.length == 0) {
-                    let joueursR = listeJ.filter(joueur => joueur.idGame == idGame);
-                    if (joueursR[0].listeCarte.length == 0) {
-                        setTimeout(() => {
-                            listeP.filter(partie => partie.idGame != idGame);
-
-                            db.get("SELECT delai FROM Partie WHERE idGame = " + idGame, (err, row) => {
-                                preparation6QP(idGame, row.delai);
-                            })
-                            db.close;
-                        }, 1000)
-                        return;
-                    }
-                    for (let i = 0; i < joueursR.length; i++) {
-                        io.to(joueursR[i].socketid).emit("retourInitial6quiprend", joueursR[i].listeCarte);
-                    }
-                    return;
-                }
-                return lancementTour6QP(idGame, joueurs);
-            } else if (partie.liste[ligneEcartMin - 1].length == 5) {
-                for (let j = 0; j < 5; j++) {
-                    joueur.score += comptePts6quiprend(partie.liste[ligneEcartMin - 1][j]);
-                }
-                partie.liste[ligneEcartMin - 1] = [parseInt(joueur.carteJouee)];
-                io.to(parseInt(idGame)).emit("casAnormal6quiprend", [ligneEcartMin, parseInt(joueur.carteJouee), joueur.username, joueur.score]);
-                if (joueur.score >= 66) {
-                    return fin6quiprend(idGame);
-                }
-                joueursRestants[0].carteJouee = null;
-                let joueurs = joueursRestants.filter(joueur => joueur.username != joueursRestants[0].username);
-                if (joueurs.length == 0) {
-                    let joueursR = listeJ.filter(joueur => joueur.idGame == idGame);
-                    if (joueursR[0].listeCarte.length == 0) {
-                        setTimeout(() => {
-                            listeP.filter(partie => partie.idGame != idGame);
-
-                            db.get("SELECT delai FROM Partie WHERE idGame = " + idGame, (err, row) => {
-                                preparation6QP(idGame, row.delai);
-                            })
-                            db.close;
-                        }, 1000)
-                        return;
-                    }
-                    for (let i = 0; i < joueursR.length; i++) {
-                        io.to(joueursR[i].socketid).emit("retourInitial6quiprend", joueursR[i].listeCarte);
-                    }
-                    return;
-                }
-                return lancementTour6QP(idGame, joueurs);
-            } else {
-                partie.liste[ligneEcartMin - 1].push(parseInt(joueur.carteJouee));
-                io.to(parseInt(idGame)).emit("casNormal6quiprend", [ligneEcartMin, partie.liste[ligneEcartMin - 1].length, parseInt(joueur.carteJouee)]);
-                joueursRestants[0].carteJouee = null;
-                let joueurs = joueursRestants.filter(joueur => joueur.username != joueursRestants[0].username);
-                if (joueurs.length == 0) {
-                    let joueursR = listeJ.filter(joueur => joueur.idGame == idGame);
-                    if (joueursR[0].listeCarte.length == 0) {
-                        setTimeout(() => {
-                            listeP.filter(partie => partie.idGame != idGame);
-
-                            db.get("SELECT delai FROM Partie WHERE idGame = " + idGame, (err, row) => {
-                                preparation6QP(idGame, row.delai);
-                            })
-                            db.close;
-                        }, 1000)
-                        return;
-                    }
-                    for (let i = 0; i < joueursR.length; i++) {
-                        io.to(joueursR[i].socketid).emit("retourInitial6quiprend", joueursR[i].listeCarte);
-                    }
-                    return;
-                }
-                return lancementTour6QP(idGame, joueurs);
-            }
-        }, 1500);
-
-    }
-
-    function fin6quiprend(idGame) { // Fonction 6 qui prend
-        const joueursRestants = listeJ.filter(joueur => joueur.idGame == idGame);
-        joueursRestants.sort((a, b) => a.score - b.score);
-        io.to(parseInt(idGame)).emit("fin6quiprend", joueursRestants[0].username);
-
-        //Cas gagnant
-        db.get("SELECT nbGagnee6quiprend FROM Stat6quiprend WHERE username = '" + joueursRestants[0].username + "'", (err, row) => {
-            let n = row.nbGagnee6quiprend;
-            db.run("UPDATE Stat6quiprend SET nbGagnee6quiprend = " + (n + 1) + " WHERE username = '" + joueursRestants[0].username + "'");
-            listeJ.filter(joueur => joueur != joueursRestants[0]);
-        });
-        db.get("SELECT record6quiprend FROM Stat6quiprend WHERE username = '" + joueursRestants[0].username + "'", (err, row) => {
-            let n = parseInt(row.record6quiprend);
-            if (joueursRestants[0].score < n || n == -1) {
-                db.run("UPDATE Stat6quiprend SET record6quiprend = " + joueursRestants[0].score + " WHERE username = '" + joueursRestants[0].username + "'");
-            }
-        });
-        db.get("SELECT pointsmoyen6quiprend, nbPerdue6quiprend, nbGagnee6quiprend FROM Stat6quiprend WHERE username = '" + joueursRestants[0].username + "'", (err, row) => {
-            let nbPartieTotal = row.nbGagnee6quiprend + row.nbPerdue6quiprend;
-            if (!row.pointsmoyen6quiprend) {
-                db.run("UPDATE Stat6quiprend SET pointsmoyen6quiprend = " + joueursRestants[0].score + " WHERE username = '" + joueursRestants[0].username + "'");
-            } else {
-                db.run("UPDATE Stat6quiprend SET pointsmoyen6quiprend = " + ((joueursRestants[0].score + row.pointsmoyen6quiprend * nbPartieTotal) / (nbPartieTotal + 1)) + " WHERE username = '" + joueursRestants[0].username + "'");
-            }
-        });
-        //
-        //Cas perdants
-        for (let i = 1; i < joueursRestants.length; i++) {
-            db.get("SELECT nbPerdue6quiprend FROM Stat6quiprend WHERE username = '" + joueursRestants[i].username + "'", (err, row) => {
-                let n = row.nbPerdue6quiprend;
-                db.run("UPDATE Stat6quiprend SET nbPerdue6quiprend = " + (n + 1) + " WHERE username = '" + joueursRestants[i].username + "'");
-                listeJ.filter(joueur => joueur != joueursRestants[i]);
-            });
-            db.get("SELECT pointsmoyen6quiprend, nbPerdue6quiprend, nbGagnee6quiprend FROM Stat6quiprend WHERE username = '" + joueursRestants[i].username + "'", (err, row) => {
-                let nbPartieTotal = row.nbGagnee6quiprend + row.nbPerdue6quiprend;
-                if (!row.pointsmoyen6quiprend) {
-                    db.run("UPDATE Stat6quiprend SET pointsmoyen6quiprend = " + joueursRestants[i].score + " WHERE username = '" + joueursRestants[i].username + "'");
-                } else {
-                    db.run("UPDATE Stat6quiprend SET pointsmoyen6quiprend = " + ((joueursRestants[i].score + row.pointsmoyen6quiprend * nbPartieTotal) / (nbPartieTotal + 1)) + " WHERE username = '" + joueursRestants[i].username + "'");
-                }
-            });
-        }
-        //
-        const sockets = io.sockets.adapter.rooms.get(parseInt(idGame));
-        sockets.forEach(socketid => {
-            io.sockets.sockets.get(socketid).join('');
-        });
-        io.socketsLeave(parseInt(idGame));
-    }
-});
-
-function valeurCarteBataille(x) {
-    if (x == 1) {
-        return 14;
-    }
-    return Math.abs(x - 2) % 13 + 2;
-}
-
-function comptePts6quiprend(x) { // Fonction 6 qui prend
-    if (x == 55) {
-        return 7;
-    } else if (x % 10 == 5) {
-        return 2;
-    } else if (x % 10 == 0) {
-        return 3;
-    } else if (x % 11 == 0) {
-        return 5;
-    } else {
-        return 1;
-    }
-}
-
-
-
-
-
-
 
 function getGameById(idGame) {
     return gameList.filter(g => g.idGame == idGame)[0];

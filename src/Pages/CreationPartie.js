@@ -19,13 +19,12 @@ function CreationPartie() {
   }
 
   //* Testing
-  socket.emit("createGame", 3, "crazy8", sessionStorage.getItem("pseudo"), 20);
+  //socket.emit("createGame", 3, "crazy8", sessionStorage.getItem("pseudo"), 20);
   //socket.emit("createGame", 3, "jeu-de-bataille", sessionStorage.getItem("pseudo"), 20);
   //socket.emit("createGame", 3, "6-qui-prend", sessionStorage.getItem("pseudo"), 20);
   //*
 
   socket.on("teleportCreator", data => {
-    console.log(data);
     sessionStorage.setItem("idPartie", data);
     return navigate('/PageDeJeu');
   });
