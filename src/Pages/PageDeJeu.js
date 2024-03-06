@@ -29,7 +29,7 @@ function PageDeJeu() {
     socket.emit("LancementPartie", sessionStorage.getItem("idPartie"));
   }
 
-  function CartesJoueur(ListeCartes){
+  function CartesJoueur(ListeCartes) {
     ListeCJ = ListeCartes.length;
     for (let i = 1; i < ListeCartes.length + 1; i++) {
       if (!document.getElementById("Cartes-" + i)) {
@@ -41,72 +41,72 @@ function PageDeJeu() {
     }
   }
 
-  function StyleCartesJoueurBataille(ListeCartes){
-    for (let i = 1; i < ListeCartes.length+1; i++) {
-        a = document.getElementById("Cartes-" + i);
-        if (a) {
-            a.style.backgroundImage = "url('./images/" + ListeCartes[i - 1] + ".png')";
-            a.style.marginTop = "2%";
-            a.style.height = "15%";
-            a.className = ListeCartes[i - 1];
-            PosCarte[ListeCartes[i - 1]] = i
-        }
+  function StyleCartesJoueurBataille(ListeCartes) {
+    for (let i = 1; i < ListeCartes.length + 1; i++) {
+      a = document.getElementById("Cartes-" + i);
+      if (a) {
+        a.style.backgroundImage = "url('./images/" + ListeCartes[i - 1] + ".png')";
+        a.style.marginTop = "2%";
+        a.style.height = "15%";
+        a.className = ListeCartes[i - 1];
+        PosCarte[ListeCartes[i - 1]] = i
+      }
     }
     document.getElementById('Joueur').style.width = "60%";
     document.getElementById('Joueur').style.top = "30%";
     document.getElementById('Joueur').style.left = "50%";
 
 
-    if (!document.getElementById("CartesJ1")){
-        a = document.createElement('div');
-        a.id = "CartesJ1"
-        a.style.marginLeft = "none"
-        a.style.width = "8%"
-        document.getElementById('Joueur').appendChild(a)
+    if (!document.getElementById("CartesJ1")) {
+      a = document.createElement('div');
+      a.id = "CartesJ1"
+      a.style.marginLeft = "none"
+      a.style.width = "8%"
+      document.getElementById('Joueur').appendChild(a)
     }
     else {
-        document.getElementById("CartesJ1").style.backgroundImage = "none"
+      document.getElementById("CartesJ1").style.backgroundImage = "none"
     }
 
   }
 
-  function StyleCartesJoueur6QP(ListeCartes){
-    for (let i = 1; i < ListeCartes.length+1; i++) {
-        Div = document.getElementById("Cartes-" + i);
-        if (Div) {
-          Div.style.display = "flex";
-          Div.style.bottom = '0%'
-          Div.style.height = '14%'
-          Div.style.backgroundImage = "url('./images2/" + ListeCartes[i - 1] + ".svg')";
-          Div.className = ListeCartes[i - 1];
-          PosCarte[ListeCartes[i - 1]] = i
-          Div.style.backgroundSize = "cover";
-        }
+  function StyleCartesJoueur6QP(ListeCartes) {
+    for (let i = 1; i < ListeCartes.length + 1; i++) {
+      Div = document.getElementById("Cartes-" + i);
+      if (Div) {
+        Div.style.display = "flex";
+        Div.style.bottom = '0%'
+        Div.style.height = '14%'
+        Div.style.backgroundImage = "url('./images2/" + ListeCartes[i - 1] + ".svg')";
+        Div.className = ListeCartes[i - 1];
+        PosCarte[ListeCartes[i - 1]] = i
+        Div.style.backgroundSize = "cover";
+      }
     }
     if (!document.getElementById("CartesJ1")) {
-        let a;
-        a = document.createElement('div');
-        a.id = "CartesJ1"
-        document.getElementById('CartesJouees2').appendChild(a)
-  
-  
-      }
-      else {
-        document.getElementById("CartesJ1").style.backgroundImage = "none"
+      let a;
+      a = document.createElement('div');
+      a.id = "CartesJ1"
+      document.getElementById('CartesJouees2').appendChild(a)
+
+
+    }
+    else {
+      document.getElementById("CartesJ1").style.backgroundImage = "none"
     }
   }
 
-  function AttributionAdversaire(ListAdv){
+  function AttributionAdversaire(ListAdv) {
     let j = 1;
     for (let i = 0; i < ListAdv.length; i++) {
-      if (sessionStorage.getItem("pseudo") !=ListAdv[i]) {
+      if (sessionStorage.getItem("pseudo") != ListAdv[i]) {
         ListeAdv[ListAdv[i]] = j;
         j++;
       }
     }
   }
 
-  function AffichageDecompte(Duree){
+  function AffichageDecompte(Duree) {
     Delais = Duree
     document.getElementById("Decompte").style.display = "flex"
     document.getElementById("Decompte").innerText = Delais //
@@ -134,27 +134,27 @@ function PageDeJeu() {
 
 
     for (let i in ListeAdv) {
-        Div = document.getElementById("Pseudo-" + ListeAdv[i]);
-        if (Div) {
-          let Verif1 = document.getElementById('Infos' + ListeAdv[i])
-          let Verif2 = document.getElementById('nbcartes' + ListeAdv[i])
-          if (!Verif1 && !Verif2) {
-            let Elem = document.createElement('div');
-            Elem.id = 'Infos' + ListeAdv[i]
-            Elem.innerText = i
-            let Elem2 = document.createElement('div');
-            Elem2.id = 'nbcartes' + ListeAdv[i];
-            Elem2.innerText = 0;
-            Div.appendChild(Elem);
-            Div.appendChild(Elem2);
-          }
+      Div = document.getElementById("Pseudo-" + ListeAdv[i]);
+      if (Div) {
+        let Verif1 = document.getElementById('Infos' + ListeAdv[i])
+        let Verif2 = document.getElementById('nbcartes' + ListeAdv[i])
+        if (!Verif1 && !Verif2) {
+          let Elem = document.createElement('div');
+          Elem.id = 'Infos' + ListeAdv[i]
+          Elem.innerText = i
+          let Elem2 = document.createElement('div');
+          Elem2.id = 'nbcartes' + ListeAdv[i];
+          Elem2.innerText = 0;
+          Div.appendChild(Elem);
+          Div.appendChild(Elem2);
         }
+      }
     }
   }
 
-  function AffichagePlateau6QP(ListeCartesPlateau6QP){
+  function AffichagePlateau6QP(ListeCartesPlateau6QP) {
     let Div;
-    
+
     for (let i = 1; i < 5; i++) {
       for (let j = 1; j < 7; j++) {
         if (!document.getElementById("CartesL" + i + "-" + j)) {
@@ -170,7 +170,7 @@ function PageDeJeu() {
 
       }
     }
-    
+
 
     for (let i = 1; i < 5; i++) {
       Div = document.getElementById("CartesL" + i + '-' + 1);
@@ -182,8 +182,8 @@ function PageDeJeu() {
 
   }
 
-  function AffichageScoreJoueur(Score){
-   let Div = document.getElementById("Scorejoueur");
+  function AffichageScoreJoueur(Score) {
+    let Div = document.getElementById("Scorejoueur");
     if (!document.getElementById('score')) {
       Div.style.display = "flex";
       let Elem = document.createElement('div');
@@ -193,26 +193,26 @@ function PageDeJeu() {
     }
   }
 
-function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
-    clic=false
+  function LancerTour(ListeDesCartes, DossierImageExt, NomSocket) {
+    clic = false
     for (let i = 0; i < ListeDesCartes.length; i++) {
       let b = document.getElementById("Cartes-" + PosCarte[ListeDesCartes[i]]);
       if (b) {
         b.onclick = null;
         b.onclick = function () {
-            CarteCliquee(b, ListeDesCartes,DossierImageExt,NomSocket);
+          CarteCliquee(b, ListeDesCartes, DossierImageExt, NomSocket);
         };
       }
     }
-    Chrono(Delais, ListeDesCartes,DossierImageExt,NomSocket)
+    Chrono(Delais, ListeDesCartes, DossierImageExt, NomSocket)
   }
 
-  function CarteCliquee(b, ListeDesCartes,DossierImageExt,NomSocket) {
+  function CarteCliquee(b, ListeDesCartes, DossierImageExt, NomSocket) {
     ListeCJ = ListeCJ - 1;
     clic = true;
-    document.getElementById("Decompte").innerText = Delais ;
+    document.getElementById("Decompte").innerText = Delais;
     document.getElementById("Decompte").style.backgroundColor = "transparent";
-    document.getElementById("CartesJ1").style.backgroundImage = "url('./"+DossierImageExt[0]+"/" + b.className +DossierImageExt[1]+" ')";
+    document.getElementById("CartesJ1").style.backgroundImage = "url('./" + DossierImageExt[0] + "/" + b.className + DossierImageExt[1] + " ')";
     b.style.backgroundImage = "none";
     socket.emit(NomSocket, [b.className, sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo")])
     b.remove();
@@ -224,7 +224,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
     }
   }
 
-  function Chrono(Decompte, Liste,DossierImageExt,NomSocket) {
+  function Chrono(Decompte, Liste, DossierImageExt, NomSocket) {
     setTimeout(() => {
       if (Decompte > 0) {
         if (!clic) {
@@ -244,41 +244,41 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
       else {
         let i = Math.floor(Math.random() * ((Liste.length - 1) - 0 + 1));
         let Cal = document.getElementById("Cartes-" + PosCarte[Liste[i]]);
-        return CarteCliquee(Cal, Liste,DossierImageExt,NomSocket);
+        return CarteCliquee(Cal, Liste, DossierImageExt, NomSocket);
       }
     }, 1000);
   }
 
-  function CarteJoueeJ(Nom,DossierImageExt){
+  function CarteJoueeJ(Nom, DossierImageExt) {
     if (sessionStorage.getItem("pseudo") != Nom) {
-        let Div = document.getElementById("Adversaire-" + ListeAdv[Nom]);
-        if (Div) {
-          Div.style.backgroundImage = "url(./"+DossierImageExt
-          Div.style.backgroundPosition = "center center"
-          Div.style.backgroundRepeat = "no-repeat"
-        }
-    }
-}
-
-  function RetourneCartesJouees(ListeCartesJ,DossierImageExt){
-    for (let i in ListeCartesJ) {
-        if (ListeAdv[i]) {
-          let NumCarte=ListeCartesJ[i][ListeCartesJ[i].length-1]
-          console.log(JSON.stringify("Adversaire-" + ListeAdv[i]));
-          document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "url('./"+DossierImageExt[0]+"/" + NumCarte +DossierImageExt[1]+" ')";
-          document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundPosition = "center center"
-          document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundRepeat = "no-repeat"
-        }
-  
+      let Div = document.getElementById("Adversaire-" + ListeAdv[Nom]);
+      if (Div) {
+        Div.style.backgroundImage = "url(./" + DossierImageExt
+        Div.style.backgroundPosition = "center center"
+        Div.style.backgroundRepeat = "no-repeat"
       }
-}
+    }
+  }
 
-  function AlertMessage(Message){
+  function RetourneCartesJouees(ListeCartesJ, DossierImageExt) {
+    for (let i in ListeCartesJ) {
+      if (ListeAdv[i]) {
+        let NumCarte = ListeCartesJ[i][ListeCartesJ[i].length - 1]
+        console.log(JSON.stringify("Adversaire-" + ListeAdv[i]));
+        document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "url('./" + DossierImageExt[0] + "/" + NumCarte + DossierImageExt[1] + " ')";
+        document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundPosition = "center center"
+        document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundRepeat = "no-repeat"
+      }
+
+    }
+  }
+
+  function AlertMessage(Message) {
     alert(Message)
     setTimeout(() => {
       navigate('/PageChoix');
     }, 5000);
-}
+  }
 
   function Retour() {
     navigate('/PageChoix');
@@ -297,7 +297,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
   function Enregistrer() {
     socket.emit("Enregistrer", sessionStorage.getItem("idPartie"));
   }
-  
+
 
 
 
@@ -326,7 +326,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
     AttributionAdversaire(data[1])
     EmplAdversaires(data[1])
     AffichageDecompte(data[2])
-    LancerTour(data[0],["images",".png"],"joueCarteBataille")
+    LancerTour(data[0], ["images", ".png"], "joueCarteBataille")
 
   })
 
@@ -338,28 +338,28 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
     AffichagePlateau6QP(data[2])
     AffichageScoreJoueur(data[3])
     AffichageDecompte(data[4])
-    LancerTour(data[0],["images2",".svg"],"joueCarte6quiprend")
+    LancerTour(data[0], ["images2", ".svg"], "joueCarte6quiprend")
   });
 
   socket.on("joueCarteBataille", data => {
-    CarteJoueeJ(data,"images/Verso-Cartes.png)")
+    CarteJoueeJ(data, "images/Verso-Cartes.png)")
   })
 
   socket.on("joueCarteCacheeBataille", data => {
-    CarteJoueeJ(data,"images/Verso-Cartes.png)")
+    CarteJoueeJ(data, "images/Verso-Cartes.png)")
   })
 
   socket.on("retourneCarte6quiprend", data => {
-    RetourneCartesJouees(data,["images2",".svg"])
+    RetourneCartesJouees(data, ["images2", ".svg"])
   })
 
   socket.on("retourneCarteBataille", data => {
     console.log(data)
-    RetourneCartesJouees(data,["images",".png"])
+    RetourneCartesJouees(data, ["images", ".png"])
   })
 
   socket.on("joueCarte6quiprend", data => {
-    CarteJoueeJ(data,"images2/boeuf.svg)")
+    CarteJoueeJ(data, "images2/boeuf.svg)")
   })
 
   socket.on("choixCarteCacheeBataille", data => {
@@ -367,8 +367,8 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
       document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "none";
     }
     document.getElementById("CartesJ1").style.backgroundImage = "none";
-    LancerTour(data,["images",".png"],"joueCarteCacheeBataille")
-    
+    LancerTour(data, ["images", ".png"], "joueCarteCacheeBataille")
+
   })
 
   socket.on("perduBataille", data => {
@@ -385,10 +385,10 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
     }
     document.getElementById("CartesJ1").style.backgroundImage = "none";
     if (ListeCJ == 0) {
-        CartesJoueur(data)
-        StyleCartesJoueurBataille(data)    
+      CartesJoueur(data)
+      StyleCartesJoueurBataille(data)
     }
-    LancerTour(data,["images",".png"],"joueCarteBataille")
+    LancerTour(data, ["images", ".png"], "joueCarteBataille")
   })
 
   socket.on("retourInitial6quiprend", data => {
@@ -396,7 +396,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
       document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "none";
     }
     document.getElementById("CartesJ1").style.backgroundImage = "none";
-    LancerTour(data,["images2",".svg"],"joueCarte6quiprend")
+    LancerTour(data, ["images2", ".svg"], "joueCarte6quiprend")
   })
 
   socket.on("fin6quiprend", data => {
@@ -409,7 +409,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
     document.getElementById("RetourFin").style.display = "flex";
   })
 
-  
+
   socket.on("casAnormal6quiprend", data => {
     let Div;
     for (let i = 2; i < 7; i++) {
@@ -477,21 +477,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
   });
 
 
-//##############################################################################
-
-
-
-
-
-  
-
-
-
-
-
-
-
-  
+  //##############################################################################
 
 
 
@@ -506,13 +492,27 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
 
 
 
-  
 
 
 
-  
-//##############################################################################
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //##############################################################################
+
 
   return (
     <div className="PageDeJeu">
