@@ -290,7 +290,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
 
   function MesTchat() {
     let Message = document.getElementById('message')
-    socket.emit("Message", [sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"), Message.value]);
+    socket.emit("messageSent", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"), Message.value);
 
   }
 
