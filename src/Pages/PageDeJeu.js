@@ -285,7 +285,7 @@ function LancerTour(ListeDesCartes,DossierImageExt,NomSocket) {
   }
 
   function EtatBoutton() {
-    socket.emit("EtatBoutton", [sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo")]);
+    socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
   }
 
   function MesTchat() {
