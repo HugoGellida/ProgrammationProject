@@ -107,6 +107,18 @@ const rooms = {"preLobby": [], "lobby": []};
 
 io.on("connection", (socket) => {
 
+    socket.on("testing", () => {
+        setTimeout(() => {
+            socket.emit("opponentPlayedTake6", "test");
+        }, 3000);
+    });
+
+    socket.on("testing2", () => {
+        setTimeout(() => {
+            socket.emit("resetCardPlayedTake6", "test");
+        }, 3000);
+    })
+
     socket.join('preLobby');
     socket.emit("goToPreLobby");
     rooms["preLobby"].push(socket.id);
@@ -122,7 +134,7 @@ io.on("connection", (socket) => {
             if (game){
                 const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
                 if (game.isLaunched){
-                    io.to(parseInt(game.idGame)).emit("messageReceived", game.idGame, `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER", "green");
+                    io.to(parseInt(game.idGame)).emit("messageReceived", `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER", "green");
                     game.eliminatePlayer(playerSocket);
                     if (game instanceof WarGame){
                         db.get(`SELECT * FROM StatWar WHERE username = '${playerSocket.username}'`, (err, row) => {
@@ -156,7 +168,7 @@ io.on("connection", (socket) => {
                         gameList = gameList.filter(g => g.idGame != game.idGame);
                         console.log(`game ${game.idGame} has been removed`);
                     } else {
-                        io.to(game.idGame).emit("messageReceived", game.idGame, `The player ${playerSocket.username} has left`, "SERVER", "green");
+                        io.to(game.idGame).emit("messageReceived", `The player ${playerSocket.username} has left`, "SERVER", "green");
                         game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
                         if (playerSocket.isCreator){
                             game.playerList[0].isCreator = true;
@@ -425,6 +437,7 @@ io.on("connection", (socket) => {
     function prepareCrazy8(idGame) {
         const game = getGameById(idGame);
         game.prepareRound();
+        console.dir(game.playerList);
         const currentPlayer = game.currentPlayer();
         boardAnalyseCrazy8(game, currentPlayer);
     }
@@ -452,6 +465,7 @@ io.on("connection", (socket) => {
             for (let i = 0; i < game.playerAmount; i++) {
                 let player = game.playerList[i];
                 let handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+                console.log(handCard);
                 if (player == currentPlayer) {
                     let playableCards = player.playableCards().map(card => ({ value: card.value, type: card.type }));
                     io.to(player.socketid).emit("playerTurnCrazy8", game.timer, playableCards, handCard);
@@ -619,7 +633,7 @@ io.on("connection", (socket) => {
         const playerConcerned = game.getPlayerByUsername(username);
         playerConcerned.chooseCard(card);
         console.log(`the player ${username} choose the card ${card.value} which is ${card.pointAmount} points`);
-        io.to(idGame).emit("refreshOpponent", username);
+        io.to(idGame).emit("opponentPlayedTake6", username);
         if (game.allPlayed()) {
             game.sortPlayerList();
             launchCardAnalyseTake6(game.playerList, game);
@@ -659,6 +673,7 @@ io.on("connection", (socket) => {
                     const player = playerList[0];
                     game.placeCard(player, player.cardPlayed);
                     io.to(parseInt(game.idGame)).emit("refreshCardBoardTake6", game.cardBoard);
+                    io.to(game.idGame).emit("resetCardPlayedTake6", player.username);
                     io.to(player.socketid).emit("refreshPlayerPointTake6", player.totalPoint);
                     return launchCardAnalyseTake6(playerList.filter(p => p.username != player.username), game);
                 }

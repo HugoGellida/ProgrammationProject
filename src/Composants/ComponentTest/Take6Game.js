@@ -1,5 +1,6 @@
-import React from "react";
 import { useState, useEffect } from "react";
+import Take6Opponent from "./Take6Opponent";
+import { socket } from "../../socket";
 
 export default function Take6Game({opponents, handCard, timer, idGame, username, cardBoard}){
     const [info, setInfo] = useState({
@@ -48,6 +49,11 @@ export default function Take6Game({opponents, handCard, timer, idGame, username,
 
     return (
         <>
+            <div id="opponents">
+                {info.opponents.map(opponent => (
+                    <Take6Opponent information={opponent}></Take6Opponent>
+                ))}
+            </div>
             {!info.launchClickTime && info.handCard.map(card => (
                 <div id={`${card.type}-${card.value}`} style={`url('./images/${card.type}-${card.value}.png')`}></div>
             ))}

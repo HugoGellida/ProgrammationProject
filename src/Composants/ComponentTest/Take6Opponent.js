@@ -1,6 +1,5 @@
-import React from "react";
 import { useState, useEffect } from "react";
-
+import { socket } from "./../../socket";
 
 export default function Take6Opponent({information}){
     const [info, setInfo] = useState({
@@ -8,34 +7,51 @@ export default function Take6Opponent({information}){
         pointAmount: information.pointAmount,
         played: false
     });
+    
+    function revealCard(card){
+        document.getElementById("card").style.backgroundImage = `url('./images2/${card.value}')`;
+    }
 
     useEffect(() => {
-        socket.on("refreshOpponentTake6", username => {
-            if (info.username == username) played = true;
+        if (!info.played){
+            console.log("test");
+            socket.emit("testing");
+        } else {
+            console.log("test2");
+            socket.emit("testing2");
+        }
+        
+        socket.on("opponentPlayedTake6", username => {
+            console.log("e");
+            if (info.username == username) setInfo({
+                ...info,
+                played: true
+            });
         });
 
-        function insertCard(){
-            const div = document.createElement("div");
-            div.style.backgroundImage = `url('./images/Verso-Cartes.png)`;
-            document.getElementById(info.username).insertBefore(div, document.getElementById(info.username).firstChild);
-        }
-
-        function resetCard(){
-            
-        }
+        socket.on("resetCardPlayedTake6", username => {
+            console.log("ee");
+            if (info.username == username) setInfo({
+                ...info,
+                played: false
+            });
+        });
 
         return () => {
+            console.log("end");
             socket.off("refreshOpponentTake6", info.username);
+            socket.off("resetCardPlayedTake6", info.username);
         }
     });
 
     return (
         <>
             <div className="opponentTake6" id={info.username}>
+                {info.played && (
+                    <div style={{backgroundImage: `url('./images2/boeuf.png)`}} id="card"></div>
+                )}
                 <div>{`${info.username}\n${info.pointAmount}`}</div>
             </div>
-            {!info.played && resetCard()}
-            {info.played && insertCard()}
         </>
     );
 }

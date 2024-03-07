@@ -26,8 +26,12 @@ function PageDeJeu() {
 
   function Affichage() {
     console.log("oui");
-    socket.emit("LancementPartie", sessionStorage.getItem("idPartie"));
+    socket.emit("launchGame", sessionStorage.getItem("idPartie"));
   }
+
+  socket.on("playerTurnCrazy8", (timer, playableCards, handCard) => {
+    console.log(timer, playableCards, handCard);
+  });
 
   function CartesJoueur(ListeCartes) {
     ListeCJ = ListeCartes.length;
