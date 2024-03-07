@@ -290,7 +290,7 @@ function PageDeJeu() {
 
   function MesTchat() {
     let Message = document.getElementById('message')
-    socket.emit("messageSent", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"), Message.value);
+    socket.emit("messageSent", sessionStorage.getItem("idPartie"), Message.value, sessionStorage.getItem("pseudo"));
 
   }
 
@@ -444,30 +444,24 @@ function PageDeJeu() {
 
   socket.on("Enregistrer", data => {
     navigate('/PageChoix');
-  })
+  });
 
-  socket.on("messageReceived", (idGame, message, username) => {
-    if (idGame == sessionStorage.getItem("idPartie")) {
-      let divP = document.getElementById("Message");
-      let messageElement = document.createElement('div');
-      if (message == sessionStorage.getItem("pseudo")) {
-        messageElement.className = 'messageAuteur';
-        messageElement.textContent = `Vous: ${username}`;
-        divP.appendChild(messageElement);
-        divP.innerHTML += "</br></br>";
-        // Faire défiler vers le bas pour afficher le dernier message
-        divP.scrollTop = divP.scrollHeight;
-      }
-      else {
-        messageElement.className = 'messageAutres';
-        messageElement.textContent = `${message}: ${username}`;
-        divP.appendChild(messageElement);
-        divP.innerHTML += "</br></br>";
-        // Faire défiler vers le bas pour afficher le dernier message
-        divP.scrollTop = divP.scrollHeight;
-      }
-    }
-  })
+  socket.on("messageReceived", (message, username, color) => {
+    const divP = document.getElementById("Message");
+    const messageElement = document.createElement('div');
+    document.getElementById("message").value = "";
+    //* New model
+    messageElement.className = "playerMessage";
+    const spanUsername = document.createElement('span'); const spanMessage = document.createElement('span');
+    spanUsername.style.color = color; spanUsername.textContent = `${username}:`;
+    spanMessage.textContent = message;
+    messageElement.appendChild(spanUsername);
+    messageElement.appendChild(spanMessage);
+    //*
+    divP.appendChild(messageElement);
+    divP.innerHTML += "</br></br>";
+    divP.scrollTop = divP.scrollHeight;
+  });
 
   socket.on("showLaunchButton", () => {
     let Div = document.getElementById("Boutton");

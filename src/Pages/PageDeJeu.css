@@ -28,6 +28,11 @@ div[id^="nbcartes"] {
     top: 50%;
     left: 40%;
   }
+
+.playerMessage{
+  float:left;
+}
+
 #score{
   position: absolute;
     top: 50%;

@@ -122,7 +122,7 @@ io.on("connection", (socket) => {
             if (game){
                 const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
                 if (game.isLaunched){
-                    io.to(parseInt(game.idGame)).emit("messageReceived", game.idGame, `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER");
+                    io.to(parseInt(game.idGame)).emit("messageReceived", game.idGame, `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER", "green");
                     game.eliminatePlayer(playerSocket);
                     if (game instanceof WarGame){
                         db.get(`SELECT * FROM StatWar WHERE username = '${playerSocket.username}'`, (err, row) => {
@@ -156,7 +156,7 @@ io.on("connection", (socket) => {
                         gameList = gameList.filter(g => g.idGame != game.idGame);
                         console.log(`game ${game.idGame} has been removed`);
                     } else {
-                        io.to(game.idGame).emit("messageReceived", game.idGame, `The player ${playerSocket.username} has left`, "SERVER");
+                        io.to(game.idGame).emit("messageReceived", game.idGame, `The player ${playerSocket.username} has left`, "SERVER", "green");
                         game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
                         if (playerSocket.isCreator){
                             game.playerList[0].isCreator = true;
@@ -297,7 +297,9 @@ io.on("connection", (socket) => {
     });
 
     socket.on("messageSent", (idGame, message, username) => { // data = [idPartie, Message, username]
-        io.to(parseInt(idGame)).emit("messageReceived", idGame, message, username);
+        const game = getGameById(idGame);
+        const player = game.getPlayerByUsername(username);
+        io.to(parseInt(idGame)).emit("messageReceived", message, username, player.colorMessage);
     });
 
     socket.on("askPause", idGame => {
@@ -617,6 +619,7 @@ io.on("connection", (socket) => {
         const playerConcerned = game.getPlayerByUsername(username);
         playerConcerned.chooseCard(card);
         console.log(`the player ${username} choose the card ${card.value} which is ${card.pointAmount} points`);
+        io.to(idGame).emit("refreshOpponent", username);
         if (game.allPlayed()) {
             game.sortPlayerList();
             launchCardAnalyseTake6(game.playerList, game);
@@ -634,7 +637,7 @@ io.on("connection", (socket) => {
             for (let i = 0; i < game.playerAmount; i++) {
                 const player = game.playerList[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
-                io.to(player.socketid).emit("playerTurnTake6", handCard, game.timer);
+                io.to(player.socketid).emit("playerTurnTake6", handCard);
             }
         }, 1);
     }
