@@ -80,16 +80,16 @@ db.run("UPDATE User SET isConnected = false");
 
 
 
-db.run("DROP TABLE JoueurPartie", (err) => {
+//db.run("DROP TABLE JoueurPartie", (err) => {
     //db.run("DROP TABLE Joueur", (err) => {
     //    db.run("CREATE TABLE Joueur(pseudo VARCHAR(10) PRIMARY KEY, motdepasse VARCHAR(10), connecte BOOLEAN)");
     //});
-    db.run("DROP TABLE Partie", (err) => {
-        db.run("CREATE TABLE Partie(idP INTEGER PRIMARY KEY, typeDeJeu VARCHAR(15), nbJoueur INTEGER, partieLancee BOOLEAN, delai INTEGER, partiePause BOOLEAN)");
-        db.run("UPDATE Joueur SET connecte = false");
-    });
-    db.run("CREATE TABLE JoueurPartie(idPartie REFERENCES Partie(idP), pseudoJoueur REFERENCES Joueur(pseudo), isCreator BOOLEAN, PRIMARY KEY (idPartie, pseudoJoueur))");
-});
+    //db.run("DROP TABLE Partie", (err) => {
+    //    db.run("CREATE TABLE Partie(idP INTEGER PRIMARY KEY, typeDeJeu VARCHAR(15), nbJoueur INTEGER, partieLancee BOOLEAN, delai INTEGER, partiePause BOOLEAN)");
+    //    db.run("UPDATE Joueur SET connecte = false");
+    //});
+    //db.run("CREATE TABLE JoueurPartie(idPartie REFERENCES Partie(idP), pseudoJoueur REFERENCES Joueur(pseudo), isCreator BOOLEAN, PRIMARY KEY (idPartie, pseudoJoueur))");
+//});
 
 //db.run("CREATE TABLE StatCrazy8(pseudo REFERENCES Joueur(pseudo), winAmountCrazy8 INTEGER, loseAmountCrazy8 INTEGER)")
 //db.run("DROP TABLE Stat6quiprend", (err) => {

@@ -19,7 +19,7 @@ function CreationPartie() {
   }
 
   //* Testing
-  socket.emit("createGame", 2, "crazy8", sessionStorage.getItem("pseudo"), 20);
+  //socket.emit("createGame", 2, "crazy8", sessionStorage.getItem("pseudo"), 20);
   //socket.emit("createGame", 3, "jeu-de-bataille", sessionStorage.getItem("pseudo"), 20);
   //socket.emit("createGame", 3, "6-qui-prend", sessionStorage.getItem("pseudo"), 20);
   //*
