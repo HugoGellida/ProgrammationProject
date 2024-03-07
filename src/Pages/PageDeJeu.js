@@ -26,7 +26,7 @@ function PageDeJeu() {
 
   function Affichage() {
     console.log("oui");
-    socket.emit("LancementPartie", sessionStorage.getItem("idPartie"));
+    socket.emit("launchGame", sessionStorage.getItem("idPartie"));
   }
 
   function CartesJoueur(ListeCartes) {
@@ -470,10 +470,21 @@ function PageDeJeu() {
     Div2.style.display = "flex";
   });
 
+//########################    Crazy 8    ################################
+
+
+
+
 
   //##############################################################################
 
-
+  socket.on("playerTurnCrazy8",(gameTimer,playableCards,handCard)=>{
+    console.log(handCard)
+    CartesJoueur(handCard)
+    StyleCartesJoueurBataille(handCard)
+    AttributionAdversaire(["John"])
+    EmplAdversaires(["John"])
+  })
 
 
 
