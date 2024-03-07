@@ -474,10 +474,21 @@ function PageDeJeu() {
     Div2.style.display = "flex";
   });
 
+//########################    Crazy 8    ################################
+
+
+
+
 
   //##############################################################################
 
-
+  socket.on("playerTurnCrazy8",(gameTimer,playableCards,handCard)=>{
+    console.log(handCard)
+    CartesJoueur(handCard)
+    StyleCartesJoueurBataille(handCard)
+    AttributionAdversaire(["John"])
+    EmplAdversaires(["John"])
+  })
 
 
 
