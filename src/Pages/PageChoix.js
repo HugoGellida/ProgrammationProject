@@ -42,11 +42,16 @@ function PageChoix() {
   }
 
   function goToResumeGames() {
-    navigate("./PagePause");
+    navigate("/PagePause");
+  }
+
+  function goToParameters(){
+    navigate("/Parameters");
   }
 
   return (
     <div className="PageChoix">
+      {Boutton("Parameters", goToParameters)}
       <h5>Choix de la Partie</h5>
       <button id='Scores' onClick={Scores}>Scores</button>
       {Boutton("Reprendre une partie", goToResumeGames())}

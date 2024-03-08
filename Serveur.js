@@ -67,36 +67,15 @@ let listeP = [];
 let gameList = [];
 
 //* New Database Model
-//TODO Decomment all the following lines once, execute he server once, then recomment the lines
-//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50))");
+//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20))");
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 //db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
-//TODO
-
+db.run(`ALTER TABLE User ADD COLUMN chatColor VARCHAR(10), title VARCHAR(20)`, (err)=> {
+    db.run(`UPDATE User SET chatColor = 'grey', title = 'NOOBY'`);
+});
 db.run("UPDATE User SET isConnected = false");
 //*
-
-
-
-
-//db.run("DROP TABLE JoueurPartie", (err) => {
-    //db.run("DROP TABLE Joueur", (err) => {
-    //    db.run("CREATE TABLE Joueur(pseudo VARCHAR(10) PRIMARY KEY, motdepasse VARCHAR(10), connecte BOOLEAN)");
-    //});
-    //db.run("DROP TABLE Partie", (err) => {
-    //    db.run("CREATE TABLE Partie(idP INTEGER PRIMARY KEY, typeDeJeu VARCHAR(15), nbJoueur INTEGER, partieLancee BOOLEAN, delai INTEGER, partiePause BOOLEAN)");
-    //    db.run("UPDATE Joueur SET connecte = false");
-    //});
-    //db.run("CREATE TABLE JoueurPartie(idPartie REFERENCES Partie(idP), pseudoJoueur REFERENCES Joueur(pseudo), isCreator BOOLEAN, PRIMARY KEY (idPartie, pseudoJoueur))");
-//});
-
-//db.run("CREATE TABLE StatCrazy8(pseudo REFERENCES Joueur(pseudo), winAmountCrazy8 INTEGER, loseAmountCrazy8 INTEGER)")
-//db.run("DROP TABLE Stat6quiprend", (err) => {
-//    db.run("CREATE TABLE Stat6quiprend(pseudo REFERENCES Joueur(pseudo), nbGagnee6quiprend INTEGER, record6quiprend INTEGER, nbPerdue6quiprend INTEGER, pointsmoyen6quiprend FLOAT)");
-//});
-//db.run("CREATE TABLE StatBataille(pseudo REFERENCES Joueur(pseudo), nbGagneeBataille INTEGER, nbPerdueBataille INTEGER, nbNulBataille INTEGER)");
-//db.run("ALTER TABLE StatBataille ADD COLUMN nbNulBataille INTEGER");
 
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
@@ -106,6 +85,58 @@ server.listen(3001, () => {
 const rooms = {"preLobby": [], "lobby": []};
 
 io.on("connection", (socket) => {
+
+    socket.on("askChatTitles", (username) => {
+        db.get(`SELECT * FROM StatWar WHERE username = ${username}`, rowWar => {
+            db.get(`SELECT * FROM StatTake6 WHERE username = ${username}`, rowTake6 => {
+                db.get(`SELECT * FROM StatCrazy8 WHERE username = ${username}`, rowCrazy8 => {
+                    let locked = []; let unlocked = [];
+                    if (rowWar.winAmount >= 50 && rowTake6.winAmount >= 50 && rowCrazy8.winAmount >= 50) unlocked.push("ULTIMATE");
+                    else locked.push({name: "Player eradicator", title: "ULTIMATE", difficulty: "extreme", description: "Win 50 of every game"});
+                    if (rowWar.winAmount >= 30) unlocked.push("WAR GENERAL");
+                    else locked.push({name: "War addict", title:"WAR GENERAL", difficulty: "hard", description: "Win 30 times at War"});
+                    if (rowTake6.winAmount >= 30) unlocked.push("NO GAIN NO LOSE");
+                    else locked.push({name: "Don't take it or die", title:"NO GAIN NO LOSE", difficulty: "hard", description: "Win 30 times at Take6"});
+                    if (rowCrazy8.winAmount >= 30) unlocked.push("MANIAC");
+                    else locked.push({name: "Crazier and crazier", title:"MANIAC", difficulty: "hard", description: "Win 30 times at Crazy8"});
+                    if (rowWar.winAmount >= 1 && rowTake6.winAmount >= 1 && rowCrazy8.winAmount >= 1) unlocked.push("NOOBY");
+                    else locked.push({name: "It's only the beggining", title:"STARTER", difficulty: "medium", description: "Win every game once"});
+                    unlocked.push("NOOBY"); unlocked.push("TESTER");
+                    socket.emit("sendChatTitles", locked, unlocked);
+                });
+            });
+        });
+    });
+
+    socket.on("chooseChatTitle", (username, title) => {
+        db.run (`UPDATE User SET title = '${title}' WHERE username = '${username}'`);
+    });
+
+    socket.on("askChatColors", (username) => {
+        db.get(`SELECT * FROM StatWar WHERE username = ${username}`, rowWar => {
+            db.get(`SELECT * FROM StatTake6 WHERE username = ${username}`, rowTake6 => {
+                db.get(`SELECT * FROM StatCrazy8 WHERE username = ${username}`, rowCrazy8 => {
+                    let locked = []; let unlocked = [];
+                    if (rowWar.winAmount >= 10 && rowTake6.winAmount >= 10 && rowCrazy8.winAmount >= 10) unlocked.push("red");
+                    else locked.push({name: "A thirst for victory", color: "red", difficulty: "hard", description: "Win 10 of every game"});
+                    if (rowWar.winAmount >= 10) unlocked.push("blue");
+                    else locked.push({name: "War veteran", color:"blue", difficulty: "medium", description: "Win 10 times at War"});
+                    if (rowTake6.winAmount >= 10) unlocked.push("purple");
+                    else locked.push({name: "The only thing I will take", color:"purple", difficulty: "medium", description: "Win 10 times at Take6"});
+                    if (rowCrazy8.winAmount >= 10) unlocked.push("pink");
+                    else locked.push({name: "Going crazy", color:"pink", difficulty: "medium", description: "Win 10 times at Crazy8"});
+                    if (rowWar.winAmount >= 1 || rowTake6.winAmount >= 1 || rowCrazy8.winAmount >= 1) unlocked.push("brown");
+                    else locked.push({name: "Ready to triumph", color:"brown", difficulty: "easy", description: "Win your first game ever"});
+                    unlocked.push("gray"); unlocked.push("yellow");
+                    socket.emit("sendChatColors", locked, unlocked);
+                });
+            });
+        });
+    });
+
+    socket.on("chooseChatColor", (username, color) => {
+        db.run(`UPDATE User SET chatColor = '${color}' WHERE username = '${username}'`);
+    });
 
     socket.on("testing", () => {
         setTimeout(() => {
@@ -203,7 +234,7 @@ io.on("connection", (socket) => {
                 socket.join('lobby');
                 rooms["lobby"].push(socket.id);
                 rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
-                db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}')`, (err) => {
+                db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}', chatColor = 'grey', title = 'NOOBY')`, (err) => {
                     db.run(`INSERT INTO StatTake6 VALUES('${username}', 0, 0, -1, -1)`);
                     db.run(`INSERT INTO StatWar VALUES('${username}', 0, 0, 0)`);
                     db.run(`INSERT INTO StatCrazy8 VALUES('${username}', 0, 0)`);
@@ -309,9 +340,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("messageSent", (idGame, message, username) => { // data = [idPartie, Message, username]
-        const game = getGameById(idGame);
-        const player = game.getPlayerByUsername(username);
-        io.to(parseInt(idGame)).emit("messageReceived", message, username, player.colorMessage);
+        db.get(`SELECT * FROM User WHERE username = '${username}'`, (err, row) => {
+            const game = getGameById(idGame);
+            const player = game.getPlayerByUsername(username);
+            io.to(parseInt(idGame)).emit("messageReceived", message, username, row.chatColor, row.title);
+        });
     });
 
     socket.on("askPause", idGame => {
@@ -524,7 +557,7 @@ io.on("connection", (socket) => {
             for (let i = 0; i < game.fightingPlayers.length; i++) {
                 const player = game.fightingPlayers[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-                io.to(player.socketid).emit("playerTurnWar", handCard, game.timer);
+                io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
             }
         }
     }
@@ -553,7 +586,7 @@ io.on("connection", (socket) => {
             for (let i = 0; i < game.playerAmount; i++) {
                 const player = game.playerList[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-                io.to(player.socketid).emit("playerTurnWar", handCard, game.timer);
+                io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
             }
         }, 1);
     }
@@ -601,6 +634,7 @@ io.on("connection", (socket) => {
                         db.get(`SELECT * FROM StatWar WHERE username = '${game.playerList[i].username}'`, (err, row) => {
                             db.run(`UPDATE StatWar SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${game.playerList[i].username}'`, (err) => {
                                 console.log(`the player ${game.playerList[i].username} has been eliminated`);
+                                io.to(game.playerList[i].socketid).emit("loseWar");
                                 game.eliminatePlayer(game.playerList[i]);
                                 i--;
                                 resolve(row);

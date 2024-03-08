@@ -16,6 +16,10 @@ class Game {
     getPlayerByUsername(username){
         return this.playerList.filter(p => p.username == username)[0];
     }
+
+    getOpponentsUsername(username){
+        return this.playerList.filter(p => p.username != username).map(p => p.username);
+    }
 }
 
 module.exports = Game;

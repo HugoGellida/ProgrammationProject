@@ -8,6 +8,7 @@ import PageDeJeu from './PageDeJeu'
 import PageScores from './PageScores'
 import Pagepause from './Pagepause';
 import Take6Opponent from '../Composants/ComponentTest/Take6Opponent';
+import Parameters from './Parameters';
 
 function App() {
   
@@ -23,7 +24,7 @@ function App() {
         <Route path="/PageScores" element={<PageScores/>} />
         <Route path="/PagePause" element={<Pagepause/>} />
         <Route path="/Test" element={<Take6Opponent information={{username: "test", pointAmount: 0}}/>} />
-
+        <Route path="/Parameters" element={<Parameters/>} />
       </Routes>
     </div>
   );
