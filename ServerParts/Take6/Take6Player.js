@@ -19,8 +19,10 @@ class Take6Player extends Player {
     }
 
     chooseCard(cardChosen){
-        this.cardPlayed = cardChosen;
+        const cardClass = this.handCard.filter(card => card.value == cardChosen.value)[0];
+        this.cardPlayed = cardClass;
         this.handCard = this.handCard.filter(card => card.value != cardChosen.value);
+        return cardClass;
     }
 
     removeCardPlayed(){

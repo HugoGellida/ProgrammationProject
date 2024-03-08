@@ -36,10 +36,18 @@ function PageDeJeu() {
   function CartesJoueur(ListeCartes) {
     ListeCJ = ListeCartes.length;
     for (let i = 0; i < ListeCartes.length; i++) {
-      if (!document.getElementById(`Cartes-${ListeCartes[i].value}-${ListeCartes[i].type}`)) {
-        const a = document.createElement('div');
-        a.id = `Cartes-${ListeCartes[i].value}-${ListeCartes[i].type}`;
-        document.getElementById('Joueur').appendChild(a);
+      if (ListeCartes[i].type && ListeCartes[i].value){
+        if (!document.getElementById(`Cartes-${ListeCartes[i].value}-${ListeCartes[i].type}`)) {
+          const a = document.createElement('div');
+          a.id = `Cartes-${ListeCartes[i].value}-${ListeCartes[i].type}`;
+          document.getElementById('Joueur').appendChild(a);
+        }
+      } else if (ListeCartes[i].value && !ListeCartes[i].type){
+        if (!document.getElementById(`Cartes-${ListeCartes[i].value}`)) {
+          const a = document.createElement('div');
+          a.id = `Cartes-${ListeCartes[i].value}`;
+          document.getElementById('Joueur').appendChild(a);
+        }
       }
     }
   }
@@ -82,7 +90,7 @@ function PageDeJeu() {
         Div.style.height = '14%'
         Div.style.backgroundImage = "url('./images2/" + ListeCartes[i - 1] + ".svg')";
         Div.className = ListeCartes[i - 1];
-        PosCarte[ListeCartes[i - 1]] = i
+        PosCarte[ListeCartes[i - 1]] = i;
         Div.style.backgroundSize = "cover";
       }
     }
@@ -154,29 +162,23 @@ function PageDeJeu() {
 
   function AffichagePlateau6QP(ListeCartesPlateau6QP) {
     let Div;
-
     for (let i = 1; i < 5; i++) {
       for (let j = 1; j < 7; j++) {
         if (!document.getElementById("CartesL" + i + "-" + j)) {
           let a;
           a = document.createElement('div');
-          a.id = "CartesL" + i + "-" + j
+          a.id = "CartesL" + i + "-" + j;
           document.getElementById('CartesJouees2').appendChild(a)
-
         }
         else {
           document.getElementById("CartesL" + i + "-" + j).style.backgroundImage = "none"
         }
-
       }
     }
-
-
     for (let i = 1; i < 5; i++) {
       Div = document.getElementById("CartesL" + i + '-' + 1);
       if (Div) {
-        Div.style.backgroundImage = "url('./images2/" + ListeCartesPlateau6QP[i - 1] + ".svg')";
-
+        Div.style.backgroundImage = `url('./images2/${ListeCartesPlateau6QP[i - 1].value}.svg')`;
       }
     }
 
@@ -196,7 +198,10 @@ function PageDeJeu() {
   function LancerTour(ListeDesCartes, DossierImageExt, NomSocket) {
     clic = false
     for (let i = 0; i < ListeDesCartes.length; i++) {
-      let b = document.getElementById("Cartes-" + PosCarte[`${ListeDesCartes[i].value}-${ListeDesCartes[i].type}`]);
+      let b;
+      if (ListeDesCartes[i].value && ListeDesCartes[i].type) b = document.getElementById(`Cartes-${ListeDesCartes[i].value}-${ListeDesCartes[i].type}`);
+      else if (ListeDesCartes[i].value && !ListeDesCartes[i].type) b = document.getElementById(`Cartes-${ListeDesCartes[i].value}`);
+      console.log(b);
       if (b) {
         b.onclick = null;
         b.onclick = function (){
@@ -213,16 +218,26 @@ function PageDeJeu() {
     console.log(ListeDesCartes, b, DossierImageExt, NomSocket);
     document.getElementById("Decompte").innerText = Delais;
     document.getElementById("Decompte").style.backgroundColor = "transparent";
-    document.getElementById("CartesJ1").style.backgroundImage = `url('./${DossierImageExt[0]}/${b.className}-${DossierImageExt[1]}')`;
+    document.getElementById("CartesJ1").style.backgroundImage = `url('./${DossierImageExt[0]}/${b.className}${DossierImageExt[1]}')`;
     b.style.backgroundImage = "none";
-    let trash; let value; let type;
-    [trash, value, type] = b.split("-");
-    socket.emit(NomSocket, sessionStorage.getItem("idPartie"), {value: value, type: type}, sessionStorage.getItem("pseudo"))
-    b.remove();
-    for (let i = 0; i < ListeDesCartes.length; i++) {
-      let b = document.getElementById(`Cartes-${PosCarte[`${ListeDesCartes[i].value}-${ListeDesCartes[i].type}`]}`);
-      if (b) {
-        b.onclick = null;
+    if (ListeDesCartes[0].type && ListeDesCartes[0].value){
+      const sep = b.className.split("-");
+      socket.emit(NomSocket, sessionStorage.getItem("idPartie"), {value: sep[0], type: sep[1]}, sessionStorage.getItem("pseudo"))
+      b.remove();
+      for (let i = 0; i < ListeDesCartes.length; i++) {
+        let b = document.getElementById(`Cartes-${ListeDesCartes[i].value}-${ListeDesCartes[i].type}`);
+        if (b) {
+          b.onclick = null;
+        }
+      }
+    } else if (ListeDesCartes[0].value && !ListeDesCartes[0].type){
+      socket.emit(NomSocket, sessionStorage.getItem("idPartie"), {value: b.className}, sessionStorage.getItem("pseudo"));
+      b.remove();
+      for (let i = 0; i < ListeDesCartes.length; i++) {
+        let b = document.getElementById(`Cartes-${ListeDesCartes[i].value}`);
+        if (b) {
+          b.onclick = null;
+        }
       }
     }
   }
@@ -241,12 +256,14 @@ function PageDeJeu() {
               document.getElementById("Decompte").style.backgroundColor = "";
             }, 500);
           }
-          return Chrono(Decompte - 1, Liste);
+          return Chrono(Decompte - 1, Liste, DossierImageExt, NomSocket);
         }
       }
       else {
         let i = Math.floor(Math.random() * ((Liste.length - 1) - 0 + 1));
-        let Cal = document.getElementById("Cartes-" + PosCarte[`${Liste[i].value}-${Liste[i].type}`]);
+        let Cal;
+        if (Liste[i].type && Liste[i].value) Cal = document.getElementById(`Cartes-${Liste[i].value}-${Liste[i].type}`);
+        else if (Liste[i].value && !Liste[i].type) Cal = document.getElementById(`Cartes-${Liste[i].value}`);
         return CarteCliquee(Cal, Liste, DossierImageExt, NomSocket);
       }
     }, 1000);
@@ -266,9 +283,11 @@ function PageDeJeu() {
   function RetourneCartesJouees(ListeCartesJ, DossierImageExt) {
     for (let i in ListeCartesJ) {
       if (ListeAdv[i.username]) {
-        let NumCarte = `${ListeCartesJ[i.card].value}-${ListeCartesJ[i.card].type}`;
+        let NumCarte;
+        if (ListeCartesJ[i.card].value && ListeCartesJ[i.card].type) NumCarte = `${ListeCartesJ[i.card].value}-${ListeCartesJ[i.card].type}`;
+        else if (ListeCartesJ[i.card].value && !ListeCartesJ[i.card].type) NumCarte = `${ListeCartesJ[i.card].value}`;
         console.log(JSON.stringify("Adversaire-" + ListeAdv[i.username]));
-        document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundImage = `url('./${DossierImageExt[0]}/${NumCarte}${DossierImageExt[1]} ')`;
+        document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundImage = `url('./${DossierImageExt[0]}/${NumCarte}${DossierImageExt[1]}')`;
         document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundPosition = "center center"
         document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundRepeat = "no-repeat"
       }
@@ -331,17 +350,17 @@ function PageDeJeu() {
     console.log(handCard, opponents, timer);
     LancerTour(handCard, ["imagesTest", ".png"], "chooseCardWar");
 
-  })
+  });
 
-  socket.on("Prepa6quiprend", data => {
-    CartesJoueur(data[0])
-    StyleCartesJoueur6QP(data[0])
-    AttributionAdversaire(data[1])
-    EmplAdversaires(data[1])
-    AffichagePlateau6QP(data[2])
-    AffichageScoreJoueur(data[3])
-    AffichageDecompte(data[4])
-    LancerTour(data[0], ["imagesTest", ".svg"], "joueCarte6quiprend")
+  socket.on("playerTurnTake6", (handCard, opponents, firstCards, score, timer) => {
+    CartesJoueur(handCard)
+    StyleCartesJoueur6QP(handCard)
+    AttributionAdversaire(opponents)
+    EmplAdversaires(opponents)
+    AffichagePlateau6QP(firstCards)
+    AffichageScoreJoueur(score)
+    AffichageDecompte(timer)
+    LancerTour(handCard, ["images2", ".svg"], "chooseCardTake6");
   });
 
   socket.on("refreshOponnentCardWar", username => {
@@ -364,33 +383,13 @@ function PageDeJeu() {
     LancerTour(handCard, ["imagesTest", ".png"], "chooseHiddenCardWar")
   });
 
-  socket.on("loseWar", data => {
+  socket.on("loseWar", () => {
     alert("You lose the game");
-  })
+  });
 
-  socket.on("victoireBataille", data => {
-    AlertMessage("Vous avez gagné !!")
-  })
-/*
-  socket.on("retourInitialBataille", data => {
-    for (let i in ListeAdv) {
-      document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "none";
-    }
-    document.getElementById("CartesJ1").style.backgroundImage = "none";
-    if (ListeCJ == 0) {
-      CartesJoueur(data)
-      StyleCartesJoueurBataille(data)
-    }
-    LancerTour(data, ["images", ".png"], "joueCarteBataille")
-  })
-*/
-  socket.on("retourInitial6quiprend", data => {
-    for (let i in ListeAdv) {
-      document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "none";
-    }
-    document.getElementById("CartesJ1").style.backgroundImage = "none";
-    LancerTour(data, ["images2", ".svg"], "joueCarte6quiprend")
-  })
+  socket.on("winWar", () => {
+    alert("You won the game");
+  });
 
   socket.on("fin6quiprend", data => {
     if (sessionStorage.getItem('pseudo') == data) {

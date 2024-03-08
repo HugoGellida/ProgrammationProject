@@ -26,47 +26,10 @@ const io = new require("socket.io")(server, {
 const fs = require("fs");
 const { syncBuiltinESMExports } = require("module");
 const sql = require("sqlite3").verbose();
-
 const db = new sql.Database("./Database.db");
-
-class Joueur6quiprend { //Classe de joueur
-    constructor(username, idGame, socketid) {
-        this.username = username;
-        this.idGame = idGame;
-        this.carteJouee = null;
-        this.listeCarte = [];
-        this.score = 0;
-        this.socketid = socketid;
-
-    }
-};
-
-class Partie6quiprend {
-    constructor(liste, idGame) {
-        this.liste = liste;
-        this.idGame = idGame;
-    }
-}
-
-class JoueurBataille { //Classe de joueur
-    constructor(username, idGame, socketid) {
-        this.username = username;
-        this.idGame = idGame;
-        this.socketid = socketid;
-        this.carteJouee = [];
-        this.cartePioche = [];
-        this.listeCarte = [];
-        this.concerne = true;
-        this.bloque = false;
-    }
-}
-
-let listeJ = [];
-let listeP = [];
 
 let gameList = [];
 
-//* New Database Model
 //db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20))");
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
@@ -75,7 +38,6 @@ db.run(`ALTER TABLE User ADD COLUMN chatColor VARCHAR(10), title VARCHAR(20)`, (
     db.run(`UPDATE User SET chatColor = 'grey', title = 'NOOBY'`);
 });
 db.run("UPDATE User SET isConnected = false");
-//*
 
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
@@ -656,6 +618,8 @@ io.on("connection", (socket) => {
                 if (!isGameEnd) {
                     game.resetFightingPlayers();
                     nextTurnWar(game);
+                } else {
+                    io.to(playerWinnerRound.socketid).emit("winWar");
                 }
             });
         }
@@ -665,7 +629,7 @@ io.on("connection", (socket) => {
     socket.on("chooseCardTake6", (idGame, card, username) => {
         const game = getGameById(idGame);
         const playerConcerned = game.getPlayerByUsername(username);
-        playerConcerned.chooseCard(card);
+        card = playerConcerned.chooseCard(card);
         console.log(`the player ${username} choose the card ${card.value} which is ${card.pointAmount} points`);
         io.to(idGame).emit("opponentPlayedTake6", username);
         if (game.allPlayed()) {
@@ -685,7 +649,12 @@ io.on("connection", (socket) => {
             for (let i = 0; i < game.playerAmount; i++) {
                 const player = game.playerList[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
-                io.to(player.socketid).emit("playerTurnTake6", handCard);
+                const keys = Object.keys(game.cardBoard);
+                const firstCards = [];
+                keys.forEach(key => {
+                    firstCards.push(game.cardBoard[key][0]);
+                });
+                io.to(player.socketid).emit("playerTurnTake6", handCard, game.getOpponentsUsername(player.username), firstCards, player.score, game.timer);
             }
         }, 1);
     }
