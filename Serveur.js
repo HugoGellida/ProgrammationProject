@@ -753,6 +753,8 @@ io.on("connection", (socket) => {
         if (isPlayerCreator) {
             newPlayer.isCreator = true;
             io.to(newPlayer.socketid).emit("teleportCreator", idGame);
+        } else {
+            io.to(idGame).emit("messageReceived", `${username} has joined the game`, "SERVER", "green");
         }
         game.addPlayer(newPlayer);
         io.to('lobby').emit("refreshGameList");

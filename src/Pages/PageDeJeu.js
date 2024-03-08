@@ -457,8 +457,12 @@ function PageDeJeu() {
     //* New model
     messageElement.className = "playerMessage";
     const spanUsername = document.createElement('span'); const spanMessage = document.createElement('span');
-    spanUsername.style.color = color; spanUsername.textContent = `${username}:`;
+    const strongUsername = document.createElement("strong");
+    spanUsername.style.color = color; strongUsername.textContent = `${username}:`;
+    strongUsername.style.fontSize = "15px";
+    spanUsername.appendChild(strongUsername);
     spanMessage.textContent = message;
+    spanMessage.style.fontSize = "12.5px";
     messageElement.appendChild(spanUsername);
     messageElement.appendChild(spanMessage);
     //*

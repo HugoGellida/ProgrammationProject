@@ -4,11 +4,13 @@ button {
 	background: black;
 	padding: .85em 1.5em;
 	color: #f8f1f1;
-	border-radius: 2em;
-	transition: 1s;
-  }
-  
-  button:hover, button:focus, button:active {
+	border-radius: 1.5em;
+	transition: 0.5s;
+}
+
+button:hover,
+button:focus,
+button:active {
 	background: #e90d0d;
 	color: #fff;
-  }
+}
