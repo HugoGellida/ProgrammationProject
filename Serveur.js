@@ -47,7 +47,7 @@ server.listen(3001, () => {
 const rooms = {"preLobby": [], "lobby": []};
 
 io.on("connection", (socket) => {
-
+    console.log(`presence detected on site: ${socket.id}`);
     socket.on("askChatTitles", (username) => {
         db.get(`SELECT * FROM StatWar WHERE username = ${username}`, rowWar => {
             db.get(`SELECT * FROM StatTake6 WHERE username = ${username}`, rowTake6 => {
@@ -133,7 +133,12 @@ io.on("connection", (socket) => {
                         db.get(`SELECT * FROM StatWar WHERE username = '${playerSocket.username}'`, (err, row) => {
                             db.run(`UPDATE StatWar SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${playerSocket.username}'`);
                         });
-                        if (game.allPlayed()){
+                        if (game.playerAmount == 1){
+                            db.get(`SELECT * FROM StatWar WHERE username = '${game.playerList[0].username}'`, (err, row) => {
+                                db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${game.playerList[0].username}'`);
+                            });
+                            io.to(game.playerList[0].socketid).emit("winWar");
+                        } if (game.allPlayed()){
                             if (game.isHidden) return hiddenCardAnalyseWar(game);
                             else return cardAnalyseWar(game);
                         }
@@ -550,7 +555,7 @@ io.on("connection", (socket) => {
                 const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
                 io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
             }
-        }, 1);
+        }, 1000 * game.playerAmount);
     }
 
     function tieWar(game) {
@@ -756,9 +761,8 @@ io.on("connection", (socket) => {
         if (isPlayerCreator) {
             newPlayer.isCreator = true;
             io.to(newPlayer.socketid).emit("teleportCreator", idGame);
-        } else {
-            io.to(idGame).emit("messageReceived", `${username} has joined the game`, "SERVER", "green");
         }
+        socket.broadcast.to(idGame).emit("messageReceived", `${username} has joined the game`, "SERVER", "green");
         game.addPlayer(newPlayer);
         io.to('lobby').emit("refreshGameList");
         console.log(`user ${username} is now a player of ${idGame}`);

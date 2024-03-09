@@ -3,7 +3,7 @@ import { socket } from "./socket.js";
 import EmplacementAdversaires from "./../Composants/EmplacementAdversaires"
 import EmplacementJoueur from './../Composants/EmplacementJoueur';
 import CartesJouees from './../Composants/CartesJouees'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Tchat from './../Composants/Tchat.js'
 import CartesGagnees from './../Composants/CartesGagnees.js'
 import CartesJouees2 from './../Composants/CartesJouees2.js'
@@ -21,6 +21,9 @@ function PageDeJeu() {
   let Div2;
   let Div3;
   let a;
+  const [launchTimer, setLaunchTimer] = useState(false);
+  const [hasClicked, setHasClicked] = useState(false);
+  const [info, setInfo] = useState({});
 
   const navigate = useNavigate();
 
@@ -107,13 +110,11 @@ function PageDeJeu() {
     }
   }
 
-  function AttributionAdversaire(ListAdv) {
+  function AttributionAdversaire(opponents) {
     let j = 1;
-    for (let i = 0; i < ListAdv.length; i++) {
-      if (sessionStorage.getItem("pseudo") != ListAdv[i]) {
-        ListeAdv[ListAdv[i]] = j;
-        j++;
-      }
+    for (let i = 0; i < opponents.length; i++) {
+      ListeAdv[opponents[i]] = j;
+      j++;
     }
   }
 
@@ -125,14 +126,14 @@ function PageDeJeu() {
 
   function EmplAdversaires(ListePseudosJoueur) {
     document.getElementById("Boutton").style.display = "none";
-    for (let i = 1; i < ListePseudosJoueur.length; i++) {
-      if (!document.getElementById("Adversaire-" + i)) {
+    for (let i = 1; i < ListePseudosJoueur.length + 1; i++) {
+      if (!document.getElementById(`Adversaire-${i}`)) {
         Div = document.createElement('div');
-        Div.id = "Adversaire-" + i
+        Div.id = `Adversaire-${i}`
         Div2 = document.createElement('div');
-        Div2.id = "Pseudo-" + i
+        Div2.id = `Pseudo-${i}`
         Div3 = document.createElement('div');
-        Div3.id = "Case-" + i
+        Div3.id = `Case-${i}`
         Div3.appendChild(Div)
         Div3.appendChild(Div2)
         document.getElementById('Adversaires').appendChild(Div3)
@@ -196,12 +197,14 @@ function PageDeJeu() {
   }
 
   function LancerTour(ListeDesCartes, DossierImageExt, NomSocket) {
-    clic = false
+    setHasClicked(false);
+    clic = false;
     for (let i = 0; i < ListeDesCartes.length; i++) {
       let b;
-      if (ListeDesCartes[i].value && ListeDesCartes[i].type) b = document.getElementById(`Cartes-${ListeDesCartes[i].value}-${ListeDesCartes[i].type}`);
+      if (ListeDesCartes[i].value && ListeDesCartes[i].type){
+        b = document.getElementById(`Cartes-${ListeDesCartes[i].value}-${ListeDesCartes[i].type}`);
+      }
       else if (ListeDesCartes[i].value && !ListeDesCartes[i].type) b = document.getElementById(`Cartes-${ListeDesCartes[i].value}`);
-      console.log(b);
       if (b) {
         b.onclick = null;
         b.onclick = function (){
@@ -209,14 +212,16 @@ function PageDeJeu() {
         };
       }
     }
-    Chrono(Delais, ListeDesCartes, DossierImageExt, NomSocket)
+    setLaunchTimer(true);
+    //Chrono(Delais, ListeDesCartes, DossierImageExt, NomSocket)
   }
 
   function CarteCliquee(b, ListeDesCartes, DossierImageExt, NomSocket) {
     ListeCJ = ListeCJ - 1;
     clic = true;
-    console.log(ListeDesCartes, b, DossierImageExt, NomSocket);
-    document.getElementById("Decompte").innerText = Delais;
+    setLaunchTimer(false);
+    setHasClicked(true);
+    document.getElementById("Decompte").innerText = 0;
     document.getElementById("Decompte").style.backgroundColor = "transparent";
     document.getElementById("CartesJ1").style.backgroundImage = `url('./${DossierImageExt[0]}/${b.className}${DossierImageExt[1]}')`;
     b.style.backgroundImage = "none";
@@ -241,11 +246,118 @@ function PageDeJeu() {
       }
     }
   }
+  useEffect(() => {
+    let intervalIDTimer;
+    if (launchTimer){
+      intervalIDTimer = setInterval(() => {
+        document.getElementById("Decompte").innerText = info.timer - 1;
+        if (document.getElementById("Decompte").style.backgroundColor == "red") document.getElementById("Decompte").style.backgroundColor = "";
+        else document.getElementById("Decompte").style.backgroundColor = "red";
+        setInfo({
+          ...info,
+          timer: info.timer - 1
+        });
+      }, 1000);
+      if (!hasClicked && info.timer == 0){
+        let i = Math.floor(Math.random() * ((info.handCard.length - 1) - 0 + 1));
+        let Cal;
+        if (info.handCard[i].type && info.handCard[i].value) Cal = document.getElementById(`Cartes-${info.handCard[i].value}-${info.handCard[i].type}`);
+        else if (info.handCard[i].value && !info.handCard[i].type) Cal = document.getElementById(`Cartes-${info.handCard[i].value}`);
+        CarteCliquee(Cal, info.handCard, [info.repertory, info.extension], info.socketEventName);
+      }
+    }
 
+    const playerTurnWar = (handCard, opponents, timer) => {
+      document.getElementById("Boutton").style.display = "none";
+      CartesJoueur(handCard)
+      StyleCartesJoueurBataille(handCard)
+      AttributionAdversaire(opponents)
+      EmplAdversaires(opponents)
+      AffichageDecompte(timer)
+      setInfo({
+        handCard: handCard,
+        repertory: "imagesTest",
+        extension: ".png",
+        socketEventName: "chooseCardWar",
+        opponents: opponents,
+        timer: timer
+      });
+      LancerTour(handCard, ["imagesTest", ".png"], "chooseCardWar");
+    }
+
+    const playerHiddenTurnWar = (handCard, timer) => {
+      for (let i in ListeAdv) {
+        document.getElementById("Adversaire-" + ListeAdv[i]).style.backgroundImage = "none";
+      }
+      document.getElementById("CartesJ1").style.backgroundImage = "none";
+      setInfo({
+        ...info,
+        handCard: handCard,
+        repertory: "imagesTest",
+        extension: ".png",
+        socketEventName: "chooseHiddenCardWar",
+        timer: timer
+      });
+      LancerTour(handCard, ["imagesTest", ".png"], "chooseHiddenCardWar");
+    }
+
+    const  messageReceived = (message, username, color, title) => {
+      const divP = document.getElementById("Message");
+      //const messageElement = document.createElement('div');
+      document.getElementById("message").value = "";
+      //* New model
+      //messageElement.className = "playerMessage";
+      const spanMessage = document.createElement('span');
+      if (title){
+        const strongTitle = document.createElement("strong");
+        strongTitle.textContent = `[${title}]`;
+        strongTitle.style.color = color;
+        divP.appendChild(strongTitle);
+      }
+      const strongUsername = document.createElement("strong");
+      strongUsername.style.color = color;
+      strongUsername.textContent = `${username}:`;
+      strongUsername.style.fontSize = "12.5px";
+      spanMessage.textContent = `${message}`;
+      spanMessage.style.fontSize = "12.5px";
+      divP.appendChild(strongUsername);
+      divP.appendChild(spanMessage);
+      //*
+      //divP.appendChild(messageElement);
+      divP.innerHTML += "</br>";
+      divP.scrollTop = divP.scrollHeight;
+    }
+
+    const winWar = () => {
+      alert("You won the game");
+      setLaunchTimer(false);
+      setHasClicked(true);
+    }
+
+    socket.on("loseWar", () => {alert("You lose the game");});
+    socket.on("winWar", winWar);
+    socket.on("playerHiddenTurnWar", playerHiddenTurnWar);
+    socket.on("playerTurnWar", playerTurnWar);
+    socket.on("refreshOponnentCardWar", username => {CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)");});
+    socket.on("revealAllCardWar", cardPerPlayer => {RetourneCartesJouees(cardPerPlayer, ["imagesTest", ".svg"]);});
+    socket.on("messageReceived", messageReceived);
+
+    return () => {
+      clearInterval(intervalIDTimer);
+      socket.off("playerHiddenTurnWar", playerHiddenTurnWar);
+      socket.off("playerTurnWar", playerTurnWar);
+      socket.off("loseWar", () => {alert("You lose the game");});
+      socket.off("winWar", winWar);
+      socket.off("refreshOponnentCardWar", username => {CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)");});
+      socket.off("revealAllCardWar", cardPerPlayer => {RetourneCartesJouees(cardPerPlayer, ["imagesTest", ".svg"]);});
+      socket.off("messageReceived", messageReceived);
+    }
+  })
+/*
   function Chrono(Decompte, Liste, DossierImageExt, NomSocket) {
     setTimeout(() => {
       if (Decompte > 0) {
-        if (!clic) {
+        if (!hasClicked) {
           document.getElementById("Decompte").innerText = Decompte - 1;
           if (Decompte % 2 == 0) {
             setTimeout(() => {
@@ -268,7 +380,7 @@ function PageDeJeu() {
       }
     }, 1000);
   }
-
+*/
   function CarteJoueeJ(Nom, DossierImageExt) {
     if (sessionStorage.getItem("pseudo") != Nom) {
       let Div = document.getElementById("Adversaire-" + ListeAdv[Nom]);
@@ -281,15 +393,17 @@ function PageDeJeu() {
   }
 
   function RetourneCartesJouees(ListeCartesJ, DossierImageExt) {
-    for (let i in ListeCartesJ) {
-      if (ListeAdv[i.username]) {
+    for (let i = 0; i < ListeCartesJ.length; i++) {
+      const username = ListeCartesJ[i].username;
+      const card = ListeCartesJ[i].card;
+      if (ListeAdv[username]) {
         let NumCarte;
-        if (ListeCartesJ[i.card].value && ListeCartesJ[i.card].type) NumCarte = `${ListeCartesJ[i.card].value}-${ListeCartesJ[i.card].type}`;
-        else if (ListeCartesJ[i.card].value && !ListeCartesJ[i.card].type) NumCarte = `${ListeCartesJ[i.card].value}`;
-        console.log(JSON.stringify("Adversaire-" + ListeAdv[i.username]));
-        document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundImage = `url('./${DossierImageExt[0]}/${NumCarte}${DossierImageExt[1]}')`;
-        document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundPosition = "center center"
-        document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundRepeat = "no-repeat"
+        if (card.value && card.type) NumCarte = `${card.value}-${card.type}`;
+        else if (card.value && !card.type) NumCarte = `${card.value}`;
+        console.log(JSON.stringify("Adversaire-" + ListeAdv[username]));
+        document.getElementById("Adversaire-" + ListeAdv[username]).style.backgroundImage = `url('./${DossierImageExt[0]}/${NumCarte}${DossierImageExt[1]}')`;
+        document.getElementById("Adversaire-" + ListeAdv[username]).style.backgroundPosition = "center center"
+        document.getElementById("Adversaire-" + ListeAdv[username]).style.backgroundRepeat = "no-repeat"
       }
     }
   }
@@ -327,29 +441,12 @@ function PageDeJeu() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  socket.on("playerTurnWar", (handCard, opponents, timer) => {
-    CartesJoueur(handCard)
-    StyleCartesJoueurBataille(handCard)
-    AttributionAdversaire(opponents)
-    EmplAdversaires(opponents)
-    AffichageDecompte(timer)
-    console.log(handCard, opponents, timer);
-    LancerTour(handCard, ["imagesTest", ".png"], "chooseCardWar");
-
+  socket.on("showLaunchButton", () => {
+    console.log("hi");
+    let Div = document.getElementById("Boutton");
+    Div.style.display = "flex";
+    let Div2 = document.getElementById("Enregistrer");
+    Div2.style.display = "flex";
   });
 
   socket.on("playerTurnTake6", (handCard, opponents, firstCards, score, timer) => {
@@ -360,35 +457,20 @@ function PageDeJeu() {
     AffichagePlateau6QP(firstCards)
     AffichageScoreJoueur(score)
     AffichageDecompte(timer)
+    setInfo({
+      handCard: handCard,
+      repertory: "images2",
+      extension: ".svg",
+      socketEventName: "chooseCardTake6",
+      opponents: opponents,
+      timer: timer,
+      score: score
+    });
     LancerTour(handCard, ["images2", ".svg"], "chooseCardTake6");
   });
 
-  socket.on("refreshOponnentCardWar", username => {
-    CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)")
-  })
-
-  socket.on("revealAllCardWar", cardPerPlayer => {
-    RetourneCartesJouees(cardPerPlayer, ["imagesTest", ".svg"])
-  })
-
   socket.on("joueCarte6quiprend", data => {
     CarteJoueeJ(data, "images2/boeuf.svg)")
-  });
-
-  socket.on("playerHiddenTurnWar", handCard => {
-    for (let i in ListeAdv) {
-      document.getElementById("Adversaire-" + ListeAdv[i.username]).style.backgroundImage = "none";
-    }
-    document.getElementById("CartesJ1").style.backgroundImage = "none";
-    LancerTour(handCard, ["imagesTest", ".png"], "chooseHiddenCardWar")
-  });
-
-  socket.on("loseWar", () => {
-    alert("You lose the game");
-  });
-
-  socket.on("winWar", () => {
-    alert("You won the game");
   });
 
   socket.on("fin6quiprend", data => {
@@ -436,40 +518,6 @@ function PageDeJeu() {
 
   socket.on("Enregistrer", data => {
     navigate('/PageChoix');
-  });
-
-  socket.on("messageReceived", (message, username, color, title) => {
-    const divP = document.getElementById("Message");
-    //const messageElement = document.createElement('div');
-    document.getElementById("message").value = "";
-    //* New model
-    //messageElement.className = "playerMessage";
-    const spanMessage = document.createElement('span');
-    if (title){
-      const strongTitle = document.createElement("strong");
-      strongTitle.textContent = `[${title}]`;
-      strongTitle.style.color = color;
-      divP.appendChild(strongTitle);
-    }
-    const strongUsername = document.createElement("strong");
-    strongUsername.style.color = color;
-    strongUsername.textContent = `${username}:`;
-    strongUsername.style.fontSize = "12.5px";
-    spanMessage.textContent = `${message}`;
-    spanMessage.style.fontSize = "12.5px";
-    divP.appendChild(strongUsername);
-    divP.appendChild(spanMessage);
-    //*
-    //divP.appendChild(messageElement);
-    divP.innerHTML += "</br>";
-    divP.scrollTop = divP.scrollHeight;
-  });
-
-  socket.on("showLaunchButton", () => {
-    let Div = document.getElementById("Boutton");
-    Div.style.display = "flex";
-    let Div2 = document.getElementById("Enregistrer");
-    Div2.style.display = "flex";
   });
 
 //########################    Crazy 8    ################################

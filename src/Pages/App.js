@@ -11,10 +11,8 @@ import Take6Opponent from '../Composants/ComponentTest/Take6Opponent';
 import Parameters from './Parameters';
 
 function App() {
-  
   return (
     <div className="App">
-      
       <Routes>
         <Route path="/" element={<Inscription/>} />
         <Route path="/CreationPartie" element={<CreationPartie/>} />
