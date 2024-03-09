@@ -34,9 +34,6 @@ let gameList = [];
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 //db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
-db.run(`ALTER TABLE User ADD COLUMN chatColor VARCHAR(10), title VARCHAR(20)`, (err)=> {
-    db.run(`UPDATE User SET chatColor = 'grey', title = 'NOOBY'`);
-});
 db.run("UPDATE User SET isConnected = false");
 
 server.listen(3001, () => {
@@ -49,9 +46,9 @@ const rooms = {"preLobby": [], "lobby": []};
 io.on("connection", (socket) => {
     console.log(`presence detected on site: ${socket.id}`);
     socket.on("askChatTitles", (username) => {
-        db.get(`SELECT * FROM StatWar WHERE username = ${username}`, rowWar => {
-            db.get(`SELECT * FROM StatTake6 WHERE username = ${username}`, rowTake6 => {
-                db.get(`SELECT * FROM StatCrazy8 WHERE username = ${username}`, rowCrazy8 => {
+        db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, rowWar) => {
+            db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, rowTake6) => {
+                db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, rowCrazy8) => {
                     let locked = []; let unlocked = [];
                     if (rowWar.winAmount >= 50 && rowTake6.winAmount >= 50 && rowCrazy8.winAmount >= 50) unlocked.push("ULTIMATE");
                     else locked.push({name: "Player eradicator", title: "ULTIMATE", difficulty: "extreme", description: "Win 50 of every game"});
@@ -75,10 +72,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("askChatColors", (username) => {
-        db.get(`SELECT * FROM StatWar WHERE username = ${username}`, rowWar => {
-            db.get(`SELECT * FROM StatTake6 WHERE username = ${username}`, rowTake6 => {
-                db.get(`SELECT * FROM StatCrazy8 WHERE username = ${username}`, rowCrazy8 => {
+        db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, rowWar) => {
+            db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, rowTake6) => {
+                db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, rowCrazy8) => {
                     let locked = []; let unlocked = [];
+                    console.log(rowWar, rowTake6, rowCrazy8);
                     if (rowWar.winAmount >= 10 && rowTake6.winAmount >= 10 && rowCrazy8.winAmount >= 10) unlocked.push("red");
                     else locked.push({name: "A thirst for victory", color: "red", difficulty: "hard", description: "Win 10 of every game"});
                     if (rowWar.winAmount >= 10) unlocked.push("blue");

@@ -85,15 +85,15 @@ function PageDeJeu() {
   }
 
   function StyleCartesJoueur6QP(ListeCartes) {
-    for (let i = 1; i < ListeCartes.length + 1; i++) {
-      Div = document.getElementById("Cartes-" + i);
+    for (let i = 0; i < ListeCartes.length; i++) {
+      Div = document.getElementById(`Cartes-${ListeCartes[i].value}`);
       if (Div) {
         Div.style.display = "flex";
         Div.style.bottom = '0%'
         Div.style.height = '14%'
-        Div.style.backgroundImage = "url('./images2/" + ListeCartes[i - 1] + ".svg')";
-        Div.className = ListeCartes[i - 1];
-        PosCarte[ListeCartes[i - 1]] = i;
+        Div.style.backgroundImage = `url('./images2/${ListeCartes[i].value}.svg')`;
+        Div.className = ListeCartes[i].value;
+        PosCarte[ListeCartes[i].value] = i + 1;
         Div.style.backgroundSize = "cover";
       }
     }
