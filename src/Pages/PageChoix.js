@@ -51,9 +51,8 @@ function PageChoix() {
 
   return (
     <div className="PageChoix">
-      {Boutton("Parameters", goToParameters)}
       <h5>Choix de la Partie</h5>
-      <button id='Scores' onClick={Scores}>Scores</button>
+      {Boutton("Parameters", goToParameters)}
       {Boutton("Reprendre une partie", goToResumeGames())}
       <main>
         {Boutton("Créer une Partie", Choix)}

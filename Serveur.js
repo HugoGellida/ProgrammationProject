@@ -34,7 +34,10 @@ let gameList = [];
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 //db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
-db.run("UPDATE User SET isConnected = false");
+//db.run("UPDATE User SET isConnected = false");
+//db.run("UPDATE StatWar SET winAmount = 75 WHERE username = 'z'");
+//db.run("UPDATE StatTake6 SET winAmount = 40 WHERE username = 'z'");
+//db.run("UPDATE StatCrazy8 SET winAmount = 40 WHERE username = 'z'");
 
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
@@ -58,7 +61,7 @@ io.on("connection", (socket) => {
                     else locked.push({name: "Don't take it or die", title:"NO GAIN NO LOSE", difficulty: "hard", description: "Win 30 times at Take6"});
                     if (rowCrazy8.winAmount >= 30) unlocked.push("MANIAC");
                     else locked.push({name: "Crazier and crazier", title:"MANIAC", difficulty: "hard", description: "Win 30 times at Crazy8"});
-                    if (rowWar.winAmount >= 1 && rowTake6.winAmount >= 1 && rowCrazy8.winAmount >= 1) unlocked.push("NOOBY");
+                    if (rowWar.winAmount >= 1 && rowTake6.winAmount >= 1 && rowCrazy8.winAmount >= 1) unlocked.push("STARTER");
                     else locked.push({name: "It's only the beggining", title:"STARTER", difficulty: "medium", description: "Win every game once"});
                     unlocked.push("NOOBY"); unlocked.push("TESTER");
                     socket.emit("sendChatTitles", locked, unlocked);
@@ -187,7 +190,7 @@ io.on("connection", (socket) => {
                 rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
                 rooms["lobby"].push(socket.id);
                 db.run(`UPDATE User SET isConnected = true, socketid = '${socket.id}' WHERE username = '${username}'`);
-                socket.emit("connectionAllowed");
+                socket.emit("connectionAllowed", username);
             }
         });
     });
@@ -199,12 +202,12 @@ io.on("connection", (socket) => {
                 socket.join('lobby');
                 rooms["lobby"].push(socket.id);
                 rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
-                db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}', chatColor = 'grey', title = 'NOOBY')`, (err) => {
+                db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}', 'grey', 'NOOBY')`, (err) => {
                     db.run(`INSERT INTO StatTake6 VALUES('${username}', 0, 0, -1, -1)`);
                     db.run(`INSERT INTO StatWar VALUES('${username}', 0, 0, 0)`);
                     db.run(`INSERT INTO StatCrazy8 VALUES('${username}', 0, 0)`);
                     console.log(`registration allowed for user ${username}`);
-                    socket.emit("registrationAllowed");
+                    socket.emit("registrationAllowed", username);
                 });
             }
         });
@@ -708,18 +711,24 @@ io.on("connection", (socket) => {
     }
 
     //Page statistique
-    socket.on("askStat", username => {
-        db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, row) => {
-            console.dir(row);
-            socket.emit("sendStatWar", row.winAmount, row.loseAmount, row.tieAmount);
+    socket.on("askStats", username => {
+        let promises = [];
+        let stats = {};
+        let promise = new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, rowWar) => {
+                stats["War"] = {winAmount: rowWar.winAmount, loseAmount: rowWar.loseAmount, tieAmount: rowWar.tieAmount};
+                db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, rowTake6) => {
+                    stats["Take6"] = {winAmount: rowTake6.winAmount, loseAmount: rowTake6.loseAmount, best: rowTake6.best, average: rowTake6.average};
+                    db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, rowCrazy8) => {
+                        stats["Crazy8"] = {winAmount: rowCrazy8.winAmount, loseAmount: rowCrazy8.loseAmount};
+                        resolve("yes");
+                    });
+                });
+            });
         });
-        db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, row) => {
-            console.dir(row);
-            socket.emit("sendStatTake6", row.winAmount, row.loseAmount, row.best, row.average);
-        });
-        db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, row) => {
-            console.dir(row);
-            socket.emit("sendStatCrazy8", row.winAmount, row.loseAmount);
+        promises.push(promise);
+        Promise.all(promises).then(() => {
+            socket.emit("sendStats", stats);
         });
     });
     //Page reprendrePartie

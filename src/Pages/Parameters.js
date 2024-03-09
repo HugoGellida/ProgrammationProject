@@ -15,27 +15,44 @@ export default function Parameters(){
     const [lockedTitles, setLockedTitles] = useState([]);
     const [showTitles, setShowTitles] = useState(false);
 
+    const [stats, setStats] = useState({});
+    const [showStats, setShowStats] = useState(false);
+
     useEffect(() => {
-        const f1 = (locked, unlocked) => {
+        const sendChatColors = (locked, unlocked) => {
             setLockedColors(locked);
             setUnlockedColors(unlocked);
-            setShowTitles(false);
+            resetShow();
             setShowColors(true);
         }
-        const f2 = (locked, unlocked) => {
+        const sendChatTitles = (locked, unlocked) => {
             setLockedTitles(locked);
             setUnlockedTitles(unlocked);
-            setShowColors(false);
+            resetShow();
             setShowTitles(true);
         }
-        socket.on("sendChatColors", f1);
-        socket.on("sendChatTitles", f2);
+        const sendStats = (stats) => {
+            console.log(stats)
+            setStats(stats);
+            resetShow();
+            setShowStats(true);
+        }
+        socket.on("sendChatColors", sendChatColors);
+        socket.on("sendChatTitles", sendChatTitles);
+        socket.on("sendStats", sendStats);
 
         return () => {
-            socket.off("sendChatColors", f1);
-            socket.off("sendChatTitles", f2);
+            socket.off("sendChatColors", sendChatColors);
+            socket.off("sendChatTitles", sendChatTitles);
+            socket.off("sendStats", sendStats);
         }
     });
+
+    function resetShow(){
+        setShowColors(false);
+        setShowStats(false);
+        setShowTitles(false);
+    }
 
     function handleClickColors(){
         socket.emit("askChatColors", sessionStorage.getItem("pseudo"));
@@ -43,6 +60,10 @@ export default function Parameters(){
 
     function handleClickTitles(){
         socket.emit("askChatTitles", sessionStorage.getItem("pseudo"));
+    }
+
+    function handleClickStats(){
+        socket.emit("askStats", sessionStorage.getItem("pseudo"));
     }
 
     const clickColor = (event) => {
@@ -66,6 +87,7 @@ export default function Parameters(){
         <>
             {Boutton("Chat colors", handleClickColors)}
             {Boutton("Title chat", handleClickTitles)}
+            {Boutton("Statistics", handleClickStats)}
             {Boutton("Leave", leave)}
             {showColors && (
                 <>
@@ -94,6 +116,23 @@ export default function Parameters(){
                         {lockedTitles.map((achievement) => (
                             <div className="lockedTitle" style={{backgroundColor: "white"}}>
                                 <text>{`[${achievement.title}] ${achievement.name}(${achievement.description})\nDifficulty: ${achievement.difficulty}`}</text>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
+            {showStats && (
+                <>
+                    <div className="statistics">
+                        {Object.keys(stats).map((statCategory) => (
+                            <div className={statCategory} style={{color: "white"}}>{statCategory}<br></br><br></br>
+                                {Object.keys(stats[statCategory]).map((statName) => (
+                                    <>
+                                        <text style={{color: "white"}}>{statName}: {stats[statCategory][statName]}</text>
+                                        <br></br>
+                                    </>
+                                ))}
+                                <br></br>
                             </div>
                         ))}
                     </div>

@@ -317,7 +317,7 @@ function PageDeJeu() {
       const strongUsername = document.createElement("strong");
       strongUsername.style.color = color;
       strongUsername.textContent = `${username}:`;
-      strongUsername.style.fontSize = "12.5px";
+      strongUsername.style.fontSize = "11.5px";
       spanMessage.textContent = `${message}`;
       spanMessage.style.fontSize = "12.5px";
       divP.appendChild(strongUsername);

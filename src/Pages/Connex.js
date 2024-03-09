@@ -11,13 +11,13 @@ function Connexion() {
     let navigate = useNavigate();
 
     function DemandeConnexion() {
-        let pseudo = document.getElementById("username").value;
-        let motdepasse = document.getElementById("password").value;
-        sessionStorage.setItem("pseudo", pseudo);
+        const pseudo = document.getElementById("username").value;
+        const motdepasse = document.getElementById("password").value;
         socket.emit("connectionAttempt", pseudo, motdepasse);
     }
     useEffect(() => {
-        const connectionAllowed = () => {
+        const connectionAllowed = (pseudo) => {
+            sessionStorage.setItem("pseudo", pseudo);
             return navigate("/PageChoix");
         }
         socket.on("connectionAllowed", connectionAllowed);
