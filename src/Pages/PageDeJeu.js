@@ -24,6 +24,7 @@ function PageDeJeu() {
   const [launchTimer, setLaunchTimer] = useState(false);
   const [hasClicked, setHasClicked] = useState(false);
   const [info, setInfo] = useState({});
+  const [noClickLaunch, setNoClickLaunch] = useState(true);
 
   const navigate = useNavigate();
 
@@ -312,12 +313,13 @@ function PageDeJeu() {
         const strongTitle = document.createElement("strong");
         strongTitle.textContent = `[${title}]`;
         strongTitle.style.color = color;
+        strongTitle.style.fontSize = "12px";
         divP.appendChild(strongTitle);
       }
       const strongUsername = document.createElement("strong");
       strongUsername.style.color = color;
-      strongUsername.textContent = `${username}:`;
-      strongUsername.style.fontSize = "11.5px";
+      strongUsername.textContent = `${username}: `;
+      strongUsername.style.fontSize = "12px";
       spanMessage.textContent = `${message}`;
       spanMessage.style.fontSize = "12.5px";
       divP.appendChild(strongUsername);
@@ -420,6 +422,7 @@ function PageDeJeu() {
   }
 
   function EtatBoutton() {
+    setNoClickLaunch(false);
     socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
   }
 
@@ -578,7 +581,7 @@ function PageDeJeu() {
       {EmplacementJoueur()}
       {CartesGagnees()}
       {Scorejoueur()}
-      {EtatBoutton()}
+      {noClickLaunch && EtatBoutton()}
       <button id='Boutton' onClick={Affichage}>Commencer</button>
       <button id='RetourFin' onClick={Retour}>Retour</button>
       <button id='Enregistrer' onClick={Enregistrer}>Enregistrer</button>

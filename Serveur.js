@@ -34,10 +34,10 @@ let gameList = [];
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 //db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
-//db.run("UPDATE User SET isConnected = false");
+db.run("UPDATE User SET isConnected = false");
 //db.run("UPDATE StatWar SET winAmount = 75 WHERE username = 'z'");
-//db.run("UPDATE StatTake6 SET winAmount = 40 WHERE username = 'z'");
-//db.run("UPDATE StatCrazy8 SET winAmount = 40 WHERE username = 'z'");
+//db.run("UPDATE StatTake6 SET winAmount = 60 WHERE username = 'z'");
+//db.run("UPDATE StatCrazy8 SET winAmount = 60 WHERE username = 'z'");
 
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
