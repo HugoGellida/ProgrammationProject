@@ -341,7 +341,7 @@ function PageDeJeu() {
     socket.on("playerHiddenTurnWar", playerHiddenTurnWar);
     socket.on("playerTurnWar", playerTurnWar);
     socket.on("refreshOponnentCardWar", username => {CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)");});
-    socket.on("revealAllCardWar", cardPerPlayer => {RetourneCartesJouees(cardPerPlayer, ["imagesTest", ".svg"]);});
+    socket.on("revealAllCardWar", cardPerPlayer => {RetourneCartesJouees(cardPerPlayer, ["imagesTest", ".png"]);});
     socket.on("messageReceived", messageReceived);
 
     return () => {
