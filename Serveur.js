@@ -70,11 +70,9 @@ io.on("connection", (socket) => {
         const rowWar = await getStats("StatWar", username);
         const rowTake6 = await getStats("StatTake6", username);
         const rowCrazy8 = await getStats("StatCrazy8", username);
-        const buyableTitles = await getBuyableTitles(username);
-
+        const buyableTitles = await getBuyableTitles(username, true);
         let locked = [];
         let unlocked = [];
-
         if (rowWar.winAmount >= 50 && rowTake6.winAmount >= 50 && rowCrazy8.winAmount >= 50) unlocked.push("ULTIMATE");
         else locked.push({ name: "Player eradicator", title: "ULTIMATE", difficulty: "extreme", description: "Win 50 of every game" });
         if (rowWar.winAmount >= 30) unlocked.push("WAR GENERAL");
@@ -98,8 +96,7 @@ io.on("connection", (socket) => {
         const rowWar = await getStats("StatWar", username);
         const rowTake6 = await getStats("StatTake6", username);
         const rowCrazy8 = await getStats("StatCrazy8", username);
-        const buyableColors = await getBuyableColors(username);
-
+        const buyableColors = await getBuyableColors(username, true);
         let locked = [];
         let unlocked = [];
         if (rowWar.winAmount >= 10 && rowTake6.winAmount >= 10 && rowCrazy8.winAmount >= 10) unlocked.push("red");
@@ -117,9 +114,50 @@ io.on("connection", (socket) => {
         socket.emit("sendChatColors", locked, unlocked);
     });
 
-    socket.on("askShopStock", username => {
-        db.all(`SELECT * FROM BuyableColor WHERE username = ? AND isBought = false`, [username], (err, rowsColor) => {
-            console.log(rowsColor);
+    socket.on("askShopStock", async (username) => {
+        const buyableColors = await getBuyableColors(username, false);
+        const buyableTitles = await getBuyableTitles(username, false);
+        let notBoughtColors = [];
+        let notBoughtTitles = [];
+        buyableColors.forEach(row => notBoughtColors.push(row));
+        buyableTitles.forEach(row => notBoughtTitles.push(row));
+        db.get(`SELECT * FROM User WHERE username = ?`, [username], (err, row) => {
+            socket.emit("sendShopStock", notBoughtColors, notBoughtTitles, row.money);
+        });
+    });
+
+    socket.on("purchaseAttempt", async (username, objectName) => {
+        const buyableColors = await getBuyableColors(username, false);
+        const buyableTitles = await getBuyableTitles(username, false);
+        let target;
+        buyableColors.forEach(row => {
+            if (row.color == objectName){
+                target = row;
+            }
+        });
+        buyableTitles.forEach(row => {
+            if (row.title == objectName){
+                target = row;
+            }
+        });
+        db.get("SELECT * FROM User WHERE username = ?", [username], (err, row) => {
+            if (target.cost > row.money){
+                socket.emit("deniedPurchase", target.cost - row.money);
+            } else {
+                if (target.title){
+                    db.run("UPDATE BuyableTitle SET isBought = true WHERE username = ? AND title = ?", [username, objectName], (err) => {
+                        db.run("UPDATE User SET money = ? WHERE username = ?", [row.money - target.cost, username], (err) => {
+                            socket.emit("acceptedPurchase");
+                        });
+                    });
+                } else if (target.color){
+                    db.run("UPDATE BuyableColor SET isBought = true WHERE username = ? AND color = ?", [username, objectName], (err) => {
+                        db.run("UPDATE User SET money = ? WHERE username = ?", [row.money - target.cost, username], (err) => {
+                            socket.emit("acceptedPurchase");
+                        });
+                    });
+                }
+            }
         })
     })
 
@@ -135,9 +173,9 @@ io.on("connection", (socket) => {
         });
     }
 
-    async function getBuyableTitles(username) {
+    async function getBuyableTitles(username, bought) {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM BuyableTitle WHERE username = ? AND isBought = true`, [username], (err, rows) => {
+            db.all(`SELECT * FROM BuyableTitle WHERE username = ? AND isBought = ?`, [username, bought], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -147,9 +185,9 @@ io.on("connection", (socket) => {
         });
     }
 
-    async function getBuyableColors(username) {
+    async function getBuyableColors(username, bought) {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM BuyableColor WHERE username = ? AND isBought = true`, [username], (err, rows) => {
+            db.all(`SELECT * FROM BuyableColor WHERE username = ? AND isBought = ?`, [username, bought], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -473,13 +511,14 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         const player = game.playerList.filter(p => p.username == username)[0];
         io.to(parseInt(idGame)).emit("winCrazy8", player);
-        db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, row) => {
-            db.run(`UPDATE StatCrazy8 SET winAmount = '${(row.winAmount + 1)}' WHERE username = '${username}'`);
+        db.get(`SELECT * FROM StatCrazy8, User WHERE User.username = StatCrazy8.username AND username = '${username}'`, (err, row) => {
+            db.run(`UPDATE StatCrazy8 SET winAmount = ${(row.winAmount + 1)} WHERE username = '${username}'`);
+            db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${username}'`);
         });
         const opponents = player.getOpponents();
         for (let i = 0; i < opponents.length; i++) {
             db.get(`SELECT * FROM StatCrazy8 WHERE username = '${opponents[i].username}'`, (err, row) => {
-                db.run(`UPDATE StatCrazy8 SET loseAmount = '${(row.loseAmount + 1)}' WHERE username = '${opponents[i].username}'`);
+                db.run(`UPDATE StatCrazy8 SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${opponents[i].username}'`);
             });
         }
         io.socketsLeave(parseInt(idGame));
@@ -601,7 +640,7 @@ io.on("connection", (socket) => {
         socket.broadcast.to(parseInt(idGame)).emit("refreshOponnentCardWar", username);
         if (game.allPlayed()) {
             const cardPerPlayer = game.fightingPlayers.map(player => ({ username: player.username, card: { value: player.cardPlayed.value, type: player.cardPlayed.type } }));
-            io.to(parseInt(idGame)).emit("revealAllCardWar", cardPerPlayer);
+            io.to(parseInt(idGame)).emit("revealAllCard", cardPerPlayer, ["imagesTest", ".png"]);
             cardAnalyseWar(game);
         }
     });
@@ -670,8 +709,9 @@ io.on("connection", (socket) => {
                                 i--;
                                 resolve(row);
                                 if (playerWinnerRound.hasWon()) {
-                                    db.get(`SELECT * FROM StatWar WHERE username = '${playerWinnerRound.username}'`, (err, row) => {
+                                    db.get(`SELECT * FROM StatWar, User WHERE User.username = StatWar.username AND username = '${playerWinnerRound.username}'`, (err, row) => {
                                         db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${playerWinnerRound.username}'`);
+                                        db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${playerWinnerRound.username}'`);
                                     });
                                     console.log(`the player ${playerWinnerRound.username} has won the game`);
                                     isGameEnd = true;
@@ -702,6 +742,8 @@ io.on("connection", (socket) => {
         console.log(`the player ${username} choose the card ${card.value} which is ${card.pointAmount} points`);
         io.to(idGame).emit("opponentPlayedTake6", username);
         if (game.allPlayed()) {
+            const cardPerPlayer = game.playerList.map(player => ({ username: player.username, card: { value: player.cardPlayed.value}}));
+            socket.emit("revealAllCard", cardPerPlayer, ["images2", ".svg"]);
             game.sortPlayerList();
             launchCardAnalyseTake6(game.playerList, game);
         }
@@ -719,11 +761,11 @@ io.on("connection", (socket) => {
                 const player = game.playerList[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
                 const keys = Object.keys(game.cardBoard);
-                const firstCards = [];
+                const cards = [];
                 keys.forEach(key => {
-                    firstCards.push(game.cardBoard[key][0]);
+                    cards.push(game.cardBoard[key].map(card => ({value: card.value})));
                 });
-                io.to(player.socketid).emit("playerTurnTake6", handCard, game.getOpponentsUsername(player.username), firstCards, player.score, game.timer);
+                io.to(player.socketid).emit("playerTurnTake6", handCard, game.getOpponentsUsername(player.username), cards, player.totalPoint, game.timer);
             }
         }, 1);
     }
@@ -743,20 +785,21 @@ io.on("connection", (socket) => {
                     }
                 } else {
                     const player = playerList[0];
-                    game.placeCard(player, player.cardPlayed);
-                    io.to(parseInt(game.idGame)).emit("refreshCardBoardTake6", game.cardBoard);
+                    let [lineUpdated, lineNumber] = game.placeCard(player, player.cardPlayed);
+                    lineUpdated = lineUpdated.map(card => ({value: card.value}));
+                    io.to(parseInt(game.idGame)).emit("refreshCardBoardTake6", lineUpdated, lineNumber);
                     io.to(game.idGame).emit("resetCardPlayedTake6", player.username);
-                    io.to(player.socketid).emit("refreshPlayerPointTake6", player.totalPoint);
+                    io.to(game.idGame).emit("refreshPlayerPointTake6", player.totalPoint, player.username);
                     return launchCardAnalyseTake6(playerList.filter(p => p.username != player.username), game);
                 }
-            }, 1);
+            }, 1000);
         }
     }
 
     function endTake6(game) {
         const winners = game.getWinners();
         for (let i = 0; i < game.playerList.length; i++) {
-            db.get(`SELECT * FROM StatTake6 WHERE username = '${game.playerList[i].username}'`, (err, row) => {
+            db.get(`SELECT * FROM StatTake6, User WHERE StatTake6.username = User.username AND username = '${game.playerList[i].username}'`, (err, row) => {
                 const totalGamePlayed = row.winAmount + row.loseAmount;
                 row.average = (row.average * totalGamePlayed + game.playerList[i].totalPoint) / (totalGamePlayed + 1);
                 if (row.best > game.playerList[i].totalPoint || row.best == -1) {
@@ -764,6 +807,7 @@ io.on("connection", (socket) => {
                 }
                 if (winners.includes(game.playerList[i])) {
                     db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
+                    db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${playerWinnerRound.username}'`);
                     console.log(`the player ${game.playerList[i].username} has won`);
                 } else {
                     db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);

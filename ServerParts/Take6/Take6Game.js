@@ -28,6 +28,7 @@ class Take6Game extends Game {
             player.drawPoint(this.cardBoard[lineNumberToPlace]);
             this.replaceLine(lineNumberToPlace, card);
         }
+        return [this.cardBoard[lineNumberToPlace], lineNumberToPlace];
     }
 
     prepareRound(){
