@@ -814,6 +814,7 @@ io.on("connection", (socket) => {
                     console.log(`the player ${game.playerList[i].username} has lost`);
                 }
             });
+            io.to(game.idGame).emit("endTake6", winners.map(winner => winner.username));
         }
     }
 

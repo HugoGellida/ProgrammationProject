@@ -391,9 +391,9 @@ function PageDeJeu() {
     if (sessionStorage.getItem("pseudo") != Nom) {
       let Div = document.getElementById("Adversaire-" + ListeAdv[Nom]);
       if (Div) {
-        Div.style.backgroundImage = "url(./" + DossierImageExt
-        Div.style.backgroundPosition = "center center"
-        Div.style.backgroundRepeat = "no-repeat"
+        Div.style.backgroundImage = "url(./" + DossierImageExt;
+        Div.style.backgroundPosition = "center center";
+        Div.style.backgroundRepeat = "no-repeat";
       }
     }
   }
@@ -476,15 +476,15 @@ function PageDeJeu() {
     LancerTour(handCard, ["images2", ".svg"], "chooseCardTake6");
   });
 
-  socket.on("fin6quiprend", data => {
-    if (sessionStorage.getItem('pseudo') == data) {
-      AlertMessage("Vous avez gagné !!!")
+  socket.on("endTake6", (winners) => {
+    if (winners.includes(sessionStorage.getItem('pseudo'))) {
+      alert("Vous avez gagné !!!\n+750 money");
     }
     else {
-      AlertMessage("Le joueur " + data + " à gagné !!!")
+      alert(`Les joueurs ${winners} ont gagnés !!!`)
     }
     document.getElementById("RetourFin").style.display = "flex";
-  })
+  });
 
   /*
   socket.on("casAnormal6quiprend", data => {
