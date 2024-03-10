@@ -28,74 +28,136 @@ const { syncBuiltinESMExports } = require("module");
 const sql = require("sqlite3").verbose();
 const db = new sql.Database("./Database.db");
 
+function insertShop(username) {
+    db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'yellow', false)`);
+    db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'white', false)`);
+    db.run(`INSERT INTO BuyableColor VALUES('${username}', 10000, 'silver', false)`);
+    db.run(`INSERT INTO BuyableColor VALUES('${username}', 10000, 'cyan', false)`);
+    db.run(`INSERT INTO BuyableColor VALUES('${username}', 25000, 'gold', false)`);
+
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 2500, 'RELAX', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 3000, 'GAMER', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 3500, 'SUN', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 5000, 'WING', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 5000, 'SLEEP', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 7500, 'PREDATOR', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 10000, 'ANGEL', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 10000, 'DEMON', false)`);
+    db.run(`INSERT INTO BuyableTitle VALUES('${username}', 20000, 'DOOM', false)`);
+}
+
 let gameList = [];
 
 //db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20))");
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 //db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
+//db.run("DROP TABLE BuyableColor; CREATE TABLE BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
+//db.run("DROP TABLE BuyableTitle; CREATE TABLE BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
 db.run("UPDATE User SET isConnected = false");
-//db.run("UPDATE StatWar SET winAmount = 75 WHERE username = 'z'");
-//db.run("UPDATE StatTake6 SET winAmount = 60 WHERE username = 'z'");
-//db.run("UPDATE StatCrazy8 SET winAmount = 60 WHERE username = 'z'");
 
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
 });
 
 
-const rooms = {"preLobby": [], "lobby": []};
+const rooms = { "preLobby": [], "lobby": [] };
 
 io.on("connection", (socket) => {
     console.log(`presence detected on site: ${socket.id}`);
-    socket.on("askChatTitles", (username) => {
-        db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, rowWar) => {
-            db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, rowTake6) => {
-                db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, rowCrazy8) => {
-                    let locked = []; let unlocked = [];
-                    if (rowWar.winAmount >= 50 && rowTake6.winAmount >= 50 && rowCrazy8.winAmount >= 50) unlocked.push("ULTIMATE");
-                    else locked.push({name: "Player eradicator", title: "ULTIMATE", difficulty: "extreme", description: "Win 50 of every game"});
-                    if (rowWar.winAmount >= 30) unlocked.push("WAR GENERAL");
-                    else locked.push({name: "War addict", title:"WAR GENERAL", difficulty: "hard", description: "Win 30 times at War"});
-                    if (rowTake6.winAmount >= 30) unlocked.push("NO GAIN NO LOSE");
-                    else locked.push({name: "Don't take it or die", title:"NO GAIN NO LOSE", difficulty: "hard", description: "Win 30 times at Take6"});
-                    if (rowCrazy8.winAmount >= 30) unlocked.push("MANIAC");
-                    else locked.push({name: "Crazier and crazier", title:"MANIAC", difficulty: "hard", description: "Win 30 times at Crazy8"});
-                    if (rowWar.winAmount >= 1 && rowTake6.winAmount >= 1 && rowCrazy8.winAmount >= 1) unlocked.push("STARTER");
-                    else locked.push({name: "It's only the beggining", title:"STARTER", difficulty: "medium", description: "Win every game once"});
-                    unlocked.push("NOOBY"); unlocked.push("TESTER");
-                    socket.emit("sendChatTitles", locked, unlocked);
-                });
-            });
-        });
+
+    socket.on("askChatTitles", async (username) => {
+        const rowWar = await getStats("StatWar", username);
+        const rowTake6 = await getStats("StatTake6", username);
+        const rowCrazy8 = await getStats("StatCrazy8", username);
+        const buyableTitles = await getBuyableTitles(username);
+
+        let locked = [];
+        let unlocked = [];
+
+        if (rowWar.winAmount >= 50 && rowTake6.winAmount >= 50 && rowCrazy8.winAmount >= 50) unlocked.push("ULTIMATE");
+        else locked.push({ name: "Player eradicator", title: "ULTIMATE", difficulty: "extreme", description: "Win 50 of every game" });
+        if (rowWar.winAmount >= 30) unlocked.push("WAR GENERAL");
+        else locked.push({ name: "War addict", title: "WAR GENERAL", difficulty: "hard", description: "Win 30 times at War" });
+        if (rowTake6.winAmount >= 30) unlocked.push("NO GAIN NO LOSE");
+        else locked.push({ name: "Don't take it or die", title: "NO GAIN NO LOSE", difficulty: "hard", description: "Win 30 times at Take6" });
+        if (rowCrazy8.winAmount >= 30) unlocked.push("MANIAC");
+        else locked.push({ name: "Crazier and crazier", title: "MANIAC", difficulty: "hard", description: "Win 30 times at Crazy8" });
+        if (rowWar.winAmount >= 1 && rowTake6.winAmount >= 1 && rowCrazy8.winAmount >= 1) unlocked.push("STARTER");
+        else locked.push({ name: "It's only the beggining", title: "STARTER", difficulty: "medium", description: "Win every game once" });
+        unlocked.push("NOOBY"); unlocked.push("TESTER");
+        buyableTitles.forEach(row => unlocked.push(row.title));
+        socket.emit("sendChatTitles", locked, unlocked);
     });
 
     socket.on("chooseChatTitle", (username, title) => {
-        db.run (`UPDATE User SET title = '${title}' WHERE username = '${username}'`);
+        db.run(`UPDATE User SET title = '${title}' WHERE username = '${username}'`);
     });
 
-    socket.on("askChatColors", (username) => {
-        db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, rowWar) => {
-            db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, rowTake6) => {
-                db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, rowCrazy8) => {
-                    let locked = []; let unlocked = [];
-                    console.log(rowWar, rowTake6, rowCrazy8);
-                    if (rowWar.winAmount >= 10 && rowTake6.winAmount >= 10 && rowCrazy8.winAmount >= 10) unlocked.push("red");
-                    else locked.push({name: "A thirst for victory", color: "red", difficulty: "hard", description: "Win 10 of every game"});
-                    if (rowWar.winAmount >= 10) unlocked.push("blue");
-                    else locked.push({name: "War veteran", color:"blue", difficulty: "medium", description: "Win 10 times at War"});
-                    if (rowTake6.winAmount >= 10) unlocked.push("purple");
-                    else locked.push({name: "The only thing I will take", color:"purple", difficulty: "medium", description: "Win 10 times at Take6"});
-                    if (rowCrazy8.winAmount >= 10) unlocked.push("pink");
-                    else locked.push({name: "Going crazy", color:"pink", difficulty: "medium", description: "Win 10 times at Crazy8"});
-                    if (rowWar.winAmount >= 1 || rowTake6.winAmount >= 1 || rowCrazy8.winAmount >= 1) unlocked.push("brown");
-                    else locked.push({name: "Ready to triumph", color:"brown", difficulty: "easy", description: "Win your first game ever"});
-                    unlocked.push("gray"); unlocked.push("yellow");
-                    socket.emit("sendChatColors", locked, unlocked);
-                });
+    socket.on("askChatColors", async (username) => {
+        const rowWar = await getStats("StatWar", username);
+        const rowTake6 = await getStats("StatTake6", username);
+        const rowCrazy8 = await getStats("StatCrazy8", username);
+        const buyableColors = await getBuyableColors(username);
+
+        let locked = [];
+        let unlocked = [];
+        if (rowWar.winAmount >= 10 && rowTake6.winAmount >= 10 && rowCrazy8.winAmount >= 10) unlocked.push("red");
+        else locked.push({ name: "A thirst for victory", color: "red", difficulty: "hard", description: "Win 10 of every game" });
+        if (rowWar.winAmount >= 10) unlocked.push("blue");
+        else locked.push({ name: "War veteran", color: "blue", difficulty: "medium", description: "Win 10 times at War" });
+        if (rowTake6.winAmount >= 10) unlocked.push("purple");
+        else locked.push({ name: "The only thing I will take", color: "purple", difficulty: "medium", description: "Win 10 times at Take6" });
+        if (rowCrazy8.winAmount >= 10) unlocked.push("pink");
+        else locked.push({ name: "Going crazy", color: "pink", difficulty: "medium", description: "Win 10 times at Crazy8" });
+        if (rowWar.winAmount >= 1 || rowTake6.winAmount >= 1 || rowCrazy8.winAmount >= 1) unlocked.push("brown");
+        else locked.push({ name: "Ready to triumph", color: "brown", difficulty: "easy", description: "Win your first game ever" });
+        unlocked.push("gray");
+        buyableColors.forEach(row => unlocked.push(row.color));
+        socket.emit("sendChatColors", locked, unlocked);
+    });
+
+    socket.on("askShopStock", username => {
+        db.all(`SELECT * FROM BuyableColor WHERE username = ? AND isBought = false`, [username], (err, rowsColor) => {
+            console.log(rowsColor);
+        })
+    })
+
+    async function getStats(tableName, username) {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM ${tableName} WHERE username = ?`, [username], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
             });
         });
-    });
+    }
+
+    async function getBuyableTitles(username) {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM BuyableTitle WHERE username = ? AND isBought = true`, [username], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
+
+    async function getBuyableColors(username) {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM BuyableColor WHERE username = ? AND isBought = true`, [username], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
 
     socket.on("chooseChatColor", (username, color) => {
         db.run(`UPDATE User SET chatColor = '${color}' WHERE username = '${username}'`);
@@ -125,37 +187,37 @@ io.on("connection", (socket) => {
             socket.leave(socketLastRoom);
             rooms[socketLastRoom] = rooms[socketLastRoom].filter(socketid => socketid != socket.id);
             const game = getGameById(socketLastRoom);
-            if (game){
+            if (game) {
                 const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
-                if (game.isLaunched){
+                if (game.isLaunched) {
                     io.to(parseInt(game.idGame)).emit("messageReceived", `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER", "green");
                     game.eliminatePlayer(playerSocket);
-                    if (game instanceof WarGame){
+                    if (game instanceof WarGame) {
                         db.get(`SELECT * FROM StatWar WHERE username = '${playerSocket.username}'`, (err, row) => {
                             db.run(`UPDATE StatWar SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${playerSocket.username}'`);
                         });
-                        if (game.playerAmount == 1){
+                        if (game.playerAmount == 1) {
                             db.get(`SELECT * FROM StatWar WHERE username = '${game.playerList[0].username}'`, (err, row) => {
                                 db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${game.playerList[0].username}'`);
                             });
                             io.to(game.playerList[0].socketid).emit("winWar");
-                        } if (game.allPlayed()){
+                        } if (game.allPlayed()) {
                             if (game.isHidden) return hiddenCardAnalyseWar(game);
                             else return cardAnalyseWar(game);
                         }
-                    } else if (game instanceof Take6Game){
+                    } else if (game instanceof Take6Game) {
                         db.get(`SELECT * FROM StatTake6 WHERE username = '${playerSocket.username}'`, (err, row) => {
-                            const average = (((row.loseAmount + row.winAmount) * row.average) + 66)/(row.loseAmount + row.winAmount + 1);
+                            const average = (((row.loseAmount + row.winAmount) * row.average) + 66) / (row.loseAmount + row.winAmount + 1);
                             db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, average = ${average} WHERE username = '${playerSocket.username}'`);
                         });
-                        if (game.allPlayed()){
+                        if (game.allPlayed()) {
                             game.sortPlayerList();
                             launchCardAnalyseTake6(game.playerList, game);
                         }
-                    } else if (game instanceof Crazy8Game){
+                    } else if (game instanceof Crazy8Game) {
                         db.get(`SELECT * FROM StatCrazy8 WHERE username = '${playerSocket.username}'`, (err, row) => {
                             db.run(`UPDATE StatCrazy8 SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${playerSocket.username}'`);
-                            if (game.currentPlayer().username == playerSocket.username){
+                            if (game.currentPlayer().username == playerSocket.username) {
                                 game.changeTurn();
                                 currentPlayer = game.currentPlayer();
                                 boardAnalyseCrazy8(game, currentPlayer);
@@ -169,7 +231,7 @@ io.on("connection", (socket) => {
                     } else {
                         io.to(game.idGame).emit("messageReceived", `The player ${playerSocket.username} has left`, "SERVER", "green");
                         game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
-                        if (playerSocket.isCreator){
+                        if (playerSocket.isCreator) {
                             game.playerList[0].isCreator = true;
                             io.to(game.playerList[0].socketid).emit("showLaunchButton");
                         }
@@ -202,10 +264,11 @@ io.on("connection", (socket) => {
                 socket.join('lobby');
                 rooms["lobby"].push(socket.id);
                 rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
-                db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}', 'grey', 'NOOBY')`, (err) => {
+                db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}', 'grey', 'NOOBY', 0)`, (err) => {
                     db.run(`INSERT INTO StatTake6 VALUES('${username}', 0, 0, -1, -1)`);
                     db.run(`INSERT INTO StatWar VALUES('${username}', 0, 0, 0)`);
                     db.run(`INSERT INTO StatCrazy8 VALUES('${username}', 0, 0)`);
+                    insertShop(username);
                     console.log(`registration allowed for user ${username}`);
                     socket.emit("registrationAllowed", username);
                 });
@@ -215,8 +278,8 @@ io.on("connection", (socket) => {
     //Page CreationPartie
     socket.on("createGame", (playerAmount, typeOfGame, username, timer) => {
         let newIdGame = 1;
-        for (let i = 0; i < gameList.length; i++){
-            if (gameList[i].idGame == newIdGame) newIdGame ++;
+        for (let i = 0; i < gameList.length; i++) {
+            if (gameList[i].idGame == newIdGame) newIdGame++;
             else if (gameList[i].idGame > newIdGame) break;
         }
         let newGame = null;
@@ -238,7 +301,7 @@ io.on("connection", (socket) => {
         let types = [];
         let actualPlayerAmounts = [];
         for (let i = 0; i < gameList.length; i++) {
-            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length){
+            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length) {
                 idGames.push(gameList[i].idGame);
                 playerAmounts.push(gameList[i].playerAmount);
                 actualPlayerAmounts.push(gameList[i].playerList.length);
@@ -324,7 +387,7 @@ io.on("connection", (socket) => {
         io.to(parseInt(idGame)).emit("pauseAllowed");
     });
 
-//* Crazy8
+    //* Crazy8
     socket.on("pickCardCrazy8", idGame => {
         const game = getGameById(idGame);
         const currentPlayer = game.currentPlayer();
@@ -498,7 +561,7 @@ io.on("connection", (socket) => {
         io.to(playerConcerned.socketid).emit("refreshHandCardCrazy8", handCard);
     });
 
-//* War
+    //* War
     socket.on("chooseHiddenCardWar", (idGame, card, username) => {
         console.log(`the player ${username} chose a ${card.value} of ${card.type} for hidden`);
         const game = getGameById(idGame);
@@ -510,7 +573,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    function hiddenCardAnalyseWar(game){
+    function hiddenCardAnalyseWar(game) {
         game.resetAllCardPlayed();
         game.updatePlayerStatus();
         game.updateFightingPlayers();
@@ -631,7 +694,7 @@ io.on("connection", (socket) => {
         }
     }
 
-//* Take6
+    //* Take6
     socket.on("chooseCardTake6", (idGame, card, username) => {
         const game = getGameById(idGame);
         const playerConcerned = game.getPlayerByUsername(username);
@@ -716,11 +779,11 @@ io.on("connection", (socket) => {
         let stats = {};
         let promise = new Promise((resolve, reject) => {
             db.get(`SELECT * FROM StatWar WHERE username = '${username}'`, (err, rowWar) => {
-                stats["War"] = {winAmount: rowWar.winAmount, loseAmount: rowWar.loseAmount, tieAmount: rowWar.tieAmount};
+                stats["War"] = { winAmount: rowWar.winAmount, loseAmount: rowWar.loseAmount, tieAmount: rowWar.tieAmount };
                 db.get(`SELECT * FROM StatTake6 WHERE username = '${username}'`, (err, rowTake6) => {
-                    stats["Take6"] = {winAmount: rowTake6.winAmount, loseAmount: rowTake6.loseAmount, best: rowTake6.best, average: rowTake6.average};
+                    stats["Take6"] = { winAmount: rowTake6.winAmount, loseAmount: rowTake6.loseAmount, best: rowTake6.best, average: rowTake6.average };
                     db.get(`SELECT * FROM StatCrazy8 WHERE username = '${username}'`, (err, rowCrazy8) => {
-                        stats["Crazy8"] = {winAmount: rowCrazy8.winAmount, loseAmount: rowCrazy8.loseAmount};
+                        stats["Crazy8"] = { winAmount: rowCrazy8.winAmount, loseAmount: rowCrazy8.loseAmount };
                         resolve("yes");
                     });
                 });
@@ -754,7 +817,7 @@ io.on("connection", (socket) => {
         socket.join(parseInt(idGame));
     });
 
-//! Function Part
+    //! Function Part
     function affectPlayer(idGame, username, isPlayerCreator) { // Fonction générale
         socket.leave('lobby');
         socket.join(idGame);
@@ -775,14 +838,15 @@ io.on("connection", (socket) => {
         console.log(`user ${username} is now a player of ${idGame}`);
     }
 
-function getGameById(idGame) {
-    return gameList.filter(g => g.idGame == idGame)[0];
-}
+    function getGameById(idGame) {
+        return gameList.filter(g => g.idGame == idGame)[0];
+    }
 
-function getStringOfGame(game) {
-    if (game instanceof WarGame) return "jeu-de-bataille";
-    else if (game instanceof Take6Game) return "6-qui-prend";
-    else if (game instanceof Crazy8Game) return "crazy8";
-}
+    function getStringOfGame(game) {
+        if (game instanceof WarGame) return "jeu-de-bataille";
+        else if (game instanceof Take6Game) return "6-qui-prend";
+        else if (game instanceof Crazy8Game) return "crazy8";
+    }
+
 
 });
