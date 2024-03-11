@@ -340,7 +340,85 @@ function PageDeJeu() {
       setHasClicked(true);
     }
 
-    socket.on("loseWar", () => {alert("You lose the game");});
+    const loseWar = () => {
+      alert("You lose the game");
+      setLaunchTimer(false);
+      setHasClicked(true);
+    }
+    const playerTurnTake6 = (handCard, opponents, cards, score, timer) => {
+      CartesJoueur(handCard)
+      StyleCartesJoueur6QP(handCard)
+      AttributionAdversaire(opponents)
+      EmplAdversaires(opponents)
+      AffichagePlateau6QP(cards)
+      AffichageScoreJoueur(score)
+      AffichageDecompte(timer)
+      setInfo({
+        handCard: handCard,
+        repertory: "images2",
+        extension: ".svg",
+        socketEventName: "chooseCardTake6",
+        opponents: opponents,
+        timer: timer,
+        score: score
+      });
+      LancerTour(handCard, ["images2", ".svg"], "chooseCardTake6");
+    }
+  
+    const endTake6 = (winners) => {
+      setLaunchTimer(false);
+      setHasClicked(true);
+      if (winners.includes(sessionStorage.getItem('pseudo'))) {
+        alert("Vous avez gagné !!!\n+750 money");
+      }
+      else {
+        alert(`Les joueurs ${winners} ont gagnés !!!`)
+      }
+      document.getElementById("RetourFin").style.display = "flex";
+    }
+  
+    const refreshCardBoardTake6 = (lineUpdated, lineNumber) => {
+      let Div;
+      for (let i = 1; i < lineUpdated.length + 1; i++){
+        Div = document.getElementById(`CartesL${lineNumber}-${i}`);
+        Div.style.backgroundImage = `url(./images2/${lineUpdated[i - 1].value}.svg)`;
+      }
+      for (let i = lineUpdated.length + 1; i < 7; i++){
+        Div = document.getElementById(`CartesL${lineNumber}-${i}`);
+        Div.style.backgroundImage = `none`;
+      }
+    }
+  
+    const refreshPlayerPointTake6 = (score, username) => {
+      if (ListeAdv[username]){
+        const scoreDiv = document.getElementById(`nbcartes${ListeAdv[username]}`);
+        scoreDiv.innerText = score;
+      } else {
+        const scoreDiv = document.getElementById('score');
+        scoreDiv.innerText = score;
+      }
+    }
+  
+    const resetCardPlayedTake6 = (username) => {
+      if (ListeAdv[username]){
+        const opponentDiv = document.getElementById(`Adversaire-${ListeAdv[username]}`);
+        opponentDiv.style.backgroundImage = "none";
+      } else {
+        const carteDiv = document.getElementById('CartesJ1');
+        carteDiv.style.backgroundImage = "none";
+      }
+    }
+
+    const opponentPlayedTake6 = (username) => {CarteJoueeJ(username, "images2/boeuf.svg)");}
+  
+    socket.on("opponentPlayedTake6", opponentPlayedTake6);
+    socket.on("playerTurnTake6", playerTurnTake6);
+    socket.on("endTake6", endTake6);
+    socket.on("refreshCardBoardTake6", refreshCardBoardTake6);
+    socket.on("refreshPlayerPointTake6", refreshPlayerPointTake6);
+    socket.on("resetCardPlayedTake6", resetCardPlayedTake6);
+
+    socket.on("loseWar", loseWar);
     socket.on("winWar", winWar);
     socket.on("playerHiddenTurnWar", playerHiddenTurnWar);
     socket.on("playerTurnWar", playerTurnWar);
@@ -350,43 +428,24 @@ function PageDeJeu() {
 
     return () => {
       clearInterval(intervalIDTimer);
+
+      socket.off("opponentPlayedTake6", opponentPlayedTake6);
+      socket.off("playerTurnTake6", playerTurnTake6);
+      socket.off("endTake6", endTake6);
+      socket.off("refreshCardBoardTake6", refreshCardBoardTake6);
+      socket.off("refreshPlayerPointTake6", refreshPlayerPointTake6);
+      socket.off("resetCardPlayedTake6", resetCardPlayedTake6);
+
       socket.off("playerHiddenTurnWar", playerHiddenTurnWar);
       socket.off("playerTurnWar", playerTurnWar);
-      socket.off("loseWar", () => {alert("You lose the game");});
+      socket.off("loseWar", loseWar);
       socket.off("winWar", winWar);
       socket.off("refreshOponnentCardWar", username => {CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)");});
       socket.off("revealAllCard", (cardPerPlayer, repertory) => {RetourneCartesJouees(cardPerPlayer, repertory);});
       socket.off("messageReceived", messageReceived);
     }
-  })
-/*
-  function Chrono(Decompte, Liste, DossierImageExt, NomSocket) {
-    setTimeout(() => {
-      if (Decompte > 0) {
-        if (!hasClicked) {
-          document.getElementById("Decompte").innerText = Decompte - 1;
-          if (Decompte % 2 == 0) {
-            setTimeout(() => {
-              document.getElementById("Decompte").style.backgroundColor = "red";
-            }, 500);
-          } else {
-            setTimeout(() => {
-              document.getElementById("Decompte").style.backgroundColor = "";
-            }, 500);
-          }
-          return Chrono(Decompte - 1, Liste, DossierImageExt, NomSocket);
-        }
-      }
-      else {
-        let i = Math.floor(Math.random() * ((Liste.length - 1) - 0 + 1));
-        let Cal;
-        if (Liste[i].type && Liste[i].value) Cal = document.getElementById(`Cartes-${Liste[i].value}-${Liste[i].type}`);
-        else if (Liste[i].value && !Liste[i].type) Cal = document.getElementById(`Cartes-${Liste[i].value}`);
-        return CarteCliquee(Cal, Liste, DossierImageExt, NomSocket);
-      }
-    }, 1000);
-  }
-*/
+  });
+
   function CarteJoueeJ(Nom, DossierImageExt) {
     if (sessionStorage.getItem("pseudo") != Nom) {
       let Div = document.getElementById("Adversaire-" + ListeAdv[Nom]);
@@ -455,98 +514,6 @@ function PageDeJeu() {
     let Div2 = document.getElementById("Enregistrer");
     Div2.style.display = "flex";
   });
-
-  socket.on("playerTurnTake6", (handCard, opponents, cards, score, timer) => {
-    CartesJoueur(handCard)
-    StyleCartesJoueur6QP(handCard)
-    AttributionAdversaire(opponents)
-    EmplAdversaires(opponents)
-    AffichagePlateau6QP(cards)
-    AffichageScoreJoueur(score)
-    AffichageDecompte(timer)
-    setInfo({
-      handCard: handCard,
-      repertory: "images2",
-      extension: ".svg",
-      socketEventName: "chooseCardTake6",
-      opponents: opponents,
-      timer: timer,
-      score: score
-    });
-    LancerTour(handCard, ["images2", ".svg"], "chooseCardTake6");
-  });
-
-  socket.on("endTake6", (winners) => {
-    if (winners.includes(sessionStorage.getItem('pseudo'))) {
-      alert("Vous avez gagné !!!\n+750 money");
-    }
-    else {
-      alert(`Les joueurs ${winners} ont gagnés !!!`)
-    }
-    document.getElementById("RetourFin").style.display = "flex";
-  });
-
-  /*
-  socket.on("casAnormal6quiprend", data => {
-    let Div;
-    for (let i = 2; i < 7; i++) {
-      Div = document.getElementById("CartesL" + data[0] + "-" + i);
-      Div.style.backgroundImage = "none"
-    }
-    document.getElementById("CartesL" + data[0] + "-" + 1).style.backgroundImage = "url(./images2/" + data[1] + ".svg)";
-
-    if (sessionStorage.getItem("pseudo") != data[2]) {
-      document.getElementById("nbcartes" + ListeAdv[data[2]]).remove();
-      let Elem = document.createElement('div');
-      Elem.id = 'nbcartes' + ListeAdv[data[2]]
-      Elem.innerText = data[3]
-      document.getElementById("Pseudo-" + ListeAdv[data[2]]).appendChild(Elem)
-
-    }
-    else {
-      document.getElementById("score").remove();
-      let Elem = document.createElement('div');
-      Elem.id = 'score'
-      Elem.innerText = data[3]
-      document.getElementById("Scorejoueur").appendChild(Elem)
-    }
-  })
-  */
-
-  socket.on("refreshCardBoardTake6", (lineUpdated, lineNumber) => {
-    let Div;
-    for (let i = 1; i < lineUpdated.length + 1; i++){
-      Div = document.getElementById(`CartesL${lineNumber}-${i}`);
-      Div.style.backgroundImage = `url(./images2/${lineUpdated[i - 1].value}.svg)`;
-    }
-    for (let i = lineUpdated.length + 1; i < 7; i++){
-      Div = document.getElementById(`CartesL${lineNumber}-${i}`);
-      Div.style.backgroundImage = `none`;
-    }
-  });
-
-  socket.on("refreshPlayerPointTake6", (score, username) => {
-    if (ListeAdv[username]){
-      const scoreDiv = document.getElementById(`nbcartes${ListeAdv[username]}`);
-      scoreDiv.innerText = score;
-    } else {
-      const scoreDiv = document.getElementById('score');
-      scoreDiv.innerText = score;
-    }
-  });
-
-  socket.on("resetCardPlayedTake6", (username) => {
-    if (ListeAdv[username]){
-      const opponentDiv = document.getElementById(`Adversaire-${ListeAdv[username]}`);
-      opponentDiv.style.backgroundImage = "none";
-    } else {
-      const carteDiv = document.getElementById('CartesJ1');
-      carteDiv.style.backgroundImage = "none";
-    }
-  });
-
-  socket.on("opponentPlayedTake6", username => {CarteJoueeJ(username, "images2/boeuf.svg)");});
-
   socket.on("Enregistrer", data => {
     navigate('/PageChoix');
   });

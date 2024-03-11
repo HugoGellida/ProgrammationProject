@@ -28,6 +28,16 @@ const { syncBuiltinESMExports } = require("module");
 const sql = require("sqlite3").verbose();
 const db = new sql.Database("./Database.db");
 
+let gameList = [];
+
+//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20))");
+//db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
+//db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
+//db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
+//db.run("CREATE TABLE BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
+//db.run("CREATE TABLE BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
+db.run("UPDATE User SET isConnected = false");
+
 function insertShop(username) {
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'yellow', false)`);
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'white', false)`);
@@ -46,15 +56,6 @@ function insertShop(username) {
     db.run(`INSERT INTO BuyableTitle VALUES('${username}', 20000, 'DOOM', false)`);
 }
 
-let gameList = [];
-
-//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20))");
-//db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
-//db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
-//db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
-//db.run("DROP TABLE BuyableColor; CREATE TABLE BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
-//db.run("DROP TABLE BuyableTitle; CREATE TABLE BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
-db.run("UPDATE User SET isConnected = false");
 
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
@@ -238,6 +239,10 @@ io.on("connection", (socket) => {
                             db.get(`SELECT * FROM StatWar WHERE username = '${game.playerList[0].username}'`, (err, row) => {
                                 db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${game.playerList[0].username}'`);
                             });
+                            db.get(`SELECT * FROM User WHERE username = '${game.playerList[0].username}'`, (err, row) => {
+                                db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${game.playerList[0].username}'`);
+                            });
+                            game.isLaunched = false;
                             io.to(game.playerList[0].socketid).emit("winWar");
                         } if (game.allPlayed()) {
                             if (game.isHidden) return hiddenCardAnalyseWar(game);
@@ -248,6 +253,16 @@ io.on("connection", (socket) => {
                             const average = (((row.loseAmount + row.winAmount) * row.average) + 66) / (row.loseAmount + row.winAmount + 1);
                             db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, average = ${average} WHERE username = '${playerSocket.username}'`);
                         });
+                        if (game.playerAmount == 1) {
+                            db.get(`SELECT * FROM StatTake6 WHERE username = '${game.playerList[0].username}'`, (err, row) => {
+                                db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)} WHERE username = '${game.playerList[0].username}'`);
+                            });
+                            db.get(`SELECT * FROM User WHERE username = '${game.playerList[0].username}'`, (err, row) => {
+                                db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${game.playerList[0].username}'`);
+                            });
+                            game.isLaunched = false;
+                            io.to(game.playerList[0].socketid).emit("endTake6", [game.playerList[0].username]);
+                        }
                         if (game.allPlayed()) {
                             game.sortPlayerList();
                             launchCardAnalyseTake6(game.playerList, game);
@@ -709,10 +724,12 @@ io.on("connection", (socket) => {
                                 i--;
                                 resolve(row);
                                 if (playerWinnerRound.hasWon()) {
-                                    db.get(`SELECT * FROM StatWar, User WHERE User.username = StatWar.username AND username = '${playerWinnerRound.username}'`, (err, row) => {
+                                    db.get(`SELECT * FROM StatWar WHERE username = '${playerWinnerRound.username}'`, (err, row) => {
                                         db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${playerWinnerRound.username}'`);
-                                        db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${playerWinnerRound.username}'`);
                                     });
+                                    db.get("SELECT * FROM User WHERE username = ?", [playerWinnerRound.username], (err, row) => {
+                                        db.run("UPDATE User SET money = ? WHERE username = ?", [row.money + 750, playerWinnerRound.username]);
+                                    })
                                     console.log(`the player ${playerWinnerRound.username} has won the game`);
                                     isGameEnd = true;
                                 }
@@ -728,6 +745,7 @@ io.on("connection", (socket) => {
                     game.resetFightingPlayers();
                     nextTurnWar(game);
                 } else {
+                    game.isLaunched = false;
                     io.to(playerWinnerRound.socketid).emit("winWar");
                 }
             });
@@ -799,7 +817,7 @@ io.on("connection", (socket) => {
     function endTake6(game) {
         const winners = game.getWinners();
         for (let i = 0; i < game.playerList.length; i++) {
-            db.get(`SELECT * FROM StatTake6, User WHERE StatTake6.username = User.username AND username = '${game.playerList[i].username}'`, (err, row) => {
+            db.get(`SELECT * FROM StatTake6 WHERE username = '${game.playerList[i].username}'`, (err, row) => {
                 const totalGamePlayed = row.winAmount + row.loseAmount;
                 row.average = (row.average * totalGamePlayed + game.playerList[i].totalPoint) / (totalGamePlayed + 1);
                 if (row.best > game.playerList[i].totalPoint || row.best == -1) {
@@ -807,15 +825,18 @@ io.on("connection", (socket) => {
                 }
                 if (winners.includes(game.playerList[i])) {
                     db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
-                    db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${playerWinnerRound.username}'`);
+                    db.get("SELECT * FROM User WHERE username = ?", [game.playerList[i].username], (err, rowUser) => {
+                        db.run(`UPDATE User SET money = ${(rowUser.money + 750)} WHERE username = '${game.playerList[i].username}'`);
+                    });
                     console.log(`the player ${game.playerList[i].username} has won`);
                 } else {
                     db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
                     console.log(`the player ${game.playerList[i].username} has lost`);
                 }
             });
-            io.to(game.idGame).emit("endTake6", winners.map(winner => winner.username));
         }
+        io.to(game.idGame).emit("endTake6", winners.map(winner => winner.username));
+        game.isLaunched = false;
     }
 
     //Page statistique
