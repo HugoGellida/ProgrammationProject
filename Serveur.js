@@ -274,7 +274,7 @@ io.on("connection", (socket) => {
                             io.to(game.playerList[0].socketid).emit("showLaunchButton");
                         }
                     }
-                    io.to("lobby").emit("refreshGameList");
+                    loadGames();
                 }
             }
         });
@@ -314,41 +314,41 @@ io.on("connection", (socket) => {
         });
     });
     //Page CreationPartie
-    socket.on("createGame", (playerAmount, typeOfGame, username, timer) => {
+    socket.on("createGame", (gameInfo) => {
         let newIdGame = 1;
         for (let i = 0; i < gameList.length; i++) {
             if (gameList[i].idGame == newIdGame) newIdGame++;
             else if (gameList[i].idGame > newIdGame) break;
         }
+        console.log(gameInfo);
         let newGame = null;
-        if (typeOfGame == "crazy8") {
-            newGame = new Crazy8Game(playerAmount, timer, newIdGame);
-        } else if (typeOfGame == "jeu-de-bataille") {
-            newGame = new WarGame(playerAmount, timer, newIdGame);
-        } else if (typeOfGame == "6-qui-prend") {
-            newGame = new Take6Game(playerAmount, timer, newIdGame);
+        if (gameInfo.type == "crazy8") {
+            newGame = new Crazy8Game(gameInfo.playerAmount, gameInfo.timer, newIdGame, gameInfo.gameStatus);
+        } else if (gameInfo.type == "jeu-de-bataille") {
+            newGame = new WarGame(gameInfo.playerAmount, gameInfo.timer, newIdGame, gameInfo.gameStatus);
+        } else if (gameInfo.type == "6-qui-prend") {
+            newGame = new Take6Game(gameInfo.playerAmount, gameInfo.timer, newIdGame, gameInfo.gameStatus);
         }
         gameList.push(newGame);
         rooms[newIdGame] = [];
-        affectPlayer(newIdGame, username, true);
+        affectPlayer(newIdGame, gameInfo.creator, true);
     });
     //Page Choix
     socket.on("loadGame", () => {
-        let idGames = [];
-        let playerAmounts = [];
-        let types = [];
-        let actualPlayerAmounts = [];
+        loadGames();
+    });
+
+    function loadGames(){
+        let games = [];
+        console.log("hi");
         for (let i = 0; i < gameList.length; i++) {
-            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length) {
-                idGames.push(gameList[i].idGame);
-                playerAmounts.push(gameList[i].playerAmount);
-                actualPlayerAmounts.push(gameList[i].playerList.length);
-                const type = getStringOfGame(gameList[i]);
-                types.push(type);
+            console.log(gameList[i]);
+            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length && gameList[i].status == "public") {
+                games.push({id: gameList[i].idGame, type: getStringOfGame(gameList[i]), actualPlayerAmount: gameList[i].playerList.length, maxPlayerAmount: gameList[i].playerAmount});
             }
         }
-        socket.emit("loadGame", idGames, playerAmounts, types, actualPlayerAmounts);
-    });
+        io.to("lobby").emit("loadGame", games);
+    }
 
     socket.on("createPlayer", (idGame, username) => {
         affectPlayer(idGame, username, false);
@@ -876,10 +876,12 @@ io.on("connection", (socket) => {
         if (isPlayerCreator) {
             newPlayer.isCreator = true;
             io.to(newPlayer.socketid).emit("teleportCreator", idGame);
+        } else {
+            io.to(newPlayer.socketid).emit("teleportPlayer", idGame);
         }
         socket.broadcast.to(idGame).emit("messageReceived", `${username} has joined the game`, "SERVER", "green");
         game.addPlayer(newPlayer);
-        io.to('lobby').emit("refreshGameList");
+        loadGames();
         console.log(`user ${username} is now a player of ${idGame}`);
     }
 

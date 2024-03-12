@@ -2,8 +2,8 @@ const Game = require("../Game");
 const Take6Card = require("./Take6Card");
 
 class Take6Game extends Game {
-    constructor(playerAmount, timer, idGame){
-        super(playerAmount, timer, idGame);
+    constructor(playerAmount, timer, idGame, status){
+        super(playerAmount, timer, idGame, status);
         this.cardBoard = {1: [], 2:[], 3:[], 4:[]};
     }
 

@@ -3,8 +3,8 @@ const Crazy8Card = require("./Crazy8Card");
 
 class Crazy8Game extends Game{
 
-    constructor(playerAmount, timer, idGame){
-        super(playerAmount, timer, idGame);
+    constructor(playerAmount, timer, idGame, status){
+        super(playerAmount, timer, idGame, status);
         this.cardBoardList = [];
         this.cardPickList = [];
         this.cardNumber = this.setCardAmount();

@@ -2,8 +2,8 @@ const Game = require("./../Game");
 const WarCard = require("./WarCard");
 
 class WarGame extends Game {
-    constructor(playerAmount, timer, idGame) {
-        super(playerAmount, timer, idGame);
+    constructor(playerAmount, timer, idGame, status) {
+        super(playerAmount, timer, idGame, status);
         this.winableCards = [];
         this.fightingPlayers = [];
         this.isHidden = false;

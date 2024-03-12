@@ -3,64 +3,91 @@ import Trieur from './../Composants/Trieur';
 import { useNavigate } from "react-router-dom";
 import { socket } from './socket';
 import Boutton from './../Composants/Boutton';
+import { useEffect, useState } from 'react';
 
 function PageChoix() {
 
-  socket.on("loadGame", (allGameID, allGamePlayerAmount, allGameType, actualPlayerAmounts) => {
-    let div = document.getElementById("contenu-Parties");
-    div.innerHTML = "";
-    for (let i = 0; i < allGameID.length; i++) {
-      let b = document.createElement("button");
-      b.addEventListener("click", (event) => {
-        socket.emit("createPlayer", allGameID[i], sessionStorage.getItem("pseudo"));
-        sessionStorage.setItem("idPartie", allGameID[i]);
-        return navigate("/PageDeJeu");
-      });
-      b.innerText = `Game ${allGameID[i]}\n${actualPlayerAmounts[i]}/${allGamePlayerAmount[i]}\n${allGameType[i]}`;
-      div.appendChild(b);
+  const [gameShown, setGameShown] = useState([]);
+  const [filter, setFilter] = useState("All");
+
+  const [firstLaunch, setFirstLaunch] = useState(true);
+
+
+  useEffect(() => {
+
+    if (firstLaunch) {
+      socket.emit("loadGame");
+      setFirstLaunch(false);
+    }
+
+    const loadGame = (games) => {
+      setGameShown(games);
+    }
+
+    const teleportPlayer = (idGame) => {
+      sessionStorage.setItem("idPartie", parseInt(idGame));
+      return navigate("/PageDeJeu");
+    }
+
+    socket.on("teleportPlayer", teleportPlayer);
+    socket.on("loadGame", loadGame);
+
+    return () => {
+      socket.off("teleportPlayer", teleportPlayer);
+      socket.off("loadGame", loadGame);
     }
   });
 
-  socket.on("refreshGameList", () => {
-    socket.emit("loadGame");
-  })
-
-  socket.emit("loadGame");
-
   const navigate = useNavigate();
-  function Choix() {
+
+  const goToResumeGames = () => {
+    return navigate("/PagePause");
+  }
+
+  const goToParameters = () => {
+    return navigate("/Parameters");
+  }
+
+
+  const Choix = () => {
     return navigate('/CreationPartie');
   }
 
   function RejoindrePartieParID() {
-    let id = document.getElementById("zoneIDPartiePrivée").value;
+    let id = parseInt(document.getElementById("zoneIDPartiePrivée").value);
     socket.emit("joinPerID", id, sessionStorage.getItem("pseudo"));
   }
 
-  function Scores() {
-    navigate("/PageScores");
+  const clickGame = (event) => {
+    socket.emit("createPlayer", parseInt(event.target.id), sessionStorage.getItem("pseudo"));
   }
 
-  function goToResumeGames() {
-    navigate("/PagePause");
-  }
-
-  function goToParameters(){
-    navigate("/Parameters");
+  const sortGames = (event) => {
+    setFilter(event.target.value);
   }
 
   return (
     <div className="PageChoix">
       <h5>Choix de la Partie</h5>
       {Boutton("Parameters", goToParameters)}
-      {Boutton("Reprendre une partie", goToResumeGames())}
+      {Boutton("Reprendre une partie", goToResumeGames)}
       <main>
         {Boutton("Créer une Partie", Choix)}
-        {Trieur()}
+        <select className="Select" id="Select" onChange={sortGames}>
+          <option value="All">Tous les jeux</option>
+          <option value="jeu-de-bataille">Jeu de Bataille</option>
+          <option value="6-qui-prend">6-qui-prend</option>
+          <option value="crazy8">crazy8</option>
+        </select>
         <div><br></br><input type='text' id='zoneIDPartiePrivée' placeholder="Tapez l'id d'une partie"></input><br></br>
           <br></br></div>
         {Boutton("Entrer", RejoindrePartieParID)}
         <div id="contenu-Parties" className="contenu-partie">
+          {gameShown.map(game => {
+            if (filter == "All" || game.type == filter){
+              return (<button id={game.id} onClick={clickGame}>Game {`${game.id}\n${game.actualPlayerAmount}/${game.maxPlayerAmount}\n${game.type}`}</button>);
+            }
+          })}
         </div>
       </main>
     </div>

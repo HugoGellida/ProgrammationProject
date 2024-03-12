@@ -5,43 +5,70 @@ import DelaisTour from './../Composants/DelaisTour';
 import { useNavigate } from "react-router-dom";
 import { socket } from './socket';
 import Boutton from './../Composants/Boutton';
+import { useEffect, useState } from 'react';
 
 function CreationPartie() {
 
+  const [infoGame, setInfoGame] = useState({});
+  const [showPrivateOption, setShowPrivateOption] = useState(false);
+
   const navigate = useNavigate();
 
-  function RedirectP() {
+  function stockGameInfo() {
     let nbJoueur = document.getElementById("nbrjoueur").value;
     let Delais = document.getElementById("DelaisTour").value;
     let typedejeu = document.getElementById("Select").options[document.getElementById("Select").selectedIndex].value;
+    setInfoGame({ playerAmount: nbJoueur, timer: Delais, type: typedejeu, creator: sessionStorage.getItem("pseudo")});
+    setShowPrivateOption(true);
     console.log(nbJoueur, Delais, typedejeu);
-    socket.emit("createGame", nbJoueur, typedejeu, sessionStorage.getItem("pseudo"), Delais);
+    //socket.emit("createGame", nbJoueur, typedejeu, sessionStorage.getItem("pseudo"), Delais);
   }
 
-  //* Testing
-  //socket.emit("createGame", 2, "crazy8", sessionStorage.getItem("pseudo"), 20);
-  //socket.emit("createGame", 3, "jeu-de-bataille", sessionStorage.getItem("pseudo"), 20);
-  //socket.emit("createGame", 3, "6-qui-prend", sessionStorage.getItem("pseudo"), 20);
-  //*
+  function stockGameStatus(){
+    const gameStatus = document.getElementById("gameStatus").options[document.getElementById("gameStatus").selectedIndex].value;
+    socket.emit("createGame", {...infoGame, gameStatus: gameStatus});
+  }
 
-  socket.on("teleportCreator", data => {
-    sessionStorage.setItem("idPartie", data);
-    return navigate('/PageDeJeu');
+  useEffect(() => {
+    const teleportCreator = (idGame) => {
+      sessionStorage.setItem("idPartie", idGame);
+      return navigate('/PageDeJeu');
+    }
+
+    socket.on("teleportCreator", teleportCreator);
+
+    return () => {
+      socket.off("teleportCreator", teleportCreator);
+    }
   });
 
   return (
     <div className="CreationPartie">
       <h4>CreationPartie</h4>
       <main>
-        <label htmlFor="nbrjoueur">Nombre de joueurs: </label>
-        {nbrjoueur()}
-        <div><br></br><label htmlFor="Type de jeu">Type de jeu: </label></div>
-        {Trieur()}
-        <div><br></br></div>
-        <label htmlFor="nbrjoueur">Delais de Choix de Carte: </label>
-        {DelaisTour()}
-        <div><br></br></div>
-        {Boutton("Suivant", RedirectP)}
+        {!showPrivateOption && (
+          <>
+            <label htmlFor="nbrjoueur">Nombre de joueurs: </label>
+            {nbrjoueur()}
+            <div><br></br><label htmlFor="Type de jeu">Type de jeu: </label></div>
+            {Trieur()}
+            <div><br></br></div>
+            <label htmlFor="nbrjoueur">Delais de Choix de Carte: </label>
+            {DelaisTour()}
+            {Boutton("Suivant", stockGameInfo)}
+            <div><br></br></div>
+          </>
+        )}
+        {showPrivateOption && (
+          <>
+            <select id='gameStatus'>
+              <option value="public">Partie publique</option>
+              <option value="private">Partie privée</option>
+            </select>
+            {Boutton("Suivant", stockGameStatus)}
+          </>
+
+        )}
 
       </main>
     </div>

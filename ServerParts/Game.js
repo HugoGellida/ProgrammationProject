@@ -1,5 +1,5 @@
 class Game {
-    constructor(playerAmount, timer, idGame){
+    constructor(playerAmount, timer, idGame, status){
         this.playerAmount = playerAmount;
         this.playerList = [];
         this.timer = timer;
@@ -7,6 +7,7 @@ class Game {
         this.isPaused = false;
         this.creator = null;
         this.isLaunched = false;
+        this.status = status;
     }
 
     addPlayer(player){
