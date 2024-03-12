@@ -16,7 +16,6 @@ function PageDeJeu() {
   let PosCarte = {};
   let Delais;
   let ListeCJ;
-  let clic;
   let Div;
   let Div2;
   let Div3;
@@ -25,6 +24,8 @@ function PageDeJeu() {
   const [hasClicked, setHasClicked] = useState(false);
   const [info, setInfo] = useState({});
   const [noClickLaunch, setNoClickLaunch] = useState(true);
+  const [showPauseButton, setShowPauseButton] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
 
   const navigate = useNavigate();
 
@@ -204,7 +205,7 @@ function PageDeJeu() {
 
   function LancerTour(ListeDesCartes, DossierImageExt, NomSocket) {
     setHasClicked(false);
-    clic = false;
+    setShowPauseButton(true);
     for (let i = 0; i < ListeDesCartes.length; i++) {
       let b;
       if (ListeDesCartes[i].value && ListeDesCartes[i].type){
@@ -224,7 +225,6 @@ function PageDeJeu() {
 
   function CarteCliquee(b, ListeDesCartes, DossierImageExt, NomSocket) {
     ListeCJ = ListeCJ - 1;
-    clic = true;
     setLaunchTimer(false);
     setHasClicked(true);
     document.getElementById("Decompte").innerText = 0;
@@ -368,6 +368,7 @@ function PageDeJeu() {
     const endTake6 = (winners) => {
       setLaunchTimer(false);
       setHasClicked(true);
+      setShowPauseButton(false);
       if (winners.includes(sessionStorage.getItem('pseudo'))) {
         alert("Vous avez gagné !!!\n+750 money");
       }
@@ -378,13 +379,13 @@ function PageDeJeu() {
     }
   
     const refreshCardBoardTake6 = (lineUpdated, lineNumber) => {
-      let Div;
+      setShowPauseButton(false);
       for (let i = 1; i < lineUpdated.length + 1; i++){
-        Div = document.getElementById(`CartesL${lineNumber}-${i}`);
+        let Div = document.getElementById(`CartesL${lineNumber}-${i}`);
         Div.style.backgroundImage = `url(./images2/${lineUpdated[i - 1].value}.svg)`;
       }
       for (let i = lineUpdated.length + 1; i < 7; i++){
-        Div = document.getElementById(`CartesL${lineNumber}-${i}`);
+        let Div = document.getElementById(`CartesL${lineNumber}-${i}`);
         Div.style.backgroundImage = `none`;
       }
     }
@@ -410,6 +411,21 @@ function PageDeJeu() {
     }
 
     const opponentPlayedTake6 = (username) => {CarteJoueeJ(username, "images2/boeuf.svg)");}
+
+    const pauseAllowed = () => {
+      setLaunchTimer(false);
+      setHasClicked(true);
+      setShowPauseButton(false);
+      document.getElementById("RetourFin").style.display = "flex";
+      alert("La partie a été mise en pause par le createur");
+    }
+
+    const showLaunchButton = () => {
+      console.log("hi");
+      setIsCreator(true);
+      let Div = document.getElementById("Boutton");
+      Div.style.display = "flex";
+    }
   
     socket.on("opponentPlayedTake6", opponentPlayedTake6);
     socket.on("playerTurnTake6", playerTurnTake6);
@@ -425,6 +441,12 @@ function PageDeJeu() {
     socket.on("refreshOponnentCardWar", username => {CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)");});
     socket.on("revealAllCard", (cardPerPlayer, repertory) => {RetourneCartesJouees(cardPerPlayer, repertory);});
     socket.on("messageReceived", messageReceived);
+
+    socket.on("pauseAllowed", pauseAllowed);
+    socket.on("showLaunchButton", showLaunchButton);
+    socket.on("Enregistrer", data => {
+      navigate('/PageChoix');
+    });
 
     return () => {
       clearInterval(intervalIDTimer);
@@ -443,6 +465,8 @@ function PageDeJeu() {
       socket.off("refreshOponnentCardWar", username => {CarteJoueeJ(username, "imagesTest/Verso-Cartes.png)");});
       socket.off("revealAllCard", (cardPerPlayer, repertory) => {RetourneCartesJouees(cardPerPlayer, repertory);});
       socket.off("messageReceived", messageReceived);
+      socket.off("pauseAllowed", pauseAllowed);
+      socket.off("showLaunchButton", showLaunchButton);
     }
   });
 
@@ -480,8 +504,8 @@ function PageDeJeu() {
     }, 5000);
   }
 
-  function Retour() {
-    navigate('/PageChoix');
+  const Retour = () => {
+    return navigate('/PageChoix');
   }
 
   function EtatBoutton() {
@@ -496,27 +520,8 @@ function PageDeJeu() {
   }
 
   function Enregistrer() {
-    socket.emit("Enregistrer", sessionStorage.getItem("idPartie"));
+    socket.emit("askPause", sessionStorage.getItem("idPartie"));
   }
-
-
-
-
-
-
-
-
-
-  socket.on("showLaunchButton", () => {
-    console.log("hi");
-    let Div = document.getElementById("Boutton");
-    Div.style.display = "flex";
-    let Div2 = document.getElementById("Enregistrer");
-    Div2.style.display = "flex";
-  });
-  socket.on("Enregistrer", data => {
-    navigate('/PageChoix');
-  });
 
 //########################    Crazy 8    ################################
 
@@ -538,32 +543,6 @@ function PageDeJeu() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   //##############################################################################
 
 
@@ -579,7 +558,9 @@ function PageDeJeu() {
       {noClickLaunch && EtatBoutton()}
       <button id='Boutton' onClick={Affichage}>Commencer</button>
       <button id='RetourFin' onClick={Retour}>Retour</button>
-      <button id='Enregistrer' onClick={Enregistrer}>Enregistrer</button>
+      {(isCreator && showPauseButton) && (
+        <button id='Enregistrer' onClick={Enregistrer}>Enregistrer</button>
+      )}
       <div id='Decompte'></div>
     </div>
   );

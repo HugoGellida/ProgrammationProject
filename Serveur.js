@@ -358,7 +358,7 @@ io.on("connection", (socket) => {
         console.log("hi");
         for (let i = 0; i < gameList.length; i++) {
             console.log(gameList[i]);
-            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length && gameList[i].status == "public") {
+            if ((gameList[i].playerAmount != rooms[gameList[i].idGame].length && gameList[i].status == "public") || !gameList[i].isLaunched) {
                 games.push({id: gameList[i].idGame, type: getStringOfGame(gameList[i]), actualPlayerAmount: gameList[i].playerList.length, maxPlayerAmount: gameList[i].playerAmount});
             }
         }
@@ -388,15 +388,16 @@ io.on("connection", (socket) => {
             console.log(`the game ${idGame} has been resumed`);
             if (game instanceof WarGame) {
                 for (let i = 0; i < players.length; i++) {
-                    io.to(players[i].socketid).emit("resumeWar", players[i].handCard, game.timer, usernameList);
+                    console.log(players[i].handCard, players[i].cardPlayed, game.timer, usernameList);
+                    io.to(players[i].socketid).emit("resumeWar", players[i].handCard, players[i].cardPlayed, game.timer, usernameList);
                 }
             } else if (game instanceof Take6Game) {
                 for (let i = 0; i < players.length; i++) {
-                    io.to(players[i].socketid).emit("resumeTake6", players[i].handCard, game.timer, listePseudo);
+                    io.to(players[i].socketid).emit("resumeTake6", players[i].handCard, players[i].cardPlayed, game.timer, usernameList);
                 }
             } else if (game instanceof Crazy8Game) {
                 for (let i = 0; i < players.length; i++) {
-                    io.to(players[i].socketid).emit("resumeCrazy8", players[i].handCard, game.timer, listePseudo, game.currentPlayer().username);
+                    io.to(players[i].socketid).emit("resumeCrazy8", players[i].handCard, game.timer, game.currentPlayer().username, usernameList);
                 }
             }
         } else if (game.playerAmount == game.playerList.length) {
@@ -437,7 +438,11 @@ io.on("connection", (socket) => {
         game.isPaused = true;
         rooms[idGame] = [];
         rooms["lobby"].push(...game.playerList);
+        for (let i = 0; i < game.playerAmount; i++) {
+            io.sockets.sockets.get(game.playerList[i].socketid).join('lobby');
+        }
         io.to(parseInt(idGame)).emit("pauseAllowed");
+        io.socketsLeave(parseInt(idGame));
     });
 
     //* Crazy8
@@ -862,20 +867,22 @@ io.on("connection", (socket) => {
     });
     //Page reprendrePartie
 
-    socket.on("demandePartiePause", username => {
+    socket.on("askPausedGames", username => {
         const games = gameList.filter(game => {
             if (game.getPlayerByUsername(username)) return true;
             return false;
         });
+        console.log(games);
         let gamesInformations = [];
         for (let i = 0; i < games.length; i++) {
-            let stringType = getStringOfGame(games[i]);
-            gamesInformations.push({ idGame: games[i].idGame, playerAmount: games[i].playerAmount, timer: games[i].timer, typeOfGame: stringType });
+            const stringType = getStringOfGame(games[i]);
+            const actualPlayerAmount = io.sockets.adapter.rooms.get(parseInt(games[i].idGame)).size;
+            gamesInformations.push({ id: games[i].idGame, playerAmount: games[i].playerAmount, actualPlayerAmount: actualPlayerAmount, type: stringType});
         }
-        socket.emit("demandePartiePause", gamesInformations);
+        socket.emit("sendPausedGames", gamesInformations);
     });
 
-    socket.on("rejoindrePartiePause", (idGame, username) => {
+    socket.on("joinPausedGame", (idGame, username) => {
         const game = getGameById(idGame);
         const player = game.getPlayerByUsername(username);
         player.socketid = socket.id; //* Le joueur s'est peut-être connécté avec un autre socketid que celui précédent.
