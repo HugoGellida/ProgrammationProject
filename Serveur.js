@@ -278,18 +278,20 @@ io.on("connection", (socket) => {
                         });
                     }
                 } else {
-                    if (game.playerList.length == 1) {
-                        gameList = gameList.filter(g => g.idGame != game.idGame);
-                        console.log(`game ${game.idGame} has been removed`);
-                    } else {
-                        io.to(game.idGame).emit("messageReceived", `The player ${playerSocket.username} has left`, "SERVER", "green");
-                        game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
-                        if (playerSocket.isCreator) {
-                            game.playerList[0].isCreator = true;
-                            io.to(game.playerList[0].socketid).emit("showLaunchButton");
+                    io.to(game.idGame).emit("messageReceived", `The player ${playerSocket.username} has left`, "SERVER", "green");
+                    if (!game.isPaused){
+                        if (game.playerList.length == 1) {
+                            gameList = gameList.filter(g => g.idGame != game.idGame);
+                            console.log(`game ${game.idGame} has been removed`);
+                        } else {
+                            game.playerList = game.playerList.filter(player => player.username != playerSocket.username);
+                            if (playerSocket.isCreator) {
+                                game.playerList[0].isCreator = true;
+                                io.to(game.playerList[0].socketid).emit("showLaunchButton");
+                            }
                         }
+                        loadGames();
                     }
-                    loadGames();
                 }
             }
         });
@@ -357,8 +359,8 @@ io.on("connection", (socket) => {
         let games = [];
         console.log("hi");
         for (let i = 0; i < gameList.length; i++) {
-            console.log(gameList[i]);
-            if ((gameList[i].playerAmount != rooms[gameList[i].idGame].length && gameList[i].status == "public") || !gameList[i].isLaunched) {
+            if (gameList[i].playerAmount != rooms[gameList[i].idGame].length && gameList[i].status == "public" && !gameList[i].isPaused) {
+                console.log(`game ${gameList[i]} added`);
                 games.push({id: gameList[i].idGame, type: getStringOfGame(gameList[i]), actualPlayerAmount: gameList[i].playerList.length, maxPlayerAmount: gameList[i].playerAmount});
             }
         }
@@ -872,12 +874,10 @@ io.on("connection", (socket) => {
             if (game.getPlayerByUsername(username)) return true;
             return false;
         });
-        console.log(games);
         let gamesInformations = [];
         for (let i = 0; i < games.length; i++) {
             const stringType = getStringOfGame(games[i]);
-            const actualPlayerAmount = io.sockets.adapter.rooms.get(parseInt(games[i].idGame)).size;
-            gamesInformations.push({ id: games[i].idGame, playerAmount: games[i].playerAmount, actualPlayerAmount: actualPlayerAmount, type: stringType});
+            gamesInformations.push({ id: games[i].idGame, playerAmount: games[i].playerAmount, type: stringType});
         }
         socket.emit("sendPausedGames", gamesInformations);
     });
@@ -887,7 +887,11 @@ io.on("connection", (socket) => {
         const player = game.getPlayerByUsername(username);
         player.socketid = socket.id; //* Le joueur s'est peut-être connécté avec un autre socketid que celui précédent.
         socket.leave('lobby');
+        rooms['lobby'].filter(socketid => socketid != socket.id);
+        if (!rooms[idGame]) rooms[idGame] = [];
+        rooms[idGame].push(socket.id);
         socket.join(parseInt(idGame));
+        socket.broadcast.to(parseInt(idGame)).emit("messageReceived", `The player ${username} joined the game`, "SERVER", "green")
     });
 
     //! Function Part

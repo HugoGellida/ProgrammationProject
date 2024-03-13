@@ -253,6 +253,11 @@ function PageDeJeu() {
     }
   }
   useEffect(() => {
+    if (noClickLaunch){
+      socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
+      setNoClickLaunch(false);
+    }
+
     let intervalIDTimer;
     if (launchTimer){
       intervalIDTimer = setInterval(() => {
@@ -508,11 +513,6 @@ function PageDeJeu() {
     return navigate('/PageChoix');
   }
 
-  function EtatBoutton() {
-    setNoClickLaunch(false);
-    socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
-  }
-
   function MesTchat() {
     let Message = document.getElementById('message')
     socket.emit("messageSent", sessionStorage.getItem("idPartie"), Message.value, sessionStorage.getItem("pseudo"));
@@ -555,7 +555,6 @@ function PageDeJeu() {
       {EmplacementJoueur()}
       {CartesGagnees()}
       {Scorejoueur()}
-      {noClickLaunch && EtatBoutton()}
       <button id='Boutton' onClick={Affichage}>Commencer</button>
       <button id='RetourFin' onClick={Retour}>Retour</button>
       {(isCreator && showPauseButton) && (

@@ -42,7 +42,7 @@ function Pagepause() {
       <button id='Retour' onClick={Retour}>Retour</button>
       <div id="contenu-Parties">
         {gamePaused.map(game => {
-          return (<button id={game.id} onClick={handleClickGame}>Jeu {game.id} {game.actualPlayerAmount}/{game.playerAmount} {game.type}</button>);
+          return (<button id={game.id} onClick={handleClickGame}>Jeu {game.id} {game.playerAmount} players {game.type}</button>);
         })}
       </div>
     </>

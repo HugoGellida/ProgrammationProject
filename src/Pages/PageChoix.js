@@ -84,7 +84,7 @@ function PageChoix() {
         {Boutton("Entrer", RejoindrePartieParID)}
         <div id="contenu-Parties" className="contenu-partie">
           {gameShown.map(game => {
-            if (filter == "All" || game.type == filter){
+            if (filter === "All" || game.type === filter){
               return (<button id={game.id} onClick={clickGame}>Game {`${game.id}\n${game.actualPlayerAmount}/${game.maxPlayerAmount}\n${game.type}`}</button>);
             }
           })}
