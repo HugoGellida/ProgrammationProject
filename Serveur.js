@@ -24,7 +24,6 @@ const io = new require("socket.io")(server, {
 
 
 const fs = require("fs");
-const { syncBuiltinESMExports } = require("module");
 const sql = require("sqlite3").verbose();
 const db = new sql.Database("./Database.db");
 
@@ -567,7 +566,9 @@ io.on("connection", (socket) => {
         console.dir(game.playerList);
         for (let i = 0; i < game.playerAmount; i++){
             const player = game.playerList[i];
-            io.to(player.socketid).emit("prepareCrazy8", game.getOpponentsUsername(player.username), player.handCard, game.timer, game.lastCardPlayed);
+            let handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+            const lastCardPlayed = {value: game.getLastCard().value, type: game.getLastCard().type}
+            io.to(player.socketid).emit("prepareCrazy8", game.getOpponentsUsername(player.username), handCard, game.timer, lastCardPlayed);
         }
         const currentPlayer = game.currentPlayer();
         boardAnalyseCrazy8(game, currentPlayer);

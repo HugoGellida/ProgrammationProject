@@ -34,10 +34,6 @@ function PageDeJeu() {
     socket.emit("launchGame", sessionStorage.getItem("idPartie"));
   }
 
-  socket.on("playerTurnCrazy8", (timer, playableCards, handCard) => {
-    console.log(timer, playableCards, handCard);
-  });
-
   function CartesJoueur(ListeCartes) {
     ListeCJ = ListeCartes.length;
     for (let i = 0; i < ListeCartes.length; i++) {
@@ -111,6 +107,35 @@ function PageDeJeu() {
       document.getElementById("CartesJ1").style.backgroundImage = "none"
     }
   }
+
+  function StyleCartesJoueurCrazy8(ListeCartes,lastCardPlayed) {
+    for (let i = 0; i < ListeCartes.length; i++) {
+      Div = document.getElementById(`Cartes-${ListeCartes[i].value}-${ListeCartes[i].type}`);
+      if (Div) {
+        Div.style.display = "flex";
+        Div.style.bottom = '0%'
+        Div.style.height = '14%'
+        Div.style.backgroundImage = `url('./imagesTest/${ListeCartes[i].value}-${ListeCartes[i].type}.png')`;
+        Div.className = ListeCartes[i].value;
+        PosCarte[ListeCartes[i].value] = i + 1;
+        Div.style.backgroundSize = "cover";
+      }
+    }
+    document.getElementById("PileCachee").style.display = "flex"
+    document.getElementById("PileJouee").style.display = "flex"
+    document.getElementById("PileCachee").style.backgroundImage = "url('./imagesTest/Verso-Cartes.png')"
+    document.getElementById("PileJouee").style.backgroundImage = `url('./imagesTest/${lastCardPlayed.value}-${lastCardPlayed.type}.png')`
+
+  }
+
+
+
+
+
+
+
+
+
 
   function AttributionAdversaire(opponents) {
     let j = 1;
@@ -525,25 +550,84 @@ function PageDeJeu() {
 
 //########################    Crazy 8    ################################
 
+const prepareCrazy8 = (OpponentsUsername, handCard,timer, lastCardPlayed) => {
+  console.log(handCard)
+  CartesJoueur(handCard)
+  StyleCartesJoueurCrazy8(handCard,lastCardPlayed)
+  AttributionAdversaire(OpponentsUsername)
+  EmplAdversaires(OpponentsUsername)
+  AffichageDecompte(timer)
+}
+
+
+socket.on("prepareCrazy8",prepareCrazy8);
 
 
 
 
-  //##############################################################################
 
-  socket.on("playerTurnCrazy8",(gameTimer,playableCards,handCard)=>{
+/*
+
+socket.on("playerTurnCrazy8",(gameTimer,playableCards,handCard)=>{
     console.log(handCard)
     CartesJoueur(handCard)
-    StyleCartesJoueurBataille(handCard)
+    StyleCartesJoueur6QP(handCard)
     AttributionAdversaire(["John"])
     EmplAdversaires(["John"])
   })
 
 
+*/
+
+
+  //##############################################################################
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
   //##############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   return (
