@@ -112,10 +112,14 @@ function PageDeJeu() {
     for (let i = 0; i < ListeCartes.length; i++) {
       Div = document.getElementById(`Cartes-${ListeCartes[i].value}-${ListeCartes[i].type}`);
       if (Div) {
+        let a =ListeCartes[i].value
+        if(a==1){
+          a=14
+        }
         Div.style.display = "flex";
         Div.style.bottom = '0%'
         Div.style.height = '14%'
-        Div.style.backgroundImage = `url('./imagesTest/${ListeCartes[i].value}-${ListeCartes[i].type}.png')`;
+        Div.style.backgroundImage = `url('./imagesTest/${a}-${ListeCartes[i].type}.png')`;
         Div.className = ListeCartes[i].value;
         PosCarte[ListeCartes[i].value] = i + 1;
         Div.style.backgroundSize = "cover";
