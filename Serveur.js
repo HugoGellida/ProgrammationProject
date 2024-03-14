@@ -565,6 +565,10 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         game.prepareRound();
         console.dir(game.playerList);
+        for (let i = 0; i < game.playerAmount; i++){
+            const player = game.playerList[i];
+            io.to(player.socketid).emit("prepareCrazy8", game.getOpponentsUsername(player.username), player.handCard, game.timer, game.lastCardPlayed);
+        }
         const currentPlayer = game.currentPlayer();
         boardAnalyseCrazy8(game, currentPlayer);
     }
