@@ -308,6 +308,8 @@ io.on("connection", (socket) => {
                 rooms["lobby"].push(socket.id);
                 db.run(`UPDATE User SET isConnected = true, socketid = '${socket.id}' WHERE username = '${username}'`);
                 socket.emit("connectionAllowed", username);
+            } else {
+                socket.emit("connectionDenied");
             }
         });
     });

@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 
 function Connexion() {
 
+    const [showWarning, setShowWarning] = useState(false);
+
     let navigate = useNavigate();
 
     function DemandeConnexion() {
@@ -20,19 +22,42 @@ function Connexion() {
             sessionStorage.setItem("pseudo", pseudo);
             return navigate("/PageChoix");
         }
+
+        const connectionDenied = () => {
+            setShowWarning(true);
+        }
+
         socket.on("connectionAllowed", connectionAllowed);
+        socket.on("connectionDenied", connectionDenied);
         return () => {
             socket.off("connectionAllowed", connectionAllowed);
+            socket.off("connectionDenied", connectionDenied);
         }
     });
 
+    const removeWarning = () => {
+        setShowWarning(false);
+    }
+
     return (
         <div className="Connexion">
-            <h2>Connexion</h2>
-            <main>
-                {Formulaire("Connexion", DemandeConnexion)}
-                <label> Don't have an account? </label><br></br><Link id="lcl" to="/">Inscription</Link>
-            </main>
+            {!showWarning && (
+                <>
+                    <h2>Connexion</h2>
+                    <main>
+                        {Formulaire("Connexion", DemandeConnexion)}
+                        <label> Don't have an account? </label><br></br><Link id="lcl" to="/">Inscription</Link>
+                    </main>
+                </>
+            )}
+            {showWarning && (
+                <>
+                    <main>
+                        <label>Connection refusée</label>
+                        <button onClick={removeWarning}>Continuer</button>
+                    </main>
+                </>
+            )}
         </div>
     );
 }
