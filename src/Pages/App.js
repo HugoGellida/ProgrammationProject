@@ -6,8 +6,8 @@ import CreationPartie from './CreationPartie'
 import PageChoix from './PageChoix'
 import PageDeJeu from './PageDeJeu'
 import Pagepause from './Pagepause';
-import Take6Opponent from '../Composants/ComponentTest/Take6Opponent';
 import Parameters from './Parameters';
+import Partie from './Partie';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <Route path="/Connex" element={<Connex/>} />
         <Route path="/PageDeJeu" element={<PageDeJeu/>} />
         <Route path="/PagePause" element={<Pagepause/>} />
-        <Route path="/Test" element={<Take6Opponent information={{username: "test", pointAmount: 0}}/>} />
+        <Route path="/Test" element={<Partie/>} />
         <Route path="/Parameters" element={<Parameters/>} />
       </Routes>
     </div>

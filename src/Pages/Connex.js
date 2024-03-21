@@ -44,10 +44,10 @@ function Connexion() {
             {!showWarning && (
                 <>
                     <h2>Connexion</h2>
-                    <main>
+                    <div className='connexionForm'>
                         {Formulaire("Connexion", DemandeConnexion)}
                         <label> Don't have an account? </label><br></br><Link id="lcl" to="/">Inscription</Link>
-                    </main>
+                    </div>
                 </>
             )}
             {showWarning && (

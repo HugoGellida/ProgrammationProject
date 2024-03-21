@@ -132,26 +132,26 @@ io.on("connection", (socket) => {
         const buyableTitles = await getBuyableTitles(username, false);
         let target;
         buyableColors.forEach(row => {
-            if (row.color == objectName){
+            if (row.color == objectName) {
                 target = row;
             }
         });
         buyableTitles.forEach(row => {
-            if (row.title == objectName){
+            if (row.title == objectName) {
                 target = row;
             }
         });
         db.get("SELECT * FROM User WHERE username = ?", [username], (err, row) => {
-            if (target.cost > row.money){
+            if (target.cost > row.money) {
                 socket.emit("deniedPurchase", target.cost - row.money);
             } else {
-                if (target.title){
+                if (target.title) {
                     db.run("UPDATE BuyableTitle SET isBought = true WHERE username = ? AND title = ?", [username, objectName], (err) => {
                         db.run("UPDATE User SET money = ? WHERE username = ?", [row.money - target.cost, username], (err) => {
                             socket.emit("acceptedPurchase");
                         });
                     });
-                } else if (target.color){
+                } else if (target.color) {
                     db.run("UPDATE BuyableColor SET isBought = true WHERE username = ? AND color = ?", [username, objectName], (err) => {
                         db.run("UPDATE User SET money = ? WHERE username = ?", [row.money - target.cost, username], (err) => {
                             socket.emit("acceptedPurchase");
@@ -202,17 +202,23 @@ io.on("connection", (socket) => {
         db.run(`UPDATE User SET chatColor = '${color}' WHERE username = '${username}'`);
     });
 
-    socket.on("testing", () => {
-        setTimeout(() => {
-            socket.emit("opponentPlayedTake6", "test");
-        }, 3000);
+    socket.on("testing", (idGame) => {
+        const game = getGameById(idGame);
+        game.prepareRound();
+        for (i = 0; i < game.playerAmount; i++) {
+            let opponentsInfo = [];
+            const player = game.playerList[i];
+            for (j = 0; j < game.playerAmount; j++) {
+                if (i != j) {
+                    const opponent = game.playerList[j];
+                    opponentsInfo.push({ username: opponent.username, card: null, cardAmount: opponent.handCard.length + opponent.pickCard.length });
+                }
+            }
+            const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+            io.to(player.socketid).emit("testingResult", handCard, opponentsInfo);
+        }
     });
 
-    socket.on("testing2", () => {
-        setTimeout(() => {
-            socket.emit("resetCardPlayedTake6", "test");
-        }, 3000);
-    })
 
     socket.join('preLobby');
     socket.emit("goToPreLobby");
@@ -279,7 +285,7 @@ io.on("connection", (socket) => {
                     }
                 } else {
                     io.to(game.idGame).emit("messageReceived", `The player ${playerSocket.username} has left`, "SERVER", "green");
-                    if (!game.isPaused){
+                    if (!game.isPaused) {
                         if (game.playerList.length == 1) {
                             gameList = gameList.filter(g => g.idGame != game.idGame);
                             console.log(`game ${game.idGame} has been removed`);
@@ -357,13 +363,13 @@ io.on("connection", (socket) => {
         loadGames();
     });
 
-    function loadGames(){
+    function loadGames() {
         let games = [];
         console.log("hi");
         for (let i = 0; i < gameList.length; i++) {
             if (gameList[i].playerAmount != rooms[gameList[i].idGame].length && gameList[i].status == "public" && !gameList[i].isPaused) {
                 console.log(`game ${gameList[i]} added`);
-                games.push({id: gameList[i].idGame, type: getStringOfGame(gameList[i]), actualPlayerAmount: gameList[i].playerList.length, maxPlayerAmount: gameList[i].playerAmount});
+                games.push({ id: gameList[i].idGame, type: getStringOfGame(gameList[i]), actualPlayerAmount: gameList[i].playerList.length, maxPlayerAmount: gameList[i].playerAmount });
             }
         }
         io.to("lobby").emit("loadGame", games);
@@ -430,8 +436,6 @@ io.on("connection", (socket) => {
 
     socket.on("messageSent", (idGame, message, username) => { // data = [idPartie, Message, username]
         db.get(`SELECT * FROM User WHERE username = '${username}'`, (err, row) => {
-            const game = getGameById(idGame);
-            const player = game.getPlayerByUsername(username);
             io.to(parseInt(idGame)).emit("messageReceived", message, username, row.chatColor, row.title);
         });
     });
@@ -516,7 +520,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         let currentPlayer = game.currentPlayer();
         console.log(`the player ${currentPlayer.username} chose a ${cardChosen.value} of ${cardChosen.type}`);
-        if (game.getLastCard().value == 1 && (cardChosen.vaule != 1 || cardChosen.value != 8) && currentPlayer.needPlay) {
+        if (game.getLastCard().value == 1 && (cardChosen.value != 1 || cardChosen.value != 8) && currentPlayer.needPlay) {
             currentPlayer.pickAce();
             currentPlayer.needPlay = false;
         }
@@ -565,7 +569,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         game.prepareRound();
         console.dir(game.playerList);
-        for (let i = 0; i < game.playerAmount; i++){
+        for (let i = 0; i < game.playerAmount; i++) {
             const player = game.playerList[i];
             io.to(player.socketid).emit("prepareCrazy8", game.getOpponentsUsername(player.username), player.handCard, game.timer, game.lastCardPlayed);
         }
@@ -656,6 +660,8 @@ io.on("connection", (socket) => {
                 const player = game.fightingPlayers[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
                 io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
+                const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username}));
+                io.to(player.socketid).emit("thirdGameTest", opponents, handCard);
             }
         }
     }
@@ -666,9 +672,11 @@ io.on("connection", (socket) => {
         playerConcerned.playCard(card);
         console.log(`the player ${username} chose a ${card.value} of ${card.type}, he has ${(playerConcerned.handCard.length + playerConcerned.pickCard.length)} in total`);
         socket.broadcast.to(parseInt(idGame)).emit("refreshOponnentCardWar", username);
+        socket.broadcast.to(parseInt(idGame)).emit("firstGameTest", username, card);
         if (game.allPlayed()) {
             const cardPerPlayer = game.fightingPlayers.map(player => ({ username: player.username, card: { value: player.cardPlayed.value, type: player.cardPlayed.type } }));
             io.to(parseInt(idGame)).emit("revealAllCard", cardPerPlayer, ["imagesTest", ".png"]);
+            io.to(parseInt(idGame)).emit("secondGameTest");
             cardAnalyseWar(game);
         }
     });
@@ -680,13 +688,13 @@ io.on("connection", (socket) => {
     }
 
     function nextTurnWar(game) {
-        setTimeout(() => {
-            for (let i = 0; i < game.playerAmount; i++) {
-                const player = game.playerList[i];
-                const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-                io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
-            }
-        }, 1000 * game.playerAmount);
+        for (let i = 0; i < game.playerAmount; i++) {
+            const player = game.playerList[i];
+            const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+            io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
+            const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username}));
+            io.to(player.socketid).emit("thirdGameTest", opponents, handCard);
+        }
     }
 
     function tieWar(game) {
@@ -699,70 +707,74 @@ io.on("connection", (socket) => {
         }
     }
     function cardAnalyseWar(game) {
-        if (game.isWarTime()) {
-            game.isHidden = true;
-            game.updatePlayerStatus();
-            game.updateFightingPlayers();
-            console.log(`the players ${game.fightingPlayers.map(player => player.username)} are in a war`);
-            game.resetAllCardPlayed();
-            if (game.isLocked()) {
-                tieWar(game);
-            } else if (game.isWarLocked()) {
-                console.log("the fighting players are all locked in war, we must change fighting players");
-                game.resetFightingPlayers();
+        setTimeout(() => {
+            if (game.isWarTime()) {
+                game.isHidden = true;
+                game.updatePlayerStatus();
                 game.updateFightingPlayers();
-                cardAnalyseWar(game);
-            } else {
-                for (let i = 0; i < game.fightingPlayers.length; i++) {
-                    const player = game.fightingPlayers[i];
-                    const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-                    io.to(player.socketid).emit("playerHiddenTurnWar", handCard, game.timer);
+                console.log(`the players ${game.fightingPlayers.map(player => player.username)} are in a war`);
+                game.resetAllCardPlayed();
+                if (game.isLocked()) {
+                    tieWar(game);
+                } else if (game.isWarLocked()) {
+                    console.log("the fighting players are all locked in war, we must change fighting players");
+                    game.resetFightingPlayers();
+                    game.updateFightingPlayers();
+                    cardAnalyseWar(game);
+                } else {
+                    for (let i = 0; i < game.fightingPlayers.length; i++) {
+                        const player = game.fightingPlayers[i];
+                        const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+                        io.to(player.socketid).emit("playerHiddenTurnWar", handCard, game.timer);
+                        const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username}));
+                        io.to(player.socketid).emit("fourthGameTest", opponents, handCard);
+                    }
                 }
-            }
-        } else {
-            game.isHidden = false;
-            const playerWinnerRound = game.fightingPlayers.filter(player => player.cardPlayed.value == game.getHighestCardValue())[0];
-            console.log(`the player ${playerWinnerRound.username} won ${game.winableCards.length} cards`);
-            game.winCard(playerWinnerRound);
-            game.updatePlayerStatus();
-            let updatesMade = []; let isGameEnd = false;
-            for (let i = 0; i < game.playerAmount; i++) {
-                if (game.playerList[i].hasNoCard()) {
-                    let update = new Promise((resolve, reject) => {
-                        db.get(`SELECT * FROM StatWar WHERE username = '${game.playerList[i].username}'`, (err, row) => {
-                            db.run(`UPDATE StatWar SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${game.playerList[i].username}'`, (err) => {
-                                console.log(`the player ${game.playerList[i].username} has been eliminated`);
-                                io.to(game.playerList[i].socketid).emit("loseWar");
-                                game.eliminatePlayer(game.playerList[i]);
-                                i--;
-                                resolve(row);
-                                if (playerWinnerRound.hasWon()) {
-                                    db.get(`SELECT * FROM StatWar WHERE username = '${playerWinnerRound.username}'`, (err, row) => {
-                                        db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${playerWinnerRound.username}'`);
-                                    });
-                                    db.get("SELECT * FROM User WHERE username = ?", [playerWinnerRound.username], (err, row) => {
-                                        db.run("UPDATE User SET money = ? WHERE username = ?", [row.money + 750, playerWinnerRound.username]);
-                                    })
-                                    console.log(`the player ${playerWinnerRound.username} has won the game`);
-                                    isGameEnd = true;
-                                }
+            } else {
+                game.isHidden = false;
+                const playerWinnerRound = game.fightingPlayers.filter(player => player.cardPlayed.value == game.getHighestCardValue())[0];
+                console.log(`the player ${playerWinnerRound.username} won ${game.winableCards.length} cards`);
+                game.winCard(playerWinnerRound);
+                game.updatePlayerStatus();
+                let updatesMade = []; let isGameEnd = false;
+                for (let i = 0; i < game.playerAmount; i++) {
+                    if (game.playerList[i].hasNoCard()) {
+                        let update = new Promise((resolve, reject) => {
+                            db.get(`SELECT * FROM StatWar WHERE username = '${game.playerList[i].username}'`, (err, row) => {
+                                db.run(`UPDATE StatWar SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${game.playerList[i].username}'`, (err) => {
+                                    console.log(`the player ${game.playerList[i].username} has been eliminated`);
+                                    io.to(game.playerList[i].socketid).emit("loseWar");
+                                    game.eliminatePlayer(game.playerList[i]);
+                                    i--;
+                                    resolve(row);
+                                    if (playerWinnerRound.hasWon()) {
+                                        db.get(`SELECT * FROM StatWar WHERE username = '${playerWinnerRound.username}'`, (err, row) => {
+                                            db.run(`UPDATE StatWar SET winAmount = ${(row.winAmount + 1)} WHERE username = '${playerWinnerRound.username}'`);
+                                        });
+                                        db.get("SELECT * FROM User WHERE username = ?", [playerWinnerRound.username], (err, row) => {
+                                            db.run("UPDATE User SET money = ? WHERE username = ?", [row.money + 750, playerWinnerRound.username]);
+                                        })
+                                        console.log(`the player ${playerWinnerRound.username} has won the game`);
+                                        isGameEnd = true;
+                                    }
+                                });
                             });
                         });
-                    });
-                    updatesMade.push(update);
+                        updatesMade.push(update);
+                    }
                 }
-            }
 
-            Promise.all(updatesMade).then(() => {
-                if (!isGameEnd) {
-                    game.resetFightingPlayers();
-                    nextTurnWar(game);
-                } else {
-                    game.isLaunched = false;
-                    io.to(playerWinnerRound.socketid).emit("winWar");
-                }
-            });
-        }
+                Promise.all(updatesMade).then(() => {
+                    if (!isGameEnd) {
+                        game.resetFightingPlayers();
+                        nextTurnWar(game);
+                    } else {
+                        game.isLaunched = false;
+                        io.to(playerWinnerRound.socketid).emit("winWar");
+                    }
+                });
+            }
+        }, 1000 * game.playerAmount);
     }
 
     //* Take6
@@ -773,7 +785,7 @@ io.on("connection", (socket) => {
         console.log(`the player ${username} choose the card ${card.value} which is ${card.pointAmount} points`);
         io.to(idGame).emit("opponentPlayedTake6", username);
         if (game.allPlayed()) {
-            const cardPerPlayer = game.playerList.map(player => ({ username: player.username, card: { value: player.cardPlayed.value}}));
+            const cardPerPlayer = game.playerList.map(player => ({ username: player.username, card: { value: player.cardPlayed.value } }));
             socket.emit("revealAllCard", cardPerPlayer, ["images2", ".svg"]);
             game.sortPlayerList();
             launchCardAnalyseTake6(game.playerList, game);
@@ -794,7 +806,7 @@ io.on("connection", (socket) => {
                 const keys = Object.keys(game.cardBoard);
                 const cards = [];
                 keys.forEach(key => {
-                    cards.push(game.cardBoard[key].map(card => ({value: card.value})));
+                    cards.push(game.cardBoard[key].map(card => ({ value: card.value })));
                 });
                 io.to(player.socketid).emit("playerTurnTake6", handCard, game.getOpponentsUsername(player.username), cards, player.totalPoint, game.timer);
             }
@@ -817,7 +829,7 @@ io.on("connection", (socket) => {
                 } else {
                     const player = playerList[0];
                     let [lineUpdated, lineNumber] = game.placeCard(player, player.cardPlayed);
-                    lineUpdated = lineUpdated.map(card => ({value: card.value}));
+                    lineUpdated = lineUpdated.map(card => ({ value: card.value }));
                     io.to(parseInt(game.idGame)).emit("refreshCardBoardTake6", lineUpdated, lineNumber);
                     io.to(game.idGame).emit("resetCardPlayedTake6", player.username);
                     io.to(game.idGame).emit("refreshPlayerPointTake6", player.totalPoint, player.username);
@@ -883,7 +895,7 @@ io.on("connection", (socket) => {
         let gamesInformations = [];
         for (let i = 0; i < games.length; i++) {
             const stringType = getStringOfGame(games[i]);
-            gamesInformations.push({ id: games[i].idGame, playerAmount: games[i].playerAmount, type: stringType});
+            gamesInformations.push({ id: games[i].idGame, playerAmount: games[i].playerAmount, type: stringType });
         }
         socket.emit("sendPausedGames", gamesInformations);
     });

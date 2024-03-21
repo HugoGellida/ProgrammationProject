@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Boutton from "../Composants/Boutton";
 import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
+import './Parameters.css';
 
 export default function Parameters() {
 
@@ -142,7 +143,7 @@ export default function Parameters() {
     }
 
     return (
-        <>
+        <div className="Parameters">
             {Boutton("Chat colors", handleClickColors)}
             {Boutton("Title chat", handleClickTitles)}
             {Boutton("Statistics", handleClickStats)}
@@ -231,6 +232,6 @@ export default function Parameters() {
                     )}
                 </>
             )}
-        </>
+        </div>
     );
 }

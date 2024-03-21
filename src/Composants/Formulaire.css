@@ -6,36 +6,38 @@ h2 {
     font-weight: 900;
     color: #0a0909;
     margin-top: 20%;
-    text-shadow:0 0 4px #FF0000,0 0 50px #FF0000,0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;color:#0f0f0d;
-    background-color:transparent;
-    }
+    text-shadow: 0 0 4px #FF0000, 0 0 50px #FF0000, 0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;
+    color: #0f0f0d;
+    background-color: transparent;
+}
 
 
-    /**
+/**
     * Zone de saisie
     */
-    input {	
-      
-            width: 170px;
-            background: linear-gradient(rgb(7, 7, 7),rgb(90, 15, 15));
-            border:3px inset rgb(90, 15, 15);
-            color: rgb(224, 201, 201);
-            font: inherit;
-            box-shadow: 0 6px 10px 0 rgba(0, 0, 0 , .1);
-            border-radius: 9px;
-            outline: 0;
-            padding: 10px 10px;
-           
-            
-        }
-       
-    
-        label {
-            /* Vos styles ici */
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 8px;
-            display: block;
-            text-shadow:0 0 4px #FF0000,0 0 50px #FF0000,0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;color:#fcfcf9;
-            /* Ajoutez d'autres styles selon vos besoins */
-          }
+input {
+
+    width: 170px;
+    background: linear-gradient(rgb(7, 7, 7), rgb(90, 15, 15));
+    border: 3px inset rgb(90, 15, 15);
+    color: rgb(224, 201, 201);
+    font: inherit;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, .1);
+    border-radius: 9px;
+    outline: 0;
+    padding: 10px 10px;
+
+
+}
+
+
+label {
+    /* Vos styles ici */
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+    text-shadow: 0 0 4px #FF0000, 0 0 50px #FF0000, 0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;
+    color: #fcfcf9;
+    /* Ajoutez d'autres styles selon vos besoins */
+}

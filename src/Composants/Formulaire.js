@@ -8,7 +8,7 @@ export default function Formulaire(Action, DemandeInscription) {
     }
 
     return (
-        <div className={Action}>
+        <div>
             <form id="loginForm" onSubmit={RetirerDefault}>
                 <label htmlFor="username">Nom d'utilisateur</label>
                 <input type="text" id="username" name="username" required /><br></br><br></br>

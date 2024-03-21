@@ -12,6 +12,8 @@ function PageChoix() {
 
   const [firstLaunch, setFirstLaunch] = useState(true);
 
+  const navigate = useNavigate();
+
 
   useEffect(() => {
 
@@ -24,21 +26,21 @@ function PageChoix() {
       setGameShown(games);
     }
 
-    const teleportPlayer = (idGame) => {
+    const tp = (idGame) => {
       sessionStorage.setItem("idPartie", parseInt(idGame));
-      return navigate("/PageDeJeu");
+      return navigate("/Test");
     }
 
-    socket.on("teleportPlayer", teleportPlayer);
+    socket.on("teleportPlayer", tp);
     socket.on("loadGame", loadGame);
+    socket.on("teleportCreator", tp);
 
     return () => {
-      socket.off("teleportPlayer", teleportPlayer);
+      socket.off("teleportPlayer", tp);
       socket.off("loadGame", loadGame);
+      socket.off("teleportCreator", tp);
     }
   });
-
-  const navigate = useNavigate();
 
   const goToResumeGames = () => {
     return navigate("/PagePause");
@@ -66,6 +68,13 @@ function PageChoix() {
     setFilter(event.target.value);
   }
 
+  const Test = () => {
+    socket.emit("createGame", { playerAmount: 2, timer: 30, type: "jeu-de-bataille", creator: sessionStorage.getItem("pseudo"), gameStatus: "public"});
+  }
+  const Test2 = () => {
+    socket.emit("createPlayer", 1, sessionStorage.getItem("pseudo"));
+  }
+
   return (
     <div className="PageChoix">
       <h5>Choix de la Partie</h5>
@@ -84,11 +93,13 @@ function PageChoix() {
         {Boutton("Entrer", RejoindrePartieParID)}
         <div id="contenu-Parties" className="contenu-partie">
           {gameShown.map(game => {
-            if (filter === "All" || game.type === filter){
+            if (filter === "All" || game.type === filter) {
               return (<button id={game.id} onClick={clickGame}>Game {`${game.id}\n${game.actualPlayerAmount}/${game.maxPlayerAmount}\n${game.type}`}</button>);
             }
           })}
         </div>
+        {Boutton("TestZone", Test)}
+        {Boutton("TestZone2", Test2)}
       </main>
     </div>
   );

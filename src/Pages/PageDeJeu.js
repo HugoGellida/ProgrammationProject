@@ -516,7 +516,6 @@ function PageDeJeu() {
   function MesTchat() {
     let Message = document.getElementById('message')
     socket.emit("messageSent", sessionStorage.getItem("idPartie"), Message.value, sessionStorage.getItem("pseudo"));
-
   }
 
   function Enregistrer() {

@@ -30,7 +30,7 @@
   }
   
   
-  main {
+  .connexionForm {
     display: center;
     flex-direction: column;
     justify-content: space-between;
@@ -42,9 +42,9 @@
     color: white;
     font-size: 17px;
     font-weight: 500;
-    border-radius: 30px;
-    background-color: var(--color-secondary);
+    border-radius: 15px;
     margin-bottom: 100%;
-  
+    border: 9px inset rgb(90, 15, 15);
+    background-color: rgb(0, 0, 0, 0.75);
   }
   

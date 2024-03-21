@@ -12,7 +12,6 @@ export default function Tchat(Fonction) {
             <div id="Message"></div>
             <input id="message" type="text" placeholder="Ecrivez votre Message..." onKeyDown={handleKeyDown}/>
             {Boutton("▸", Fonction)}
-
         </div>
     )
 }

@@ -1,0 +1,11 @@
+.Parameters {
+    background-image: url('./images/Arrière-plan-paramètres.jpg');
+}
+
+.lockedColors {
+    background-image: url('./images/cadenas.jpg');
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+}
