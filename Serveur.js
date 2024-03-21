@@ -214,7 +214,7 @@ io.on("connection", (socket) => {
                 }
             }
             const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-            io.to(player.socketid).emit("testingResult", handCard, opponentsInfo);
+            io.to(player.socketid).emit("testingResult", handCard, opponentsInfo, game.timer);
         }
     });
 

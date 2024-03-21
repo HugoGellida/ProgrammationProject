@@ -8,9 +8,7 @@ button {
 	transition: 0.5s;
 }
 
-button:hover,
-button:focus,
-button:active {
+button:hover {
 	background: #e90d0d;
 	color: #fff;
 }
