@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
 
-export default function Prendqui6({ opponentInfos, cards, time, infosSup }) {
+export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [opponents, setOpponents] = useState(opponentInfos);
     const [handCard, setHandCard] = useState(cards);
     const [playedCard, setPlayedCard] = useState();

@@ -17,7 +17,7 @@ export default function Partie() {
     const [cardsGiven, setCardsGiven] = useState([]);
     const [showChat, setShowChat] = useState(true);
     const [unreadMessage, setUnreadMessage] = useState(false);
-    const [cardBoard, setCardBoard] = useState({});
+    const [infosSup, setInfosSup] = useState({});
     const messageEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -50,7 +50,7 @@ export default function Partie() {
         const test = (handCard, opponents, timer) => {
             setGameType('jeu-de-bataille');
             setCardsGiven(handCard);
-            setOpponents(opponents)
+            setOpponents(opponents);
             setTimer(timer);
             setLaunchGame(true);
         }
@@ -58,23 +58,33 @@ export default function Partie() {
         const test2 = (handCard, opponents, timer, cardB) => {
             setGameType('6-qui-prend');
             setCardsGiven(handCard);
-            setOpponents(opponents)
+            setOpponents(opponents);
             setTimer(timer);
             setLaunchGame(true);
-            console.log(cardB);
-            setCardBoard(cardB);
+            setInfosSup(cardB);
+        }
+
+        const test3 = (handCard, opponents, timer, lastCardPlayed) => {
+            setGameType('crazy8');
+            setCardsGiven(handCard);
+            setOpponents(opponents);
+            setTimer(timer);
+            setLaunchGame(true);
+            setInfosSup(lastCardPlayed);
         }
 
         socket.on("messageReceived", messageReceived);
         socket.on("showLaunchButton", launchButtonAllowed);
         socket.on("testingResult", test);
         socket.on("testingResult2", test2);
+        socket.on("testingResult3", test3);
 
         return () => {
             socket.off("messageReceived", messageReceived);
             socket.off("showLaunchButton", launchButtonAllowed);
             socket.off("testingResult", test);
             socket.off("testingResult2", test2);
+            socket.off("testingResult3", test3);
         }
     });
 
@@ -148,7 +158,10 @@ export default function Partie() {
                         <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer}></Bataille>
                     )}
                     {gameType == '6-qui-prend' && (
-                        <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} cardB={cardBoard}></Prendqui6>
+                        <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Prendqui6>
+                    )}
+                    {gameType == 'crazy8' && (
+                        
                     )}
                 </>
             )}
