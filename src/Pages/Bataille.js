@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import './Bataille.css';
 import { socket } from "./socket";
+import { useNavigate } from "react-router-dom";
 
 export default function Bataille({ opponentInfos, cards, time }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -14,6 +15,10 @@ export default function Bataille({ opponentInfos, cards, time }) {
     const [timer, setTimer] = useState(time);
     const [currentTimer, setCurrentTimer] = useState(time);
     const [launchTimer, setLaunchTimer] = useState(true);
+    const [showEnd, setShowEnd] = useState(false);
+    const [messageEnd, setMessageEnd] = useState('');
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         let intervalIDTimer;
@@ -45,26 +50,31 @@ export default function Bataille({ opponentInfos, cards, time }) {
         }
 
         const thirdGameTest = (opponents, handCard) => {
-            //need timer I think there
-            setMustClick(true);
-            setShowCard(false);
-            setLaunchTimer(true);
-            setHasPlayedCard(false);
-            setPlayedCard();
-            setOpponents(opponents);
-            setHandCard(handCard);
+            initialState(opponents, handCard);
             setCurrentEmitter('chooseCardWar');
         }
 
         const fourthGameTest = (opponents, handCard) => {
-            setMustClick(true);
-            setShowCard(false);
-            setLaunchTimer(true);
-            setHasPlayedCard(false);
-            setPlayedCard();
-            setOpponents(opponents);
-            setHandCard(handCard);
+            initialState(opponents, handCard);
             setCurrentEmitter('chooseHiddenCardWar');
+        }
+
+        const winWar = () => {
+            setMessageEnd("Vous avez gagné la partie (+750g)");
+            setShowEnd(true);
+            setHandCard([]);
+        }
+
+        const loseWar = () => {
+            setMessageEnd("Vous avez perdu la partie");
+            setShowEnd(true);
+            setHandCard([]);
+        }
+
+        const tieWar = () => {
+            setMessageEnd("Vous avez égaliser la partie");
+            setShowEnd(true);
+            setHandCard([]);
         }
 
 
@@ -72,13 +82,29 @@ export default function Bataille({ opponentInfos, cards, time }) {
         socket.on('secondGameTest', secondGameTest);
         socket.on('thirdGameTest', thirdGameTest);
         socket.on('fourthGameTest', fourthGameTest);
+        socket.on('winWar', winWar);
+        socket.on('loseWar', loseWar);
+        socket.on('tieWar', tieWar);
         return () => {
             socket.off('firstGameTest', firstGameTest);
             socket.off('secondGameTest', secondGameTest);
             socket.off('thirdGameTest', thirdGameTest);
             socket.off('fourthGameTest', fourthGameTest);
+            socket.off('winWar', winWar);
+            socket.off('loseWar', loseWar);
+            socket.off('tieWar', tieWar);
         }
-    })
+    });
+
+    const initialState = (opponents, handCard) => {
+        setMustClick(true);
+        setShowCard(false);
+        setLaunchTimer(true);
+        setHasPlayedCard(false);
+        setPlayedCard();
+        setOpponents(opponents);
+        setHandCard(handCard);
+    }
 
     const changeTarget = (index) => {
         setTargetCard(index);
@@ -97,6 +123,10 @@ export default function Bataille({ opponentInfos, cards, time }) {
             setMustClick(false);
             setTargetCard(-1);
         }
+    }
+
+    const handleEndClick = () => {
+        return navigate('/PageChoix');
     }
 
     const cardStyle = {
@@ -163,6 +193,12 @@ export default function Bataille({ opponentInfos, cards, time }) {
                     }} className="card" onMouseEnter={() => { changeTarget(index) }} onMouseLeave={() => { changeTarget(-1) }} onClick={() => selectCard(card)}></div>
                 ))}
             </div>
+            {showEnd && (
+                <div style={{bottom: '10%', left: '50%', position: 'absolute'}}>
+                    <label>{messageEnd}</label>
+                    <button onClick={handleEndClick}>Retour</button>
+                </div>
+            )}
         </>
     );
 }
