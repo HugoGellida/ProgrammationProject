@@ -69,7 +69,7 @@ function PageChoix() {
   }
 
   const Test = () => {
-    socket.emit("createGame", { playerAmount: 2, timer: 30, type: "jeu-de-bataille", creator: sessionStorage.getItem("pseudo"), gameStatus: "public"});
+    socket.emit("createGame", { playerAmount: 2, timer: 30, type: "6-qui-prend", creator: sessionStorage.getItem("pseudo"), gameStatus: "public"});
   }
   const Test2 = () => {
     socket.emit("createPlayer", 1, sessionStorage.getItem("pseudo"));

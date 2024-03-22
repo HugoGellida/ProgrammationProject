@@ -207,14 +207,30 @@ io.on("connection", (socket) => {
         for (i = 0; i < game.playerAmount; i++) {
             let opponentsInfo = [];
             const player = game.playerList[i];
-            for (j = 0; j < game.playerAmount; j++) {
-                if (i != j) {
-                    const opponent = game.playerList[j];
-                    opponentsInfo.push({ username: opponent.username, card: null, cardAmount: opponent.handCard.length + opponent.pickCard.length });
+            let handCard = [];
+            if (game instanceof WarGame) {
+                for (j = 0; j < game.playerAmount; j++) {
+                    if (i != j) {
+                        const opponent = game.playerList[j];
+                        opponentsInfo.push({ username: opponent.username, card: null, cardAmount: opponent.handCard.length });
+                    }
                 }
+                handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
+                io.to(player.socketid).emit("testingResult", handCard, opponentsInfo, game.timer);
+            } else if (game instanceof Take6Game) {
+                for (j = 0; j < game.playerAmount; j++) {
+                    if (i != j) {
+                        const opponent = game.playerList[j];
+                        opponentsInfo.push({ username: opponent.username, card: null, pointAmount: 0 });
+                    }
+                }
+                handCard = player.handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+                cardBoard = {};
+                Object.keys(game.cardBoard).forEach(index => {
+                    cardBoard[index] = game.cardBoard[index].map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+                });
+                io.to(player.socketid).emit("testingResult2", handCard, opponentsInfo, game.timer, cardBoard);
             }
-            const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-            io.to(player.socketid).emit("testingResult", handCard, opponentsInfo, game.timer);
         }
     });
 
@@ -571,7 +587,7 @@ io.on("connection", (socket) => {
         for (let i = 0; i < game.playerAmount; i++) {
             const player = game.playerList[i];
             let handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
-            const lastCardPlayed = {value: game.getLastCard().value, type: game.getLastCard().type}
+            const lastCardPlayed = { value: game.getLastCard().value, type: game.getLastCard().type }
             io.to(player.socketid).emit("prepareCrazy8", game.getOpponentsUsername(player.username), handCard, game.timer, lastCardPlayed);
         }
         const currentPlayer = game.currentPlayer();
@@ -661,7 +677,7 @@ io.on("connection", (socket) => {
                 const player = game.fightingPlayers[i];
                 const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
                 io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
-                const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username}));
+                const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({ cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username }));
                 io.to(player.socketid).emit("thirdGameTest", opponents, handCard);
             }
         }
@@ -693,7 +709,7 @@ io.on("connection", (socket) => {
             const player = game.playerList[i];
             const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
             io.to(player.socketid).emit("playerTurnWar", handCard, game.getOpponentsUsername(player.username), game.timer);
-            const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username}));
+            const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({ cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username }));
             io.to(player.socketid).emit("thirdGameTest", opponents, handCard);
         }
     }
@@ -727,7 +743,7 @@ io.on("connection", (socket) => {
                         const player = game.fightingPlayers[i];
                         const handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
                         io.to(player.socketid).emit("playerHiddenTurnWar", handCard, game.timer);
-                        const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username}));
+                        const opponents = game.playerList.filter(p => p.username != player.username).map((opponent) => ({ cardAmount: opponent.handCard.length + opponent.pickCard.length, username: opponent.username }));
                         io.to(player.socketid).emit("fourthGameTest", opponents, handCard);
                     }
                 }
@@ -785,9 +801,11 @@ io.on("connection", (socket) => {
         card = playerConcerned.chooseCard(card);
         console.log(`the player ${username} choose the card ${card.value} which is ${card.pointAmount} points`);
         io.to(idGame).emit("opponentPlayedTake6", username);
+        socket.broadcast.to(parseInt(idGame)).emit("firstGameTest", username, {value: card.value, pointAmount: card.pointAmount});
         if (game.allPlayed()) {
             const cardPerPlayer = game.playerList.map(player => ({ username: player.username, card: { value: player.cardPlayed.value } }));
             socket.emit("revealAllCard", cardPerPlayer, ["images2", ".svg"]);
+            io.to(parseInt(idGame)).emit("secondGameTest");
             game.sortPlayerList();
             launchCardAnalyseTake6(game.playerList, game);
         }
@@ -800,18 +818,21 @@ io.on("connection", (socket) => {
     }
 
     function nextTurnTake6(game) {
-        setTimeout(() => {
-            for (let i = 0; i < game.playerAmount; i++) {
-                const player = game.playerList[i];
-                const handCard = player.handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
-                const keys = Object.keys(game.cardBoard);
-                const cards = [];
-                keys.forEach(key => {
-                    cards.push(game.cardBoard[key].map(card => ({ value: card.value })));
-                });
-                io.to(player.socketid).emit("playerTurnTake6", handCard, game.getOpponentsUsername(player.username), cards, player.totalPoint, game.timer);
-            }
-        }, 1);
+        for (let i = 0; i < game.playerAmount; i++) {
+            const player = game.playerList[i];
+            const handCard = player.handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+            const keys = Object.keys(game.cardBoard);
+            const cards = [];
+            keys.forEach(key => {
+                cards.push(game.cardBoard[key].map(card => ({ value: card.value })));
+            });
+            io.to(player.socketid).emit("playerTurnTake6", handCard, game.getOpponentsUsername(player.username), cards, player.totalPoint, game.timer);
+            let cardBoard = {};
+            Object.keys(game.cardBoard).forEach(index => {
+                cardBoard[index] = game.cardBoard[index].map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+            });
+            io.to(player.socketid).emit("fourthGameTest", handCard, cardBoard);
+        }
     }
 
     function launchCardAnalyseTake6(playerList, game) {
@@ -834,6 +855,14 @@ io.on("connection", (socket) => {
                     io.to(parseInt(game.idGame)).emit("refreshCardBoardTake6", lineUpdated, lineNumber);
                     io.to(game.idGame).emit("resetCardPlayedTake6", player.username);
                     io.to(game.idGame).emit("refreshPlayerPointTake6", player.totalPoint, player.username);
+                    let cardBoard = {};
+                    Object.keys(game.cardBoard).forEach(index => {
+                        cardBoard[index] = game.cardBoard[index].map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+                    });
+                    for (let i = 0; i < game.playerAmount; i++){
+                        const opponents = game.playerList.filter(p => p.username != game.playerList[i].username).map((opponent) => ({ pointAmount: opponent.totalPoint, username: opponent.username, card: opponent.cardPlayed }));
+                        io.to(game.playerList[i].socketid).emit("thirdGameTest", opponents, cardBoard, player.username);
+                    }
                     return launchCardAnalyseTake6(playerList.filter(p => p.username != player.username), game);
                 }
             }, 1000);

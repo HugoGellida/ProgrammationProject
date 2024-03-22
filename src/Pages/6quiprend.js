@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
 
-export default function Bataille({ opponentInfos, cards, time }) {
+export default function Bataille({ opponentInfos, cards, time, cardB }) {
     const [opponents, setOpponents] = useState(opponentInfos);
     const [handCard, setHandCard] = useState(cards);
     const [playedCard, setPlayedCard] = useState();
     const [hasPlayedCard, setHasPlayedCard] = useState();
     const [showCard, setShowCard] = useState(false);
     const [targetCard, setTargetCard] = useState(-1);
-    const [currentEmitter, setCurrentEmitter] = useState('chooseCardWar');
     const [mustClick, setMustClick] = useState(true);
     const [timer, setTimer] = useState(time);
     const [currentTimer, setCurrentTimer] = useState(time);
     const [launchTimer, setLaunchTimer] = useState(true);
+    const [cardBoard, setCardBoard] = useState(cardB);
     const [showEnd, setShowEnd] = useState(false);
     const [messageEnd, setMessageEnd] = useState('');
 
@@ -48,30 +48,34 @@ export default function Bataille({ opponentInfos, cards, time }) {
             setShowCard(true);
         }
 
-        const thirdGameTest = (opponents, handCard) => {
-            initialState(opponents, handCard);
-            setCurrentEmitter('chooseCardWar');
+        const thirdGameTest = (opponents, cardBoard, username) => {
+            if (username == sessionStorage.getItem('pseudo')){
+                setHasPlayedCard(false);
+                setPlayedCard();
+            } else {
+                setOpponents(opponents);
+            }
+            setCardBoard(cardBoard);
         }
 
-        const fourthGameTest = (opponents, handCard) => {
-            initialState(opponents, handCard);
-            setCurrentEmitter('chooseHiddenCardWar');
+        const fourthGameTest = (handCard, cardBoard) => {
+            setMustClick(true);
+            setLaunchTimer(true);
+            setHandCard(handCard);
+            setShowCard(false);
+            setCardBoard(cardBoard);
         }
 
-        const winWar = () => {
-            setMessageEnd("Vous avez gagné la partie (+750g)");
-            setShowEnd(true);
-            setHandCard([]);
-        }
-
-        const loseWar = () => {
-            setMessageEnd("Vous avez perdu la partie");
-            setShowEnd(true);
-            setHandCard([]);
-        }
-
-        const tieWar = () => {
-            setMessageEnd("Vous avez égaliser la partie");
+        const endTake6 = (winners) => {
+            if (winners.includes(sessionStorage.getItem('pseudo'))){
+                setMessageEnd("Vous avez gagné la partie (+750g)");
+            } else {
+                if (winners.length == 1){
+                    setMessageEnd(`${winners[0]} a gagné la partie`);
+                } else {
+                    setMessageEnd(`Les joueurs ${winners} ont gagnés la partie`);
+                }
+            }
             setShowEnd(true);
             setHandCard([]);
         }
@@ -81,29 +85,15 @@ export default function Bataille({ opponentInfos, cards, time }) {
         socket.on('secondGameTest', secondGameTest);
         socket.on('thirdGameTest', thirdGameTest);
         socket.on('fourthGameTest', fourthGameTest);
-        socket.on('winWar', winWar);
-        socket.on('loseWar', loseWar);
-        socket.on('tieWar', tieWar);
+        socket.on('endTake6', endTake6);
         return () => {
             socket.off('firstGameTest', firstGameTest);
             socket.off('secondGameTest', secondGameTest);
             socket.off('thirdGameTest', thirdGameTest);
             socket.off('fourthGameTest', fourthGameTest);
-            socket.off('winWar', winWar);
-            socket.off('loseWar', loseWar);
-            socket.off('tieWar', tieWar);
+            socket.off('endTake6', endTake6);
         }
     });
-
-    const initialState = (opponents, handCard) => {
-        setMustClick(true);
-        setShowCard(false);
-        setLaunchTimer(true);
-        setHasPlayedCard(false);
-        setPlayedCard();
-        setOpponents(opponents);
-        setHandCard(handCard);
-    }
 
     const changeTarget = (index) => {
         setTargetCard(index);
@@ -112,11 +102,9 @@ export default function Bataille({ opponentInfos, cards, time }) {
     const selectCard = (cardChosen) => {
         if (mustClick) {
             setHandCard(handCard.filter(card => card.value !== cardChosen.value || card.type !== cardChosen.type));
-            socket.emit(currentEmitter, sessionStorage.getItem('idPartie'), cardChosen, sessionStorage.getItem('pseudo'));
-            if (currentEmitter === 'chooseCardWar') {
-                setPlayedCard(cardChosen);
-                setHasPlayedCard(true);
-            }
+            socket.emit('chooseCardTake6', sessionStorage.getItem('idPartie'), cardChosen, sessionStorage.getItem('pseudo'));
+            setPlayedCard(cardChosen);
+            setHasPlayedCard(true);
             setLaunchTimer(false);
             setCurrentTimer(timer);
             setMustClick(false);
@@ -167,23 +155,32 @@ export default function Bataille({ opponentInfos, cards, time }) {
             <div className="timer" style={timerStyle}>{currentTimer}</div>
             <div className="opponentContainer">
                 {opponents.map((opponent, index) => (
-                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: 'rgb(0, 0, 0, 75)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100/(opponents.length+1)) * (index + 1)}%` , position: 'absolute'}}>
+                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: 'rgb(0, 0, 0, 75)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100 / (opponents.length + 1)) * (index + 1)}%`, position: 'absolute' }}>
                         {opponent.card && (
-                            <div className="cardPlayed" style={{ backgroundImage: showCard ? `url('./imagesTest/${opponent.card.value}-${opponent.card.type}.png')` : `url('./imagesTest/Verso-Cartes.png')`, ...cardStyle, position: 'relative' }}></div>
+                            <div className="cardPlayed" style={{ backgroundImage: showCard ? `url('./images2/${opponent.card.value}.svg')` : `url('./imagesTest/Verso-Cartes.png')`, ...cardStyle, position: 'relative' }}></div>
                         )}
                         <label>{opponent.username}</label>
-                        <label>{opponent.cardAmount} cartes</label>
+                        <label>{opponent.pointAmount} points</label>
                     </div>
                 ))}
             </div>
+            <div className="cardBoard">
+                {Object.keys(cardBoard).map(index => (
+                    <>
+                        {cardBoard[index].map((card, index2) => (
+                            <div className="card" style={{ ...cardStyle, left: `${5 + 50 * index2}px`, top: `${75 + 75 * index}px`, width: '50px', height: '75px', position: 'absolute', backgroundImage: `url(./images2/${card.value}.svg)` }}></div>
+                        ))}
+                    </>
+                ))}
+            </div>
             {hasPlayedCard && (
-                <div className="card" style={{ backgroundImage: `url('./imagesTest/${playedCard.value}-${playedCard.type}.png')`, ...cardStyle, left: '85%', top: '40%' }}></div>
+                <div className="card" style={{ backgroundImage: `url('./images2/${playedCard.value}.svg')`, ...cardStyle, left: '85%', top: '40%' }}></div>
             )}
             <div></div>
-            <div className="cardsContainer" style={{ justifyContent: 'center', position: 'absolute', flexDirection: 'row', top: '50%', width: '90%', display: 'flex', left: '0%' }}>
+            <div className="cardsContainer" style={{ justifyContent: 'center', position: 'absolute', flexDirection: 'row', bottom: '41%', width: '90%', display: 'flex', left: '0%' }}>
                 {handCard.map((card, index) => (
                     <div style={{
-                        backgroundImage: `url('./imagesTest/${card.value}-${card.type}.png')`,
+                        backgroundImage: `url('./images2/${card.value}.svg')`,
                         ...cardStyle,
                         left: '50%',
                         transformOrigin: 'bottom right',
@@ -193,7 +190,7 @@ export default function Bataille({ opponentInfos, cards, time }) {
                 ))}
             </div>
             {showEnd && (
-                <div style={{bottom: '10%', left: '50%', position: 'absolute'}}>
+                <div style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
                     <label>{messageEnd}</label>
                     <button onClick={handleEndClick}>Retour</button>
                 </div>

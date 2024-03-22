@@ -1,9 +1,8 @@
 import './PageDeJeu.css';
 import { socket } from "./socket.js";
 import React, { useEffect, useRef, useState } from 'react';
-import Tchat from './../Composants/Tchat.js'
-import { useNavigate } from "react-router-dom";
 import Bataille from './Bataille.js';
+import Prendqui6 from './6quiprend.js';
 
 
 export default function Partie() {
@@ -18,6 +17,7 @@ export default function Partie() {
     const [cardsGiven, setCardsGiven] = useState([]);
     const [showChat, setShowChat] = useState(true);
     const [unreadMessage, setUnreadMessage] = useState(false);
+    const [cardBoard, setCardBoard] = useState({});
     const messageEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -48,20 +48,33 @@ export default function Partie() {
         }
 
         const test = (handCard, opponents, timer) => {
-            setGameType("jeu-de-bataille");
+            setGameType('jeu-de-bataille');
             setCardsGiven(handCard);
             setOpponents(opponents)
             setTimer(timer);
             setLaunchGame(true);
         }
 
+        const test2 = (handCard, opponents, timer, cardB) => {
+            setGameType('6-qui-prend');
+            setCardsGiven(handCard);
+            setOpponents(opponents)
+            setTimer(timer);
+            setLaunchGame(true);
+            console.log(cardB);
+            setCardBoard(cardB);
+        }
+
         socket.on("messageReceived", messageReceived);
         socket.on("showLaunchButton", launchButtonAllowed);
         socket.on("testingResult", test);
+        socket.on("testingResult2", test2);
 
         return () => {
             socket.off("messageReceived", messageReceived);
             socket.off("showLaunchButton", launchButtonAllowed);
+            socket.off("testingResult", test);
+            socket.off("testingResult2", test2);
         }
     });
 
@@ -94,7 +107,7 @@ export default function Partie() {
     return (
         <div className="PageDeJeu">
             {showChat && (
-                <div className='Chat' style={{ bottom: '5%', left: '1%', position: 'absolute' }}>
+                <div className='Chat' style={{ bottom: '5%', left: '1%', position: 'absolute', zIndex: '1' }}>
                     <div id='messages' style={{ height: "300px", width: "200px", overflowY: 'auto', border: '2px inset rgb(90, 15, 15)', backgroundColor: 'rgb(0, 0, 0, 0.75)' }}>
                         {messages.map(message => {
                             if (message.title) {
@@ -133,6 +146,9 @@ export default function Partie() {
                     )}
                     {gameType == "jeu-de-bataille" && (
                         <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer}></Bataille>
+                    )}
+                    {gameType == '6-qui-prend' && (
+                        <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} cardB={cardBoard}></Prendqui6>
                     )}
                 </>
             )}
