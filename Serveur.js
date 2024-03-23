@@ -234,7 +234,7 @@ io.on("connection", (socket) => {
                 for (j = 0; j < game.playerAmount; j++) {
                     if (i != j) {
                         const opponent = game.playerList[j];
-                        opponentsInfo.push({ username: opponent.username, card: null, cardAmount: opponent.handCard.length });
+                        opponentsInfo.push({ username: opponent.username, cardAmount: opponent.handCard.length });
                     }
                 }
                 handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
@@ -483,7 +483,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         let currentPlayer = game.currentPlayer();
         let lastCardPlayed = game.getLastCard();
-        switch (lastCardPlayed) { //* Il existe 2 type d'atout: ceux que tu subis et ceux à choix. L'as et le 10 sont des cartes à choix.
+        switch (lastCardPlayed.value) { //* Il existe 2 type d'atout: ceux que tu subis et ceux à choix. L'as et le 10 sont des cartes à choix.
             case 1: if (currentPlayer.needPlay) {
                 currentPlayer.pickAce();
                 currentPlayer.needPlay = false;
@@ -533,6 +533,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         let currentPlayer = game.currentPlayer();
         if (choice == "place") {
+            console.log(`the player ${currentPlayer.username} placed then the ${card.value} of ${card.type}`);
             playCardCrazy8(card, type, currentPlayer);
             io.to(parseInt(idGame)).emit("thirdGameTest", game.getLastCard());
         } else {
@@ -546,7 +547,7 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         let currentPlayer = game.currentPlayer();
         console.log(`the player ${currentPlayer.username} chose a ${cardChosen.value} of ${cardChosen.type}`);
-        if (game.getLastCard().value == 1 && (cardChosen.value != 1 || cardChosen.value != 8) && currentPlayer.needPlay) {
+        if (game.getLastCard().value == 1 && cardChosen.value != 1 && cardChosen.value != 8 && currentPlayer.needPlay) {
             currentPlayer.pickAce();
             currentPlayer.needPlay = false;
         }
@@ -562,9 +563,10 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("clickedWinCrazy8", idGame => {
+    socket.on("clickedWinCrazy8", (idGame, username) => {
         const game = getGameById(idGame);
-        const player = game.currentPlayer();
+        const player = game.getPlayerByUsername(username);
+        console.log(`the player ${player.username} clicked the win button`);
         io.to(parseInt(idGame)).emit("winCrazy8", player.username);
         db.get(`SELECT * FROM StatCrazy8 WHERE username = '${player.username}'`, (err, row) => {
             db.run(`UPDATE StatCrazy8 SET winAmount = ${(row.winAmount + 1)} WHERE username = '${player.username}'`);
@@ -580,16 +582,15 @@ io.on("connection", (socket) => {
         }
         io.socketsLeave(parseInt(idGame));
         for (let i = 0; i < game.playerAmount; i++) {
-            io.sockets.sockets.get(game.playerList[i].socketid).join('');
+            io.sockets.sockets.get(game.playerList[i].socketid).join('lobby');
         }
     });
 
-    socket.on("missedWinCrazy8", (idGame) => {
+    socket.on("missedWinCrazy8", (idGame, username) => {
         const game = getGameById(idGame);
-        const player = game.currentPlayer();
+        const player = game.getPlayerByUsername(username);
         player.pickCard();
         player.pickCard();
-        game.changeTurn();
         const currentPlayer = game.currentPlayer();
         boardAnalyseCrazy8(game, currentPlayer);
     });
@@ -610,8 +611,9 @@ io.on("connection", (socket) => {
     function boardAnalyseCrazy8(game, currentPlayer) {
         for (let i = 0; i < game.playerAmount; i++) {
             let handCard = game.playerList[i].handCard.map(card => ({ value: card.value, type: card.type }));
+            const opponents = game.playerList.filter(player => player.username != game.playerList[i].username).map(opponent => ({cardAmount: opponent.handCard.length, username: opponent.username}));
             io.to(game.playerList[i].socketid).emit("refreshHandCardCrazy8", handCard);
-            io.to(game.playerList[i].socketid).emit("firstGameTest", handCard);
+            io.to(game.playerList[i].socketid).emit("firstGameTest", handCard, opponents, currentPlayer.username);
         }
         console.log(`the last card played was a ${game.getLastCard().value} of ${game.getLastCard().type}`);
         if (!currentPlayer.canPlay()) {
@@ -663,6 +665,7 @@ io.on("connection", (socket) => {
         game.changeTurn();
         let handCard = playerConcerned.handCard.map(card => ({ value: card.value, type: card.type }));
         io.to(playerConcerned.socketid).emit("refreshHandCardCrazy8", handCard);
+        boardAnalyseCrazy8(game, game.currentPlayer());
     });
 
     //* War

@@ -55,6 +55,7 @@ class Crazy8Player extends Player {
         cardChosen.type = typeChosen;
         this.game.addCard(cardChosen);
         this.game.changeTurn();
+        this.game.card1InARow = 0;
     }
 
     playCard10(cardChosen){

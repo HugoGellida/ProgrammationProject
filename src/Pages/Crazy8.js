@@ -19,8 +19,9 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [showChoice, setShowChoice] = useState(false);
     const [currentEmitter, setCurrentEmitter] = useState('chooseCardCrazy8');
     const [showWinButton, setShowWinButton] = useState(false);
-    const [winTimer, setWinTimer] = useState(10);
-    const [currentWinTimer, setCurrentWinTimer] = useState(10);
+    const [winTimer, setWinTimer] = useState(5);
+    const [currentWinTimer, setCurrentWinTimer] = useState(winTimer);
+    const [opponentTarget, setOpponentTarget] = useState('')
 
 
     const navigate = useNavigate();
@@ -33,6 +34,10 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             }, 1000);
             if (mustClick && currentTimer == 0) {
                 socket.emit('timeOutCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
+                setLaunchTimer(false);
+                setCurrentTimer(timer);
+                setMustClick(false);
+                setPlayableCards([]);
             }
         }
         return () => {
@@ -47,7 +52,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                 setCurrentWinTimer(currentWinTimer - 1);
             }, 1000);
             if (currentWinTimer === 0){
-                socket.emit('missedWinCrazy8', sessionStorage.getItem('idPartie'));
+                socket.emit('missedWinCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
                 setShowWinButton(false);
                 setCurrentWinTimer(winTimer);
             }
@@ -59,8 +64,10 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
 
 
     useEffect(() => {
-        const firstGameTest = (handCard) => {
+        const firstGameTest = (handCard, opponents, currentPlayer) => {
             setHandCard(handCard);
+            setOpponents(opponents);
+            setOpponentTarget(currentPlayer);
         }
 
         const secondGameTest = (handCard, playableCards) => {
@@ -88,9 +95,8 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
 
         const winCrazy8 = (winner) => {
             setShowEnd(true);
-            if (winner === sessionStorage.getItem('idPartie')){
+            if (winner === sessionStorage.getItem('pseudo')){
                 setMessageEnd('Vous avez gagné la partie(+750g)');
-                setShowWinButton(false);
             }
             else {
                 setMessageEnd(`Le joueur ${winner} a gagné la partie`);
@@ -202,7 +208,9 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     }
 
     const clickWin = () => {
-        socket.emit('clickedWinCrazy8', sessionStorage.getItem('idPartie'));
+        socket.emit('clickedWinCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
+        setShowWinButton(false);
+        setCurrentWinTimer(winTimer);
     }
 
     const timerStyle = {
@@ -228,7 +236,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             <div className="timer" style={timerStyle}>{currentTimer}</div>
             <div className="opponentContainer">
                 {opponents.map((opponent, index) => (
-                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: 'rgb(0, 0, 0, 75)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100 / (opponents.length + 1)) * (index + 1)}%`, position: 'absolute' }}>
+                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: (opponent.username !== opponentTarget)?'rgb(0, 0, 0, 75)': 'rgb(90, 15, 15)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100 / (opponents.length + 1)) * (index + 1)}%`, position: 'absolute', transition: '0.3s' }}>
                         <label>{opponent.username}</label>
                         <label>{opponent.cardAmount} cartes</label>
                     </div>
