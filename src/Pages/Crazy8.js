@@ -45,7 +45,6 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
         }
     }, [currentTimer, launchTimer]);
 
-    
     useEffect(() => {
         let intervalIDTimer;
         if (showWinButton) {
