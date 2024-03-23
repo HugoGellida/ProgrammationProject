@@ -3,6 +3,7 @@ import { socket } from "./socket.js";
 import React, { useEffect, useRef, useState } from 'react';
 import Bataille from './Bataille.js';
 import Prendqui6 from './6quiprend.js';
+import Crazy8 from './Crazy8.js';
 
 
 export default function Partie() {
@@ -64,13 +65,15 @@ export default function Partie() {
             setInfosSup(cardB);
         }
 
-        const test3 = (handCard, opponents, timer, lastCardPlayed) => {
+        const test3 = (handCard, opponents, timer, lastCardPlayed, firstPlayer, playableCards) => {
+            if (firstPlayer == sessionStorage.getItem('pseudo'))setInfosSup({lastCardPlayed: lastCardPlayed, isFirstPlayer: true, playableCards: playableCards});
+            else setInfosSup({lastCardPlayed: lastCardPlayed, isFirstPlayer: false, playableCards: playableCards});
+            console.log(playableCards);
             setGameType('crazy8');
             setCardsGiven(handCard);
             setOpponents(opponents);
             setTimer(timer);
             setLaunchGame(true);
-            setInfosSup(lastCardPlayed);
         }
 
         socket.on("messageReceived", messageReceived);
@@ -161,7 +164,7 @@ export default function Partie() {
                         <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Prendqui6>
                     )}
                     {gameType == 'crazy8' && (
-                        
+                        <Crazy8 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Crazy8>
                     )}
                 </>
             )}

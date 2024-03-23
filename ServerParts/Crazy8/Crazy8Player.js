@@ -76,11 +76,7 @@ class Crazy8Player extends Player {
     }
 
     canPlay(){ // Donne l'etat du joueur
-        const lastCardPlayed = this.game.getLastCard();
-        if (lastCardPlayed.value == 1){
-            return this.handCard.filter(card => card.value == 1 || card.value == 8).length != 0;
-        }
-        return this.handCard.filter(card => card.type == lastCardPlayed.type || card.value == lastCardPlayed.value || (card.value == 8 && lastCardPlayed.value != 2)).length != 0;
+        return this.playableCards().length != 0;
     }
 
     pickCard(){ // Fait piocher un joueur
@@ -97,9 +93,6 @@ class Crazy8Player extends Player {
 
     playableCards(){
         const lastCardPlayed = this.game.getLastCard();
-        if (lastCardPlayed.value == 1){
-            return this.handCard.filter(card => card.value == 1 || card.value == 8);
-        }
         return this.handCard.filter(card => card.type == lastCardPlayed.type || card.value == lastCardPlayed.value || (card.value == 8 && lastCardPlayed.value != 2));
     }
 
