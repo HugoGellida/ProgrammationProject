@@ -4,7 +4,6 @@ import Inscription from './Inscription';
 import Connex from './Connex';
 import CreationPartie from './CreationPartie'
 import PageChoix from './PageChoix'
-import PageDeJeu from './PageDeJeu'
 import Pagepause from './Pagepause';
 import Parameters from './Parameters';
 import Partie from './Partie';
@@ -17,9 +16,8 @@ function App() {
         <Route path="/CreationPartie" element={<CreationPartie/>} />
         <Route path="/PageChoix" element={<PageChoix/>} />
         <Route path="/Connex" element={<Connex/>} />
-        <Route path="/PageDeJeu" element={<PageDeJeu/>} />
+        <Route path="/PageDeJeu" element={<Partie/>} />
         <Route path="/PagePause" element={<Pagepause/>} />
-        <Route path="/Test" element={<Partie/>} />
         <Route path="/Parameters" element={<Parameters/>} />
       </Routes>
     </div>

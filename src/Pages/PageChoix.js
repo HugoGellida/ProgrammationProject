@@ -26,19 +26,17 @@ function PageChoix() {
       setGameShown(games);
     }
 
-    const tp = (idGame) => {
+    const teleportPlayer = (idGame) => {
       sessionStorage.setItem("idPartie", parseInt(idGame));
-      return navigate("/Test");
+      return navigate("/PageDeJeu");
     }
 
-    socket.on("teleportPlayer", tp);
+    socket.on("teleportPlayer", teleportPlayer);
     socket.on("loadGame", loadGame);
-    socket.on("teleportCreator", tp);
 
     return () => {
-      socket.off("teleportPlayer", tp);
+      socket.off("teleportPlayer", teleportPlayer);
       socket.off("loadGame", loadGame);
-      socket.off("teleportCreator", tp);
     }
   });
 
@@ -68,13 +66,6 @@ function PageChoix() {
     setFilter(event.target.value);
   }
 
-  const Test = () => {
-    socket.emit("createGame", { playerAmount: 3, timer: 30, type: "crazy8", creator: sessionStorage.getItem("pseudo"), gameStatus: "public"});
-  }
-  const Test2 = () => {
-    socket.emit("createPlayer", 1, sessionStorage.getItem("pseudo"));
-  }
-
   return (
     <div className="PageChoix">
       <h5>Choix de la Partie</h5>
@@ -98,8 +89,6 @@ function PageChoix() {
             }
           })}
         </div>
-        {Boutton("TestZone", Test)}
-        {Boutton("TestZone2", Test2)}
       </main>
     </div>
   );

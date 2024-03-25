@@ -1,4 +1,3 @@
-import './PageDeJeu.css';
 import { socket } from "./socket.js";
 import React, { useEffect, useRef, useState } from 'react';
 import Bataille from './Bataille.js';
@@ -48,61 +47,38 @@ export default function Partie() {
             setGameType(type);
         }
 
-        const test = (handCard, opponents, timer) => {
-            setGameType('jeu-de-bataille');
+        const fillInfo = (type, handCard, opponents, timer, infosSup) => {
+            setGameType(type);
             setCardsGiven(handCard);
             setOpponents(opponents);
             setTimer(timer);
             setLaunchGame(true);
-        }
-
-        const test2 = (handCard, opponents, timer, cardB) => {
-            setGameType('6-qui-prend');
-            setCardsGiven(handCard);
-            setOpponents(opponents);
-            setTimer(timer);
-            setLaunchGame(true);
-            setInfosSup(cardB);
-        }
-
-        const test3 = (handCard, opponents, timer, lastCardPlayed, firstPlayer, playableCards) => {
-            if (firstPlayer == sessionStorage.getItem('pseudo'))setInfosSup({lastCardPlayed: lastCardPlayed, isFirstPlayer: true, playableCards: playableCards});
-            else setInfosSup({lastCardPlayed: lastCardPlayed, isFirstPlayer: false, playableCards: playableCards});
-            console.log(playableCards);
-            setGameType('crazy8');
-            setCardsGiven(handCard);
-            setOpponents(opponents);
-            setTimer(timer);
-            setLaunchGame(true);
+            setInfosSup(infosSup);
         }
 
         socket.on("messageReceived", messageReceived);
         socket.on("showLaunchButton", launchButtonAllowed);
-        socket.on("testingResult", test);
-        socket.on("testingResult2", test2);
-        socket.on("testingResult3", test3);
+        socket.on("fillInfo", fillInfo);
 
         return () => {
             socket.off("messageReceived", messageReceived);
             socket.off("showLaunchButton", launchButtonAllowed);
-            socket.off("testingResult", test);
-            socket.off("testingResult2", test2);
-            socket.off("testingResult3", test3);
+            socket.off("fillInfo", fillInfo);
         }
     });
 
     const startGame = () => {
-        socket.emit("testing", sessionStorage.getItem("idPartie"));
+        socket.emit("launchGame", sessionStorage.getItem("idPartie"));
     }
 
     const PauseGame = () => {
-        console.log("hello2");
+        alert("hello, I am not functionnal yet, sorry :D!!");
     }
 
     const sendMessage = () => {
         const messageWritten = document.getElementById('messageToSend').value;
         setMessageSentValue('');
-        if (messageWritten !== "") socket.emit("messageSent", sessionStorage.getItem("idPartie"), messageWritten, sessionStorage.getItem("pseudo"));
+        if (messageWritten.trim() !== "") socket.emit("messageSent", sessionStorage.getItem("idPartie"), messageWritten, sessionStorage.getItem("pseudo"));
     }
 
     const writeValue = (event) => {
