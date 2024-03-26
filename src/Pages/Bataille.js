@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
+import BackgroundAmbiance from "./backgroundAmbiance";
 
 export default function Bataille({ opponentInfos, cards, time }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -16,7 +17,7 @@ export default function Bataille({ opponentInfos, cards, time }) {
     const [launchTimer, setLaunchTimer] = useState(true);
     const [showEnd, setShowEnd] = useState(false);
     const [messageEnd, setMessageEnd] = useState('');
-
+    const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -59,18 +60,21 @@ export default function Bataille({ opponentInfos, cards, time }) {
         }
 
         const winWar = () => {
+            setEndBackgroundAmbiance(false);
             setMessageEnd("Vous avez gagné la partie (+750g)");
             setShowEnd(true);
             setHandCard([]);
         }
 
         const loseWar = () => {
+            setEndBackgroundAmbiance(false);
             setMessageEnd("Vous avez perdu la partie");
             setShowEnd(true);
             setHandCard([]);
         }
 
         const tieWar = () => {
+            setEndBackgroundAmbiance(false);
             setMessageEnd("Vous avez égaliser la partie");
             setShowEnd(true);
             setHandCard([]);
@@ -197,6 +201,9 @@ export default function Bataille({ opponentInfos, cards, time }) {
                     <label>{messageEnd}</label>
                     <button onClick={handleEndClick}>Retour</button>
                 </div>
+            )}
+            {!endBackgroundAmbiance && (
+                <BackgroundAmbiance/>
             )}
         </>
     );

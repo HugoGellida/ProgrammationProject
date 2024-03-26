@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
+import BackgroundAmbiance from "./backgroundAmbiance";
 
 export default function Prendqui6({ opponentInfos, cards, time, infosSup }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -10,12 +11,13 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup }) {
     const [showCard, setShowCard] = useState(false);
     const [targetCard, setTargetCard] = useState(-1);
     const [mustClick, setMustClick] = useState(true);
-    const [timer, setTimer] = useState(time);
+    const timer = time;
     const [currentTimer, setCurrentTimer] = useState(time);
     const [launchTimer, setLaunchTimer] = useState(true);
     const [cardBoard, setCardBoard] = useState(infosSup);
     const [showEnd, setShowEnd] = useState(false);
     const [messageEnd, setMessageEnd] = useState('');
+    const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);
 
     const navigate = useNavigate();
 
@@ -67,6 +69,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup }) {
         }
 
         const endTake6 = (winners) => {
+            setEndBackgroundAmbiance(false);
             if (winners.includes(sessionStorage.getItem('pseudo'))){
                 setMessageEnd("Vous avez gagné la partie (+750g)");
             } else {
@@ -194,6 +197,9 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup }) {
                     <label>{messageEnd}</label>
                     <button onClick={handleEndClick}>Retour</button>
                 </div>
+            )}
+            {!endBackgroundAmbiance && (
+                <BackgroundAmbiance/>
             )}
         </>
     );

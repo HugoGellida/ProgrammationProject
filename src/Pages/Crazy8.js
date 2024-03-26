@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
+import BackgroundAmbiance from "./backgroundAmbiance";
 
 export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -21,7 +22,8 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [showWinButton, setShowWinButton] = useState(false);
     const [winTimer, setWinTimer] = useState(5);
     const [currentWinTimer, setCurrentWinTimer] = useState(winTimer);
-    const [opponentTarget, setOpponentTarget] = useState('')
+    const [opponentTarget, setOpponentTarget] = useState('');
+    const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);
 
 
     const navigate = useNavigate();
@@ -212,6 +214,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
         socket.emit('clickedWinCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
         setShowWinButton(false);
         setCurrentWinTimer(winTimer);
+        setEndBackgroundAmbiance(true);
     }
 
     const timerStyle = {
@@ -282,6 +285,9 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             )}
             {showWinButton && (
                 <button onClick={clickWin} style={{left: '70%', top: '70%', position: 'absolute'}}>WIN {currentWinTimer}</button>
+            )}
+            {!endBackgroundAmbiance && (
+                <BackgroundAmbiance/>
             )}
         </>
     );

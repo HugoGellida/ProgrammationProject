@@ -61,7 +61,7 @@ server.listen(3001, () => {
 });
 
 
-const rooms = { "preLobby": [], "lobby": [] };
+const rooms = {};
 
 io.on("connection", (socket) => {
     console.log(`presence detected on site: ${socket.id}`);
@@ -201,9 +201,7 @@ io.on("connection", (socket) => {
         db.run(`UPDATE User SET chatColor = '${color}' WHERE username = '${username}'`);
     });
 
-    socket.join('preLobby');
     socket.emit("goToPreLobby");
-    rooms["preLobby"].push(socket.id);
 
     socket.on("disconnect", () => {
         db.run(`UPDATE User SET isConnected = false WHERE socketid = '${socket.id}'`, (err) => {
@@ -211,7 +209,7 @@ io.on("connection", (socket) => {
             const roomKeys = Object.keys(rooms)
             const socketLastRoom = roomKeys.filter(key => rooms[key].includes(socket.id))[0];
             socket.leave(socketLastRoom);
-            rooms[socketLastRoom] = rooms[socketLastRoom].filter(socketid => socketid != socket.id);
+            if (rooms[socketLastRoom]) rooms[socketLastRoom] = rooms[socketLastRoom].filter(socketid => socketid != socket.id);
             const game = getGameById(socketLastRoom);
             if (game) {
                 const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
@@ -289,10 +287,6 @@ io.on("connection", (socket) => {
         db.get(`SELECT * FROM User WHERE username = '${username}' AND password = '${password}' AND isConnected = false`, (err, row) => {
             if (row) {
                 console.log(`connection allowed for user ${username}`);
-                socket.leave('preLobby')
-                socket.join('lobby');
-                rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
-                rooms["lobby"].push(socket.id);
                 db.run(`UPDATE User SET isConnected = true, socketid = '${socket.id}' WHERE username = '${username}'`);
                 socket.emit("connectionAllowed", username);
             } else {
@@ -304,10 +298,6 @@ io.on("connection", (socket) => {
     socket.on("registrationAttempt", (username, password) => {
         db.get(`SELECT * FROM User WHERE username = '${username}'`, (err, row) => {
             if (!row) {
-                socket.leave('preLobby');
-                socket.join('lobby');
-                rooms["lobby"].push(socket.id);
-                rooms["preLobby"] = rooms["preLobby"].filter(socketid => socketid != socket.id);
                 db.run(`INSERT INTO User VALUES ('${username}', '${password}', true, '${socket.id}', 'grey', 'NOOBY', 0)`, (err) => {
                     db.run(`INSERT INTO StatTake6 VALUES('${username}', 0, 0, -1, -1)`);
                     db.run(`INSERT INTO StatWar VALUES('${username}', 0, 0, 0)`);
@@ -353,7 +343,7 @@ io.on("connection", (socket) => {
                 games.push({ id: gameList[i].idGame, type: getStringOfGame(gameList[i]), actualPlayerAmount: gameList[i].playerList.length, maxPlayerAmount: gameList[i].playerAmount });
             }
         }
-        io.to("lobby").emit("loadGame", games);
+        io.emit("loadGame", games);
     }
 
     socket.on("createPlayer", (idGame, username) => {
@@ -426,10 +416,6 @@ io.on("connection", (socket) => {
         game.isLaunched = false;
         game.isPaused = true;
         rooms[idGame] = [];
-        rooms["lobby"].push(...game.playerList);
-        for (let i = 0; i < game.playerAmount; i++) {
-            io.sockets.sockets.get(game.playerList[i].socketid).join('lobby');
-        }
         io.to(parseInt(idGame)).emit("pauseAllowed");
         io.socketsLeave(parseInt(idGame));
     });
@@ -537,9 +523,6 @@ io.on("connection", (socket) => {
             });
         }
         io.socketsLeave(parseInt(idGame));
-        for (let i = 0; i < game.playerAmount; i++) {
-            io.sockets.sockets.get(game.playerList[i].socketid).join('lobby');
-        }
     });
 
     socket.on("missedWinCrazy8", (idGame, username) => {
@@ -947,8 +930,6 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         const player = game.getPlayerByUsername(username);
         player.socketid = socket.id; //* Le joueur s'est peut-être connécté avec un autre socketid que celui précédent.
-        socket.leave('lobby');
-        rooms['lobby'].filter(socketid => socketid != socket.id);
         if (!rooms[idGame]) rooms[idGame] = [];
         rooms[idGame].push(socket.id);
         socket.join(parseInt(idGame));
@@ -957,10 +938,8 @@ io.on("connection", (socket) => {
 
     //! Function Part
     function affectPlayer(idGame, username, isPlayerCreator) { // Fonction générale
-        socket.leave('lobby');
         socket.join(idGame);
         rooms[idGame].push(socket.id);
-        rooms["lobby"] = rooms["lobby"].filter(socketid => socketid != socket.id);
         const game = getGameById(idGame);
         let newPlayer = null;
         if (game instanceof Take6Game) newPlayer = new Take6Player(username, game, socket.id);
