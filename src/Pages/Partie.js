@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Bataille from './Bataille.js';
 import Prendqui6 from './6quiprend.js';
 import Crazy8 from './Crazy8.js';
+import { useNavigate } from "react-router-dom";
 
 
 export default function Partie() {
@@ -19,6 +20,9 @@ export default function Partie() {
     const [unreadMessage, setUnreadMessage] = useState(false);
     const [infosSup, setInfosSup] = useState({});
     const messageEndRef = useRef(null);
+    const [cardPlayed, setCardPlayed] = useState();
+
+    const navigate = useNavigate()
 
     const scrollToBottom = () => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,6 +37,7 @@ export default function Partie() {
             socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
             setFirstLaunch(false);
         }
+
 
         if (showChat) setUnreadMessage(false);
 
@@ -56,14 +61,54 @@ export default function Partie() {
             setInfosSup(infosSup);
         }
 
+        const pauseAllowed = () => {
+            setLaunchGame(false);
+            return navigate('/PageChoix');
+        }
+
+        const resumeTake6 = (handCard, cardPlayed, timer, opponents, infosSup) => {
+            setGameType('6-qui-prend');
+            setCardsGiven(handCard);
+            setOpponents(opponents);
+            setTimer(timer);
+            setLaunchGame(true);
+            setInfosSup(infosSup);
+            setCardPlayed(cardPlayed);
+        }
+
+        const resumeCrazy8 = (handCard, timer, opponents, infosSup) => {
+            setGameType('crazy8');
+            setCardsGiven(handCard);
+            setOpponents(opponents);
+            setTimer(timer);
+            setLaunchGame(true);
+            setInfosSup(infosSup);
+        }
+
+        const resumeWar = (handCard, cardPlayed, timer, opponents) => {
+            setGameType('jeu-de-bataille');
+            setCardsGiven(handCard);
+            setOpponents(opponents);
+            setTimer(timer);
+            setLaunchGame(true);
+            setCardPlayed(cardPlayed);
+        }
+
         socket.on("messageReceived", messageReceived);
         socket.on("showLaunchButton", launchButtonAllowed);
         socket.on("fillInfo", fillInfo);
-
+        socket.on('pauseAllowed', pauseAllowed);
+        socket.on('resumeTake6', resumeTake6);
+        socket.on('resumeCrazy8', resumeCrazy8);
+        socket.on('resumeWar', resumeWar);
         return () => {
             socket.off("messageReceived", messageReceived);
             socket.off("showLaunchButton", launchButtonAllowed);
             socket.off("fillInfo", fillInfo);
+            socket.off('pauseAllowed', pauseAllowed);
+            socket.off('resumeTake6', resumeTake6);
+            socket.off('resumeCrazy8', resumeCrazy8);
+            socket.off('resumeWar', resumeWar);
         }
     });
 
@@ -72,7 +117,7 @@ export default function Partie() {
     }
 
     const PauseGame = () => {
-        alert("hello, I am not functionnal yet, sorry :D!!");
+        socket.emit("askPause", sessionStorage.getItem("idPartie"));
     }
 
     const sendMessage = () => {
@@ -134,10 +179,10 @@ export default function Partie() {
                         <button id='pause' onClick={PauseGame} style={{ top: '5%', left: '85%', position: 'absolute' }}>Enregistrer</button>
                     )}
                     {gameType == "jeu-de-bataille" && (
-                        <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer}></Bataille>
+                        <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer} cardPlayed={cardPlayed}></Bataille>
                     )}
                     {gameType == '6-qui-prend' && (
-                        <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Prendqui6>
+                        <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup} cardPlayed={cardPlayed}></Prendqui6>
                     )}
                     {gameType == 'crazy8' && (
                         <Crazy8 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Crazy8>

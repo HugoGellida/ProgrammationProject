@@ -5,7 +5,6 @@ export default function BackgroundAmbiance(){
 
     useEffect(() => {
         const audio = audioRef.current;
-        console.log(audio);
         audio.volume = 0.05;
         audio.loop = true;
         audio.play();

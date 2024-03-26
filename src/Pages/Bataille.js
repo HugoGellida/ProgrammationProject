@@ -3,18 +3,18 @@ import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "./backgroundAmbiance";
 
-export default function Bataille({ opponentInfos, cards, time }) {
+export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
     const [opponents, setOpponents] = useState(opponentInfos);
     const [handCard, setHandCard] = useState(cards);
-    const [playedCard, setPlayedCard] = useState();
-    const [hasPlayedCard, setHasPlayedCard] = useState();
+    const [playedCard, setPlayedCard] = useState(cardPlayed);
+    const [hasPlayedCard, setHasPlayedCard] = useState(cardPlayed !== undefined && cardPlayed !== null);
     const [showCard, setShowCard] = useState(false);
     const [targetCard, setTargetCard] = useState(-1);
     const [currentEmitter, setCurrentEmitter] = useState('chooseCardWar');
-    const [mustClick, setMustClick] = useState(true);
+    const [mustClick, setMustClick] = useState(cardPlayed === undefined || cardPlayed === null);
     const [timer, setTimer] = useState(time);
     const [currentTimer, setCurrentTimer] = useState(time);
-    const [launchTimer, setLaunchTimer] = useState(true);
+    const [launchTimer, setLaunchTimer] = useState(cardPlayed === undefined || cardPlayed === null);
     const [showEnd, setShowEnd] = useState(false);
     const [messageEnd, setMessageEnd] = useState('');
     const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);

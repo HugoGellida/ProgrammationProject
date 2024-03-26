@@ -369,16 +369,32 @@ io.on("connection", (socket) => {
             console.log(`the game ${idGame} has been resumed`);
             if (game instanceof WarGame) {
                 for (let i = 0; i < players.length; i++) {
-                    console.log(players[i].handCard, players[i].cardPlayed, game.timer, usernameList);
-                    io.to(players[i].socketid).emit("resumeWar", players[i].handCard, players[i].cardPlayed, game.timer, usernameList);
+                    const opponents = game.playerList.filter(player => player.username != players[i].username);
+                    const handCard = players[i].handCard.map(card => ({ value: card.value, type: card.type }));
+                    let cardPlayed;
+                    if (players[i].cardPlayed) cardPlayed = { value: players[i].cardPlayed.value, type: players[i].cardPlayed.type };
+                    else cardPlayed = undefined;
+                    io.to(players[i].socketid).emit("resumeWar", handCard, cardPlayed, game.timer, opponents.map(opponent => ({ username: opponent.username, card: opponent.cardPlayed, cardAmount: opponent.handCard.length + opponent.pickCard.length })));
                 }
             } else if (game instanceof Take6Game) {
                 for (let i = 0; i < players.length; i++) {
-                    io.to(players[i].socketid).emit("resumeTake6", players[i].handCard, players[i].cardPlayed, game.timer, usernameList);
+                    const opponents = game.playerList.filter(player => player.username != players[i].username);
+                    let cardBoard = {};
+                    Object.keys(game.cardBoard).forEach(index => {
+                        cardBoard[index] = game.cardBoard[index].map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+                    });
+                    const handCard = players[i].handCard.map(card => ({ value: card.value, pointAmount: card.pointAmount }));
+                    let cardPlayed;
+                    if (players[i].cardPlayed) cardPlayed = { value: players[i].cardPlayed.value, pointAmount: players[i].cardPlayed.pointAmount };
+                    else cardPlayed = undefined;
+                    io.to(players[i].socketid).emit("resumeTake6", handCard, cardPlayed, game.timer, opponents.map(opponent => ({ username: opponent.username, card: opponent.cardPlayed, pointAmount: opponent.totalPoint })), cardBoard);
                 }
             } else if (game instanceof Crazy8Game) {
                 for (let i = 0; i < players.length; i++) {
-                    io.to(players[i].socketid).emit("resumeCrazy8", players[i].handCard, game.timer, game.currentPlayer().username, usernameList);
+                    const opponents = game.playerList.filter(player => player.username != players[i].username);
+                    const handCard = players[i].handCard.map(card => ({ value: card.value, type: card.type }));
+                    const lastCardPlayed = { value: game.getLastCard().value, type: game.getLastCard().type };
+                    io.to(players[i].socketid).emit("resumeCrazy8", handCard, game.timer, opponents.map(opponent => ({ username: opponent.username, card: opponent.cardPlayed, cardAmount: opponent.handCard.length })), { lastCardPlayed: lastCardPlayed, isFirstPlayer: game.currentPlayer().username == players[i].username, playableCards: game.currentPlayer().playableCards().map(card => ({ value: card.value, type: card.type })) });
                 }
             }
         } else if (game.playerAmount == game.playerList.length) {
@@ -549,7 +565,7 @@ io.on("connection", (socket) => {
             }
             handCard = player.handCard.map(card => ({ value: card.value, type: card.type }));
             const lastCardPlayed = { value: game.getLastCard().value, type: game.getLastCard().type };
-            io.to(player.socketid).emit("fillInfo", getStringOfGame(game), handCard, opponentsInfo, game.timer, {lastCardPlayed: lastCardPlayed, isFirstPlayer: game.currentPlayer().username == player.username, playableCards: game.currentPlayer().playableCards().map(card => ({ value: card.value, type: card.type }))});
+            io.to(player.socketid).emit("fillInfo", getStringOfGame(game), handCard, opponentsInfo, game.timer, { lastCardPlayed: lastCardPlayed, isFirstPlayer: game.currentPlayer().username == player.username, playableCards: game.currentPlayer().playableCards().map(card => ({ value: card.value, type: card.type })) });
         }
         const currentPlayer = game.currentPlayer();
         boardAnalyseCrazy8(game, currentPlayer);

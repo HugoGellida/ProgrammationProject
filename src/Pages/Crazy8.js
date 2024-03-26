@@ -97,6 +97,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
         }
 
         const winCrazy8 = (winner) => {
+            setEndBackgroundAmbiance(true);
             setShowEnd(true);
             if (winner === sessionStorage.getItem('pseudo')){
                 setMessageEnd('Vous avez gagné la partie(+750g)');
@@ -214,7 +215,6 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
         socket.emit('clickedWinCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
         setShowWinButton(false);
         setCurrentWinTimer(winTimer);
-        setEndBackgroundAmbiance(true);
     }
 
     const timerStyle = {

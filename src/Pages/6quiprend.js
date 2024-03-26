@@ -3,17 +3,17 @@ import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "./backgroundAmbiance";
 
-export default function Prendqui6({ opponentInfos, cards, time, infosSup }) {
+export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPlayed }) {
     const [opponents, setOpponents] = useState(opponentInfos);
     const [handCard, setHandCard] = useState(cards);
-    const [playedCard, setPlayedCard] = useState();
-    const [hasPlayedCard, setHasPlayedCard] = useState();
+    const [playedCard, setPlayedCard] = useState(cardPlayed);
+    const [hasPlayedCard, setHasPlayedCard] = useState(cardPlayed !== undefined && cardPlayed !== null);
     const [showCard, setShowCard] = useState(false);
     const [targetCard, setTargetCard] = useState(-1);
-    const [mustClick, setMustClick] = useState(true);
+    const [mustClick, setMustClick] = useState(cardPlayed === undefined || cardPlayed === null);
     const timer = time;
     const [currentTimer, setCurrentTimer] = useState(time);
-    const [launchTimer, setLaunchTimer] = useState(true);
+    const [launchTimer, setLaunchTimer] = useState(cardPlayed === undefined || cardPlayed === null);
     const [cardBoard, setCardBoard] = useState(infosSup);
     const [showEnd, setShowEnd] = useState(false);
     const [messageEnd, setMessageEnd] = useState('');
