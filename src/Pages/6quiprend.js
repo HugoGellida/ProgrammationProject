@@ -21,13 +21,26 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
 
     const navigate = useNavigate();
 
+    const selectCard = (cardChosen) => {
+        if (mustClick) {
+            setHandCard(handCard.filter(card => card.value !== cardChosen.value || card.type !== cardChosen.type));
+            socket.emit('chooseCardTake6', sessionStorage.getItem('idPartie'), cardChosen, sessionStorage.getItem('pseudo'));
+            setPlayedCard(cardChosen);
+            setHasPlayedCard(true);
+            setLaunchTimer(false);
+            setCurrentTimer(timer);
+            setMustClick(false);
+            setTargetCard(-1);
+        }
+    }
+
     useEffect(() => {
         let intervalIDTimer;
         if (launchTimer) {
             intervalIDTimer = setInterval(() => {
                 setCurrentTimer(currentTimer - 1);
             }, 1000);
-            if (mustClick && currentTimer == 0) {
+            if (mustClick && currentTimer === 0) {
                 let i = Math.floor(Math.random() * handCard.length);
                 selectCard(handCard[i]);
             }
@@ -51,7 +64,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
         }
 
         const thirdGameTest = (opponents, cardBoard, username) => {
-            if (username == sessionStorage.getItem('pseudo')){
+            if (username === sessionStorage.getItem('pseudo')) {
                 setHasPlayedCard(false);
                 setPlayedCard();
             } else {
@@ -70,10 +83,10 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
 
         const endTake6 = (winners) => {
             setEndBackgroundAmbiance(false);
-            if (winners.includes(sessionStorage.getItem('pseudo'))){
+            if (winners.includes(sessionStorage.getItem('pseudo'))) {
                 setMessageEnd("Vous avez gagné la partie (+750g)");
             } else {
-                if (winners.length == 1){
+                if (winners.length === 1) {
                     setMessageEnd(`${winners[0]} a gagné la partie`);
                 } else {
                     setMessageEnd(`Les joueurs ${winners} ont gagnés la partie`);
@@ -102,19 +115,6 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
         setTargetCard(index);
     }
 
-    const selectCard = (cardChosen) => {
-        if (mustClick) {
-            setHandCard(handCard.filter(card => card.value !== cardChosen.value || card.type !== cardChosen.type));
-            socket.emit('chooseCardTake6', sessionStorage.getItem('idPartie'), cardChosen, sessionStorage.getItem('pseudo'));
-            setPlayedCard(cardChosen);
-            setHasPlayedCard(true);
-            setLaunchTimer(false);
-            setCurrentTimer(timer);
-            setMustClick(false);
-            setTargetCard(-1);
-        }
-    }
-
     const handleEndClick = () => {
         return navigate('/PageChoix');
     }
@@ -136,7 +136,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
     }
 
     const timerStyle = {
-        backgroundColor: currentTimer % 2 == 0 ? 'rgb(90, 15, 15)' : '',
+        backgroundColor: currentTimer % 2 === 0 ? 'rgb(90, 15, 15)' : '',
         transition: '0.75s',
         color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`,
         top: '20%',
@@ -199,7 +199,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
                 </div>
             )}
             {!endBackgroundAmbiance && (
-                <BackgroundAmbiance/>
+                <BackgroundAmbiance />
             )}
         </>
     );

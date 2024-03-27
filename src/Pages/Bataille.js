@@ -12,7 +12,7 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
     const [targetCard, setTargetCard] = useState(-1);
     const [currentEmitter, setCurrentEmitter] = useState('chooseCardWar');
     const [mustClick, setMustClick] = useState(cardPlayed === undefined || cardPlayed === null);
-    const [timer, setTimer] = useState(time);
+    const timer = time;
     const [currentTimer, setCurrentTimer] = useState(time);
     const [launchTimer, setLaunchTimer] = useState(cardPlayed === undefined || cardPlayed === null);
     const [showEnd, setShowEnd] = useState(false);
@@ -26,7 +26,7 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
             intervalIDTimer = setInterval(() => {
                 setCurrentTimer(currentTimer - 1);
             }, 1000);
-            if (mustClick && currentTimer == 0) {
+            if (mustClick && currentTimer === 0) {
                 let i = Math.floor(Math.random() * handCard.length);
                 selectCard(handCard[i]);
             }
@@ -149,7 +149,7 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
     }
 
     const timerStyle = {
-        backgroundColor: currentTimer % 2 == 0 ? 'rgb(90, 15, 15)' : '',
+        backgroundColor: currentTimer % 2 === 0 ? 'rgb(90, 15, 15)' : '',
         transition: '0.75s',
         color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`,
         top: '20%',

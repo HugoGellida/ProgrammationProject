@@ -8,7 +8,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [handCard, setHandCard] = useState(cards);
     const [targetCard, setTargetCard] = useState(-1);
     const [mustClick, setMustClick] = useState(infosSup.isFirstPlayer);
-    const [timer, setTimer] = useState(time);
+    const timer = time;
     const [currentTimer, setCurrentTimer] = useState(time);
     const [launchTimer, setLaunchTimer] = useState(infosSup.isFirstPlayer);
     const [lastCardPlayed, setLastCardPlayed] = useState(infosSup.lastCardPlayed);
@@ -20,7 +20,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [showChoice, setShowChoice] = useState(false);
     const [currentEmitter, setCurrentEmitter] = useState('chooseCardCrazy8');
     const [showWinButton, setShowWinButton] = useState(false);
-    const [winTimer, setWinTimer] = useState(5);
+    const winTimer = 5;
     const [currentWinTimer, setCurrentWinTimer] = useState(winTimer);
     const [opponentTarget, setOpponentTarget] = useState('');
     const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);
@@ -34,7 +34,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             intervalIDTimer = setInterval(() => {
                 setCurrentTimer(currentTimer - 1);
             }, 1000);
-            if (mustClick && currentTimer == 0) {
+            if (mustClick && currentTimer === 0) {
                 socket.emit('timeOutCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
                 setLaunchTimer(false);
                 setCurrentTimer(timer);
@@ -167,7 +167,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     }
 
     const cardInPlayableCards = (card, playableCards) => {
-        return playableCards.filter(c => c.value === card.value && c.type === card.type).length != 0;
+        return playableCards.filter(c => c.value === card.value && c.type === card.type).length !== 0;
     }
 
     const chooseType = (type) => {
@@ -218,7 +218,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     }
 
     const timerStyle = {
-        backgroundColor: currentTimer % 2 == 0 ? 'rgb(90, 15, 15)' : '',
+        backgroundColor: currentTimer % 2 === 0 ? 'rgb(90, 15, 15)' : '',
         transition: '0.75s',
         color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`,
         top: '20%',

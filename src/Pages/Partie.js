@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 export default function Partie() {
     const [messages, setMessages] = useState([]);
     const [messageSentValue, setMessageSentValue] = useState('');
-    const [firstLaunch, setFirstLaunch] = useState(true);
     const [showLaunchButton, setShowLaunchButton] = useState(false);
     const [gameType, setGameType] = useState();
     const [launchGame, setLaunchGame] = useState(false);
@@ -33,13 +32,10 @@ export default function Partie() {
     }, [messages]);
 
     useEffect(() => {
-        if (firstLaunch) {
-            socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
-            setFirstLaunch(false);
-        }
+        socket.emit("askLaunchButton", sessionStorage.getItem("idPartie"), sessionStorage.getItem("pseudo"));
+    }, []);
 
-
-        if (showChat) setUnreadMessage(false);
+    useEffect(() => {
 
 
         const messageReceived = (message, username, color, title) => {
@@ -131,11 +127,12 @@ export default function Partie() {
     }
 
     const handleKeyPress = (event) => {
-        if (event.key == "Enter") sendMessage();
+        if (event.key === "Enter") sendMessage();
     }
 
     const clickChat = () => {
         setShowChat(!showChat);
+        setUnreadMessage(false);
     }
 
     return (
@@ -178,13 +175,13 @@ export default function Partie() {
                     {showLaunchButton && (
                         <button id='pause' onClick={PauseGame} style={{ top: '5%', left: '85%', position: 'absolute' }}>Enregistrer</button>
                     )}
-                    {gameType == "jeu-de-bataille" && (
+                    {gameType === "jeu-de-bataille" && (
                         <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer} cardPlayed={cardPlayed}></Bataille>
                     )}
-                    {gameType == '6-qui-prend' && (
+                    {gameType === '6-qui-prend' && (
                         <Prendqui6 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup} cardPlayed={cardPlayed}></Prendqui6>
                     )}
-                    {gameType == 'crazy8' && (
+                    {gameType === 'crazy8' && (
                         <Crazy8 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Crazy8>
                     )}
                 </>
