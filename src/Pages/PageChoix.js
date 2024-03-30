@@ -5,26 +5,21 @@ import { socket } from './socket';
 import Boutton from './../Composants/Boutton';
 import { useEffect, useState } from 'react';
 
-function PageChoix() {
+export default function PageChoix() {
 
   const [gameShown, setGameShown] = useState([]);
   const [filter, setFilter] = useState("All");
-
-  const [firstLaunch, setFirstLaunch] = useState(true);
-
   const navigate = useNavigate();
 
+  const loadGame = (games) => {
+    setGameShown(games);
+  }
 
   useEffect(() => {
+    socket.emit('loadGame');
+  }, []);
 
-    if (firstLaunch) {
-      socket.emit("loadGame");
-      setFirstLaunch(false);
-    }
-
-    const loadGame = (games) => {
-      setGameShown(games);
-    }
+  useEffect(() => {
 
     const teleportPlayer = (idGame) => {
       sessionStorage.setItem("idPartie", parseInt(idGame));
@@ -93,5 +88,3 @@ function PageChoix() {
     </div>
   );
 }
-
-export default PageChoix;

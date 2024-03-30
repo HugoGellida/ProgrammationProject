@@ -4,7 +4,7 @@ import { socket } from "./socket.js";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from 'react';
 
-function Inscription() {
+export default function Inscription() {
 
   const navigate = useNavigate();
 
@@ -25,19 +25,15 @@ function Inscription() {
     return () => {
       socket.off("registrationAllowed", registrationAllowed);
     }
-  })
-
+  });
 
   return (
-    <div className="Inscription">
+    <>
       <h2>Inscription</h2>
-
-      <main>
+      <div className='connexionForm'>
         {Formulaire("Inscription", DemandeInscription)}<br></br>
-        <label> you have an account? </label><br></br><Link to="/Connex">Connexion</Link> 
-      </main>
-    </div>
+        <label> you have an account? </label><br></br><Link to="/Connex">Connexion</Link>
+      </div>
+    </>
   );
 }
-
-export default Inscription;

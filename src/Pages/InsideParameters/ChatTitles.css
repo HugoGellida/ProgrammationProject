@@ -1,0 +1,84 @@
+.unlockedTitles {
+    height: 40%;
+    width: 100%;
+    top: 0%;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    border-bottom: 2px inset rgb(90, 15, 15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 0%;
+}
+
+.unlockedTitlesTitle {
+    font-size: inherit;
+    position: absolute;
+    margin-bottom: auto;
+    margin-top: inherit;
+    align-self: center;
+    top: 10%;
+    margin: inherit;
+}
+
+.unlockedTitle {
+    position: relative;
+    height: auto;
+    width: auto;
+    border: 2px inset black;
+    border-radius: inherit;
+}
+
+.titleInfo {
+    height: 20%;
+    top: 40%;
+    left: 0%;
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.lockedTitles {
+    bottom: 0%;
+    height: 40%;
+    width: 100%;
+    left: 0%;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    border-top: 2px outset rgb(90, 15, 15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lockedTitlesTitle {
+    font-size: inherit;
+    position: absolute;
+    margin-bottom: auto;
+    margin-top: inherit;
+    align-self: center;
+    top: 10%;
+    margin: inherit;
+}
+
+.lockedTitle {
+    position: relative;
+    height: auto;
+    width: auto;
+    padding: 10px;
+    border: 2px inset black;
+    background-color: black;
+}
+
+.unlockedTitle:hover {
+    background-color: rgb(60, 60, 60);
+    transition: 0.5s;
+}
+
+.lockedTitle:hover {
+    background-color: rgb(60, 60, 60);
+    transition: 0.5s;
+}

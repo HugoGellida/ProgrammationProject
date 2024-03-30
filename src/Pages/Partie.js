@@ -1,9 +1,10 @@
 import { socket } from "./socket.js";
 import React, { useEffect, useRef, useState } from 'react';
-import Bataille from './Bataille.js';
-import Prendqui6 from './6quiprend.js';
-import Crazy8 from './Crazy8.js';
+import Bataille from './InsideGames/Bataille.js';
+import Prendqui6 from './InsideGames/6quiprend.js';
+import Crazy8 from './InsideGames/Crazy8.js';
 import { useNavigate } from "react-router-dom";
+import BackgroundAmbiance from "./BackgroundAmbiance.js";
 
 
 export default function Partie() {
@@ -185,6 +186,9 @@ export default function Partie() {
                         <Crazy8 opponentInfos={opponents} cards={cardsGiven} time={timer} infosSup={infosSup}></Crazy8>
                     )}
                 </>
+            )}
+            {!launchGame && (
+                <BackgroundAmbiance source={"./OST/LoadingTheme2.mp3"} volume={0.5}/>
             )}
         </div>
     );

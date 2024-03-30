@@ -1,0 +1,104 @@
+.shopWarning {
+    z-index: 1;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    border: 5px inset black;
+    height: 30%;
+    width: 40%;
+    border-radius: 7.5px;
+    background-color: rgba(60, 60, 60, 0.75);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.buyItem {
+    border: 2px inset green;
+    border-radius: 15px;
+}
+.buyItem:hover {
+    background-color: green;
+    transition: 0.5s;
+}
+
+.dontBuyItem {
+    border: 2px inset red;
+    border-radius: 15px;
+    margin-bottom: auto;
+}
+.dontBuyItem:hover {
+    background-color: red;
+    transition: 0.5s;
+}
+
+.buyableTitles {
+    position: relative;
+    height: auto;
+    width: 100%;
+    border-bottom: 2px inset rgb(90, 15, 15);
+    border-top: 2px outset rgb(90, 15, 15);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.buyableColors {
+    position: relative;
+    height: auto;
+    width: 100%;
+    border-bottom: 2px inset rgb(90, 15, 15);
+    border-top: 2px outset rgb(90, 15, 15);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.buyables {
+    height: 60%;
+    width: 100%;
+    left: 0%;
+    top: 40%;
+    position: absolute;
+}
+
+.buyableTitle {
+    border: 2px inset black;
+    border-radius: inherit;
+}
+
+.buyableColor {
+    border: 2px inset black;
+    border-radius: inherit;
+}
+
+.moneyAmount {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: fit-content;
+    padding: 10px;
+    height: auto;
+    right: 0%;
+    position: absolute;
+    border-bottom: 2px inset blueviolet;
+    border-left: 2px outset blueviolet;
+}
+
+.shopInfo {
+    left: 50%;
+    transform: translate(-50%, 0%);
+    position: absolute;
+    padding: 10px;
+    border-bottom: 2px inset blueviolet;
+    border-left: 2px outset blueviolet;
+    border-top: 2px outset blueviolet;
+    border-right: 2px inset blueviolet;
+    bottom: 100%;
+}

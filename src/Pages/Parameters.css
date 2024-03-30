@@ -1,11 +1,39 @@
-.Parameters {
-    background-image: url('./images/Arrière-plan-paramètres.jpg');
+.filter {
+    left: 0%;
+    height: 100%;
+    width: 10%;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1;
+    position: absolute;
+    border-right: 2px inset rgb(90, 15, 15);
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
 }
 
-.lockedColors {
-    background-image: url('./images/cadenas.jpg');
-    display: flex;
+.choice {
+    border: 0px;
+    border-bottom: 2px inset rgb(90, 15, 15);
+    border-top: 2px outset rgb(90, 15, 15);
+    border-radius: inherit;
+    width: 100%;
+    position: relative;
+}
+
+.container {
+    left: 10%;
     position: absolute;
-    top: 50%;
-    right: 50%;
+    width: 90%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.Parameters {
+    background-image: url('./images/ParametersBackground.jpg');
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0%;
+    background-size: cover;
 }

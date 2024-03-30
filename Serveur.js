@@ -538,6 +538,7 @@ io.on("connection", (socket) => {
                 db.run(`UPDATE StatCrazy8 SET loseAmount = ${(row.loseAmount + 1)} WHERE username = '${opponents[i].username}'`);
             });
         }
+        gameList = gameList.filter(g => g.idGame != idGame);
         io.socketsLeave(parseInt(idGame));
     });
 

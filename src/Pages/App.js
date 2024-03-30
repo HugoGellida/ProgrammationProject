@@ -1,5 +1,5 @@
-import React from 'react';
-import { Route, Routes } from "react-router-dom";
+import React, { useState } from 'react';
+import { Route, Routes, useLocation } from "react-router-dom";
 import Inscription from './Inscription';
 import Connex from './Connex';
 import CreationPartie from './CreationPartie'
@@ -10,7 +10,7 @@ import Partie from './Partie';
 
 function App() {
   return (
-    <div className="App">
+    <>
       <Routes>
         <Route path="/" element={<Inscription/>} />
         <Route path="/CreationPartie" element={<CreationPartie/>} />
@@ -20,7 +20,7 @@ function App() {
         <Route path="/PagePause" element={<Pagepause/>} />
         <Route path="/Parameters" element={<Parameters/>} />
       </Routes>
-    </div>
+    </>
   );
 }
 

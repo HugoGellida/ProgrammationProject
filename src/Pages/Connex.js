@@ -39,21 +39,17 @@ function Connexion() {
 
     return (
         <div className="Connexion">
-            {!showWarning && (
-                <>
-                    <h2>Connexion</h2>
-                    <div className='connexionForm'>
-                        {Formulaire("Connexion", DemandeConnexion)}
-                        <label> Don't have an account? </label><br></br><Link id="lcl" to="/">Inscription</Link>
-                    </div>
-                </>
-            )}
+            <>
+                <h2>Connexion</h2>
+                <div className='connexionForm'>
+                    {Formulaire("Connexion", DemandeConnexion)}
+                    <label> Don't have an account? </label><br></br><Link id="lcl" to="/">Inscription</Link>
+                </div>
+            </>
             {showWarning && (
                 <>
-                    <main>
-                        <label>Connection refusée</label>
-                        <button onClick={removeWarning}>Continuer</button>
-                    </main>
+                    <label>Connection refusée</label>
+                    <button onClick={removeWarning}>Continuer</button>
                 </>
             )}
         </div>

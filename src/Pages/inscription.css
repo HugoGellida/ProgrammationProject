@@ -1,27 +1,48 @@
 body {
- 
-  background:url("./images/Arrière-plan-cartes.jpg");
+
+  background: url('./images/Arrière-plan-cartes.jpg');
   width: auto;
   height: auto;
   background-size: 16.5% auto;
-   display: flex;
-   flex-direction: column;
-   justify-content: space-between;
-   align-items: center;
-   min-height: 100vh;
-   font-family: 'Roboto', sans-serif; 
- }
- a:link, a:visited {
-  appearance: none;
-border: .3em inset #e91e1e;
-background: black;
-padding: .50em 1em;
-color: #f8f1f1;
-border-radius: 2em;
-transition: 0.5s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
 }
 
-a:hover, a:active {
+a:link,
+a:visited {
+  appearance: none;
+  border: .3em inset #e91e1e;
+  background: black;
+  padding: .50em 1em;
+  color: #f8f1f1;
+  border-radius: 2em;
+  transition: 0.5s;
+}
+
+a:hover,
+a:active {
   background: #e90d0d;
-color: #fff;
+  color: #fff;
+}
+
+.connexionForm {
+  display: center;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 75px;
+  min-width: 200px;
+  padding: 50px;
+  text-align: center;
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 15px;
+  margin-bottom: 100%;
+  border: 9px inset rgb(90, 15, 15);
+  background-color: rgb(0, 0, 0, 0.75);
 }
