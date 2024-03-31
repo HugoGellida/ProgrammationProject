@@ -258,14 +258,14 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                     <button style={{ left: '10%', top: '90%', position: 'absolute' }} onClick={() => chooseType('clover')}>clover</button>
                     <button style={{ left: '90%', top: '10%', position: 'absolute' }} onClick={() => chooseType('heart')}>heart</button>
                     <button style={{ left: '90%', top: '90%', position: 'absolute' }} onClick={() => chooseType('tile')}>tile</button>
-                    <div style={{ left: '50%', top: '50%',backgroundImage: `url('./imagesCrazy8/8-${waitingCard.type}.png')` }}></div>
+                    <div className="card" style={{ left: '50%', top: '50%',backgroundImage: `url('./imagesCrazy8/8-${waitingCard.type}.png')` }}></div>
                 </div>
             )}
             {showChoice && (
                 <div style={{ left: '20%', top: '0%', position: 'absolute', width: '50%', height: '50%' }}>
                     <button style={{ left: '10%', top: '50%', position: 'absolute' }} onClick={() => chooseChoice('pick')}>pick</button>
                     <button style={{ left: '90%', top: '50%', position: 'absolute' }} onClick={() => chooseChoice('place')}>place</button>
-                    <div style={{ left: '50%', top: '50%', backgroundImage: `url('./imagesCrazy8/${waitingCard.value}-${waitingCard.type}.png')` }}></div>
+                    <div className="card" style={{ left: '50%', top: '50%', backgroundImage: `url('./imagesCrazy8/${waitingCard.value}-${waitingCard.type}.png')` }}></div>
                 </div>
             )}
             {showWinButton && (

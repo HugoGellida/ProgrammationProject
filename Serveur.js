@@ -29,7 +29,7 @@ const db = new sql.Database("./Database.db");
 
 let gameList = [];
 
-//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20))");
+//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20), money INTEGER)");
 //db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 //db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 //db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
@@ -59,6 +59,10 @@ function insertShop(username) {
 server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
 });
+
+//db.all("SELECT * FROM User", (rows, err) => {
+//    rows.forEach(row => console.log(row));
+//})
 
 
 const rooms = {};

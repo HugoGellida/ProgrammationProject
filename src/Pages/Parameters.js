@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
 import './Parameters.css';
 import ChatColors from "./InsideParameters/ChatColors";
 import ChatTitles from "./InsideParameters/ChatTitles";
 import Shop from "./InsideParameters/Shop";
 import Statistics from "./InsideParameters/Statistics";
-import BackgroundAmbiance from "./BackgroundAmbiance";
+import BackgroundAmbiance from "./BackgroundAmbiance.js";
 
 export default function Parameters() {
     const navigate = useNavigate();
