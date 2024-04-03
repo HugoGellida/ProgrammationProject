@@ -47,10 +47,10 @@ function Connexion() {
                 </div>
             </>
             {showWarning && (
-                <>
+                <div>
                     <label>Connection refusée</label>
                     <button onClick={removeWarning}>Continuer</button>
-                </>
+                </div>
             )}
         </div>
     );

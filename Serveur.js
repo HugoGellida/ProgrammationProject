@@ -29,13 +29,14 @@ const db = new sql.Database("./Database.db");
 
 let gameList = [];
 
-//db.run("CREATE TABLE User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20), money INTEGER)");
-//db.run("CREATE TABLE StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
-//db.run("CREATE TABLE StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
-//db.run("CREATE TABLE StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
-//db.run("CREATE TABLE BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
-//db.run("CREATE TABLE BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
-db.run("UPDATE User SET isConnected = false");
+db.run("CREATE TABLE IF NOT EXIST User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20), money INTEGER)", (err) => {
+    db.run("UPDATE User SET isConnected = false");
+});
+db.run("CREATE TABLE IF NOT EXISTS StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
+db.run("CREATE TABLE IF NOT EXISTS StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
+db.run("CREATE TABLE IF NOT EXISTS StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
+db.run("CREATE TABLE IF NOT EXISTS BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
+db.run("CREATE TABLE IF NOT EXISTS BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
 
 function insertShop(username) {
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'yellow', false)`);
@@ -173,6 +174,28 @@ io.on("connection", (socket) => {
                 } else {
                     resolve(row);
                 }
+            });
+        });
+    }
+
+    async function getAllStats() {
+        return new Promise((resolve, reject) => {
+            let infos = [];
+            db.all('SELECT * FROM User', (err, rows) => {
+                let promises = [];
+                rows.forEach((row) => {
+                    let promise = new Promise(async (resolve, reject) => {
+                        const rowWar = await getStats("StatWar", row.username);
+                        const rowTake6 = await getStats("StatTake6", row.username);
+                        const rowCrazy8 = await getStats("StatCrazy8", row.username);
+                        infos.push({username: row.username, all: rowWar.winAmount + rowTake6.winAmount + rowCrazy8.winAmount, war: rowWar.winAmount, take6: rowTake6.winAmount, crazy8: rowCrazy8.winAmount});
+                        resolve(true);
+                    });
+                    promises.push(promise);
+                });
+                Promise.all(promises).then(() => {
+                    resolve(infos);
+                });
             });
         });
     }
@@ -787,6 +810,7 @@ io.on("connection", (socket) => {
                         nextTurnWar(game);
                     } else {
                         game.isLaunched = false;
+                        gameList.filter(g => g.idGame != game.idGame);
                         io.to(playerWinnerRound.socketid).emit("winWar");
                     }
                 });
@@ -956,6 +980,11 @@ io.on("connection", (socket) => {
         socket.join(parseInt(idGame));
         socket.broadcast.to(parseInt(idGame)).emit("messageReceived", `The player ${username} joined the game`, "SERVER", "green")
     });
+
+    socket.on('askGlobalStats', async () => {
+        let infos = await getAllStats();
+        socket.emit('sendGlobalStats', infos);
+    })
 
     //! Function Part
     function affectPlayer(idGame, username, isPlayerCreator) { // Fonction générale
