@@ -6,6 +6,7 @@ import Crazy8 from './InsideGames/Crazy8.js';
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "./BackgroundAmbiance.js";
 import "./Partie.css";
+import { useTranslation } from "react-i18next";
 
 
 export default function Partie() {
@@ -23,7 +24,8 @@ export default function Partie() {
     const messageEndRef = useRef(null);
     const [cardPlayed, setCardPlayed] = useState();
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const scrollToBottom = () => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -146,17 +148,17 @@ export default function Partie() {
                             if (message.title) {
                                 return (
                                     <>
-                                        <strong style={{ fontSize: "12px", color: message.color }}>[{message.title}]</strong>
-                                        <strong style={{ fontSize: "12px", color: message.color }}>{message.username}</strong>
-                                        <span style={{ fontSize: "12.5px", color: "white" }}> {message.context}</span>
+                                        <strong style={{ fontSize: "12px", color: message.color }}>[{t(`Parameters.Titles.${message.title.replace(/\s/g, "")}.Price`)}]</strong>
+                                        <strong style={{ fontSize: "12px", color: message.color }}>{message.username}: </strong>
+                                        <span style={{ fontSize: "12.5px", color: "white" }}>{message.context}</span>
                                         <br></br>
                                     </>
                                 );
                             } else {
                                 return (
                                     <>
-                                        <strong style={{ fontSize: "12px", color: message.color }}>{message.username}</strong>
-                                        <span style={{ fontSize: "12.5px", color: "white" }}>{message.context}</span>
+                                        <strong style={{ fontSize: "12px", color: message.color }}>SERVER: </strong>
+                                        <span style={{ fontSize: "12.5px", color: "white" }}>{t(`Partie.Server.${message.context.split('has ')[1] === 'left the game'? 'Leave': message.context.split('has ')[1] === 'joined the game'? 'Join': 'RageQuit'}`, {username: message.context.split(' has ')[0]})}</span>
                                         <br></br>
                                     </>
                                 );
@@ -164,18 +166,18 @@ export default function Partie() {
                         })}
                         <div ref={messageEndRef}></div>
                     </div>
-                    <input className="messageToSend" id='messageToSend' type='text' placeholder='Ecrivez votre message...' value={messageSentValue} onChange={writeValue} onKeyDown={handleKeyPress}></input>
+                    <input className="messageToSend" id='messageToSend' type='text' placeholder={t('Partie.MessagePlaceHolder')} value={messageSentValue} onChange={writeValue} onKeyDown={handleKeyPress}></input>
                     <button className="buttonMessageToSend" onClick={sendMessage}>▸</button>
                 </div>
             )}
             <button className="showChat" onClick={clickChat} style={{ left: showChat ? '200px' : '0px', backgroundColor: unreadMessage? "rgb(60, 60, 60)": "" }}>...</button>
             {!launchGame && showLaunchButton && (
-                <button className="LaunchButton" id='LaunchButton' onClick={startGame}>Commencer</button>
+                <button className="LaunchButton" id='LaunchButton' onClick={startGame}>{t('Partie.Start')}</button>
             )}
             {launchGame && (
                 <>
                     {showLaunchButton && (
-                        <button className='pause' onClick={PauseGame}>Enregistrer</button>
+                        <button className='pause' onClick={PauseGame}>{t('Partie.Save')}</button>
                     )}
                     {gameType === "jeu-de-bataille" && (
                         <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer} cardPlayed={cardPlayed}></Bataille>

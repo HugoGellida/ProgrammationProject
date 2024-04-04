@@ -1,11 +1,9 @@
 import './CreationPartie.css';
-import nbrjoueur from './../Composants/nbrjoueur';
-import Trieur from './../Composants/Trieur';
-import DelaisTour from './../Composants/DelaisTour';
 import { useNavigate } from "react-router-dom";
 import { socket } from './socket';
-import Boutton from './../Composants/Boutton';
 import { useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
+
 
 function CreationPartie() {
 
@@ -13,16 +11,14 @@ function CreationPartie() {
   const [showPrivateOption, setShowPrivateOption] = useState(false);
 
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   function stockGameInfo() {
     let nbJoueur = document.getElementById("nbrJoueur").value;
     let Delais = document.getElementById("DelaisTour").value;
-    console.log('hmm');
     let typedejeu = document.getElementById("Select").options[document.getElementById("Select").selectedIndex].value;
     setInfoGame({ playerAmount: nbJoueur, timer: Delais, type: typedejeu, creator: sessionStorage.getItem("pseudo") });
     setShowPrivateOption(true);
-    console.log(nbJoueur, Delais, typedejeu);
-    //socket.emit("createGame", nbJoueur, typedejeu, sessionStorage.getItem("pseudo"), Delais);
   }
 
   function stockGameStatus() {
@@ -49,30 +45,30 @@ function CreationPartie() {
       <div className='creationOptions'>
         {!showPrivateOption && (
           <>
-            <label className='simpleText' htmlFor="playerAmount">Nombre de joueurs: </label>
+            <label className='simpleText' htmlFor="playerAmount">{t('CreationPartie.Labels.PlayerAmount')}</label>
             <input id='nbrJoueur' className='numberInput' type='number' max="10" min="2" defaultValue='2' required />
             <br></br>
-            <label className='simpleText' htmlFor="Type de jeu">Type de jeu: </label>
+            <label className='simpleText' htmlFor="Type de jeu">{t('CreationPartie.Labels.Type')}</label>
             <select id='Select' className="gameChoice">
-              <option value="jeu-de-bataille">Jeu de Bataille</option>
-              <option value="6-qui-prend">6-qui-prend</option>
-              <option value="crazy8">crazy8</option>
+              <option value="jeu-de-bataille">{t('CreationPartie.GameType.War')}</option>
+              <option value="6-qui-prend">{t('CreationPartie.GameType.Take6')}</option>
+              <option value="crazy8">{t('CreationPartie.GameType.Crazy8')}</option>
             </select>
             <br></br>
-            <label className='simpleText' htmlFor="DelaisTour">Delais de Choix de Carte: </label>
+            <label className='simpleText' htmlFor="DelaisTour">{t('CreationPartie.Labels.Timer')}</label>
             <input id='DelaisTour' className='numberInput' type='number' max="30" min="5" defaultValue="5" required />
             <br></br>
-            <button className='button' onClick={stockGameInfo}>Suivant</button>
+            <button className='button' onClick={stockGameInfo}>{t('CreationPartie.Next')}</button>
             <div><br></br></div>
           </>
         )}
         {showPrivateOption && (
           <>
             <select id='gameStatus' className='gameChoice'>
-              <option value="public">Partie publique</option>
-              <option value="private">Partie privée</option>
+              <option value="public">{t('CreationPartie.GameVisual.Public')}</option>
+              <option value="private">{t('CreationPartie.GameVisual.Private')}</option>
             </select>
-            <button className='button' onClick={stockGameStatus}>Créer la partie</button>
+            <button className='button' onClick={stockGameStatus}>{t('CreationPartie.Submit')}</button>
           </>
 
         )}

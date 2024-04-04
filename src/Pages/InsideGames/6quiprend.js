@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "../BackgroundAmbiance";
+import { useTranslation } from "react-i18next";
+
 
 export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPlayed }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -21,6 +23,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
     const [playWinMusic, setPlayWinMusic] = useState(false);
 
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const selectCard = (cardChosen) => {
         if (mustClick) {
@@ -85,13 +88,13 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
         const endTake6 = (winners) => {
             setEndBackgroundAmbiance(true);
             if (winners.includes(sessionStorage.getItem('pseudo'))) {
-                setMessageEnd("Vous avez gagné la partie (+750g)");
+                setMessageEnd(t("6quiprend.Win"));
                 setPlayWinMusic(true);
             } else {
                 if (winners.length === 1) {
-                    setMessageEnd(`${winners[0]} a gagné la partie`);
+                    setMessageEnd(t('6quiprend.Lose_one', {username: winners[0]}));
                 } else {
-                    setMessageEnd(`Les joueurs ${winners} ont gagnés la partie`);
+                    setMessageEnd(t('6quiprend.Lose_other', {usernames: winners}));
                 }
             }
             setShowEnd(true);
@@ -150,7 +153,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
                             <div className="card" style={{ backgroundImage: showCard ? `url('./images2/${opponent.card.value}.svg')` : `url('./imagesTest/Verso-Cartes.png')`, position: 'relative' }}></div>
                         )}
                         <label>{opponent.username}</label>
-                        <label>{opponent.pointAmount} points</label>
+                        <label>{t('6quiprend.PointAmount')} {opponent.pointAmount}</label>
                     </div>
                 ))}
             </div>
@@ -181,7 +184,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
             {showEnd && (
                 <div className="end" style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
                     <label className="simpleText">{messageEnd}</label>
-                    <button className="endButton" onClick={handleEndClick}>Retour</button>
+                    <button className="endButton" onClick={handleEndClick}>{t('6quiprend.End')}</button>
                 </div>
             )}
             {!endBackgroundAmbiance && (

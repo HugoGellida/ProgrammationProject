@@ -42,8 +42,11 @@
     color: white;
     align-items: center;
     justify-content: center;
+    align-content: center;
     flex-direction: column;
     display: flex;
+    width: 100px;
+    flex-wrap: wrap;
     background-size: cover;
     border: 3px inset rgb(90, 15, 15);
 }

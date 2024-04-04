@@ -1,12 +1,15 @@
 import './inscription.css';
+import "./../Composants/Boutton.css"
 import Formulaire from './../Composants/Formulaire';
 import { socket } from "./socket.js";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 
 export default function Inscription() {
 
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   function DemandeInscription() {
     const pseudo = document.getElementById("username").value;
@@ -29,10 +32,10 @@ export default function Inscription() {
 
   return (
     <div className='Inscription'>
-      <h2 className='h2'>Inscription</h2>
+      <h2 className='h2'>{t('Inscription.Name')}</h2>
       <div className='inscriptionForm'>
         {Formulaire("Inscription", DemandeInscription)}<br></br>
-        <label className='simpleText'>Vous avez déjà un compte?</label><br></br><Link to="/Connex">Connexion</Link>
+        <label className='simpleText'>{t('Inscription.ChangeLocationText')}</label><br></br><Link to="/Connex">{t('Inscription.ChangeLocation')}</Link>
       </div>
     </div>
   );

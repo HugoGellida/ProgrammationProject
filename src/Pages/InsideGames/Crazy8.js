@@ -3,6 +3,8 @@ import { socket } from "../socket";
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "../BackgroundAmbiance";
 import "./Crazy8.css";
+import { useTranslation } from "react-i18next";
+
 
 export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -28,8 +30,8 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
     const [playWinMusic, setPlayWinMusic] = useState(false);
     const [playCardSound, setPlayCardSound] = useState(false);
 
-
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         let intervalIDTimer;
@@ -108,10 +110,10 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             setShowEnd(true);
             if (winner === sessionStorage.getItem('pseudo')){
                 setPlayWinMusic(true);
-                setMessageEnd('Vous avez gagné la partie(+750g)');
+                setMessageEnd(t('Crazy8.Win'));
             }
             else {
-                setMessageEnd(`Le joueur ${winner} a gagné la partie`);
+                setMessageEnd(t('Crazy8.Lose', {username: winner}));
                 setHandCard([]);
             }
         }
@@ -233,7 +235,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                 {opponents.map((opponent, index) => (
                     <div className="opponent" id={opponent.username} style={{ backgroundColor: (opponent.username !== opponentTarget)?'rgb(0, 0, 0, 75)': 'rgb(90, 15, 15)' }}>
                         <label>{opponent.username}</label>
-                        <label>{opponent.cardAmount} cartes</label>
+                        <label>{t('Crazy8.CardAmount')} {opponent.cardAmount}</label>
                     </div>
                 ))}
             </div>
@@ -253,7 +255,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             {showEnd && (
                 <div className="end" style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
                     <label className="simpleText">{messageEnd}</label>
-                    <button className="endButton" onClick={handleEndClick}>Retour</button>
+                    <button className="endButton" onClick={handleEndClick}>{t('Crazy8.End')}</button>
                 </div>
             )}
             {showTypeChoice && (
@@ -273,7 +275,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                 </div>
             )}
             {showWinButton && (
-                <button onClick={clickWin} style={{left: '70%', top: '70%', position: 'absolute'}}>WIN {currentWinTimer}</button>
+                <button onClick={clickWin} style={{left: '70%', top: '70%', position: 'absolute'}}>{t('Crazy8.WinButton')} {currentWinTimer}</button>
             )}
             {!endBackgroundAmbiance && (
                 <BackgroundAmbiance source={"./OST/backgroundAmbiance.mp3"} volume={0.05}/>

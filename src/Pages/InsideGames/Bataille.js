@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "../BackgroundAmbiance";
+import { useTranslation } from "react-i18next";
 
 export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
     const [opponents, setOpponents] = useState(opponentInfos);
@@ -19,7 +20,9 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
     const [messageEnd, setMessageEnd] = useState('');
     const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);
     const [playCardSound, setPlayCardSound] = useState(false);
+
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         let intervalIDTimer;
@@ -62,21 +65,21 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
 
         const winWar = () => {
             setEndBackgroundAmbiance(false);
-            setMessageEnd("Vous avez gagné la partie (+750g)");
+            setMessageEnd("Win");
             setShowEnd(true);
             setHandCard([]);
         }
 
         const loseWar = () => {
             setEndBackgroundAmbiance(false);
-            setMessageEnd("Vous avez perdu la partie");
+            setMessageEnd("Lose");
             setShowEnd(true);
             setHandCard([]);
         }
 
         const tieWar = () => {
             setEndBackgroundAmbiance(false);
-            setMessageEnd("Vous avez égaliser la partie");
+            setMessageEnd("Tie");
             setShowEnd(true);
             setHandCard([]);
         }
@@ -158,7 +161,7 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
                             <div className="card" style={{ backgroundImage: showCard ? `url('./imagesTest/${opponent.card.value}-${opponent.card.type}.png')` : `url('./imagesTest/Verso-Cartes.png')`, position: 'relative' }}></div>
                         )}
                         <label>{opponent.username}</label>
-                        <label>{opponent.cardAmount} cartes</label>
+                        <label>{t('Bataille.CardAmount')} {opponent.cardAmount}</label>
                     </div>
                 ))}
             </div>
@@ -179,8 +182,8 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
             </div>
             {showEnd && (
                 <div className="end" style={{bottom: '10%', left: '50%', position: 'absolute'}}>
-                    <label className="simpleText">{messageEnd}</label>
-                    <button className="endButton" onClick={handleEndClick}>Retour</button>
+                    <label className="simpleText">{t(`Bataille.${messageEnd}`)}</label>
+                    <button className="endButton" onClick={handleEndClick}>{t('Bataille.End')}</button>
                 </div>
             )}
             {!endBackgroundAmbiance && (

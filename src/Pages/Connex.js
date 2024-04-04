@@ -3,12 +3,15 @@ import Formulaire from './../Composants/Formulaire';
 import { socket } from "./socket.js";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
+
 
 function Connexion() {
 
     const [showWarning, setShowWarning] = useState(false);
 
     let navigate = useNavigate();
+    const { t } = useTranslation();
 
     function DemandeConnexion() {
         const pseudo = document.getElementById("username").value;
@@ -39,11 +42,11 @@ function Connexion() {
 
     return (
         <div className="Connexion">
-            <h2 className='h2'>Connexion</h2>
+            <h2 className='h2'>{t('Connection.Name')}</h2>
             <div className='connexionForm'>
                 {Formulaire("Connexion", DemandeConnexion)}
                 <br></br>
-                <label className='simpleText'>Vous n'avez pas de compte?</label><br></br><Link id="lcl" to="/">Inscription</Link>
+                <label className='simpleText'>{t('Connection.ChangeLocationText')}</label><br></br><Link id="lcl" to="/">{t('Connection.ChangeLocation')}</Link>
             </div>
             {showWarning && (
                 <div>

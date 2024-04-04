@@ -264,7 +264,7 @@ io.on("connection", (socket) => {
             if (game) {
                 const playerSocket = game.playerList.filter(player => player.socketid == socket.id)[0];
                 if (game.isLaunched) {
-                    io.to(parseInt(game.idGame)).emit("messageReceived", `player ${playerSocket.username} had a skill issue and rage quitted`, "SERVER", "green");
+                    io.to(parseInt(game.idGame)).emit("messageReceived", `${playerSocket.username} has a skill issue and rage quitted`, "SERVER", "green");
                     game.eliminatePlayer(playerSocket);
                     if (game instanceof WarGame) {
                         db.get(`SELECT * FROM StatWar WHERE username = '${playerSocket.username}'`, (err, row) => {
@@ -313,7 +313,7 @@ io.on("connection", (socket) => {
                         });
                     }
                 } else {
-                    io.to(game.idGame).emit("messageReceived", `The player ${playerSocket.username} has left`, "SERVER", "green");
+                    io.to(game.idGame).emit("messageReceived", `${playerSocket.username} has left the game`, "SERVER", "green");
                     if (!game.isPaused) {
                         if (game.playerList.length == 1) {
                             gameList = gameList.filter(g => g.idGame != game.idGame);
@@ -414,7 +414,6 @@ io.on("connection", (socket) => {
         if (game.isPaused && game.playerAmount == playerAmountInRoom) {
             game.isPaused = false;
             const players = game.playerList;
-            let usernameList = players.map(player => player.username);
             console.log(`the game ${idGame} has been resumed`);
             if (game instanceof WarGame) {
                 for (let i = 0; i < players.length; i++) {
@@ -1000,7 +999,7 @@ io.on("connection", (socket) => {
         if (!rooms[idGame]) rooms[idGame] = [];
         rooms[idGame].push(socket.id);
         socket.join(parseInt(idGame));
-        socket.broadcast.to(parseInt(idGame)).emit("messageReceived", `The player ${username} joined the game`, "SERVER", "green")
+        socket.broadcast.to(parseInt(idGame)).emit("messageReceived", `${username} has joined the game`, "SERVER", "green")
     });
 
     socket.on('askGlobalStats', async () => {
