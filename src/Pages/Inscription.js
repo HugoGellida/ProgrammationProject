@@ -28,12 +28,12 @@ export default function Inscription() {
   });
 
   return (
-    <>
-      <h2>Inscription</h2>
-      <div className='connexionForm'>
+    <div className='Inscription'>
+      <h2 className='h2'>Inscription</h2>
+      <div className='inscriptionForm'>
         {Formulaire("Inscription", DemandeInscription)}<br></br>
-        <label> you have an account? </label><br></br><Link to="/Connex">Connexion</Link>
+        <label className='simpleText'>Vous avez déjà un compte?</label><br></br><Link to="/Connex">Connexion</Link>
       </div>
-    </>
+    </div>
   );
 }

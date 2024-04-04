@@ -1,30 +1,66 @@
-
-main {
-  display: center;
+.CreationPartie {
+  background: url('./images/ParametersBackground.jpg');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  left: 0%;
+  position: absolute;
+  display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  width: 75px;
-  min-width: 200px;
-  padding: 50px;
-  text-align: center;
-  color: white;
-  font-size: 17px;
-  font-weight: 500;
-  border-radius: 15px;
-  
-  margin-bottom: 100%;
-  
-  border:9px inset rgb(90, 15, 15);
-  
-  background-color:transparent;
+  font-family: 'Roboto', sans-serif;
 }
+
 h4 {
-  margin: 10px;
   font-size: 38px;
   font-weight: 900;
   color: #0a0909;
-  margin-top: 20%;
-  text-shadow:0 0 4px #FF0000,0 0 50px #FF0000,0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;color:#0f0f0d;
-  background-color:transparent;
-  }
+  text-shadow:
+    2px 2px rgb(60, 60, 60),
+    -2px 2px rgb(60, 60, 60),
+    2px -2px rgb(60, 60, 60),
+    -2px -2px rgb(60, 60, 60);
+  background-color: transparent;
+}
+
+.creationOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 5px inset black;
+  border-radius: 10px;
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.numberInput {
+  width: fit-content;
+  position: relative;
+}
+
+.gameChoice {
+  width: auto;
+  padding: 10px;
+  border: 2px inset black;
+  border-radius: 4px;
+  background-color: rgb(60, 60, 60);
+  color: white;
+  outline: none;
+  top: inherit;
+  position: relative;
+  transform: inherit;
+}
+
+.button {
+  padding: 10px;
+  border-radius: 0px;
+  border: 2px inset green;
+  transition: 0.5s;
+}
+
+.button:hover {
+  background-color: green;
+}

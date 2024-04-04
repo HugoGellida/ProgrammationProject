@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { socket } from "../socket";
 import './Statistics.css';
+import { useTranslation } from "react-i18next";
 
 
 export default function Statistics() {
 
     const [stats, setStats] = useState({});
     const [targetStat, setTargetStat] = useState();
+
+    const { t } = useTranslation();
 
     useEffect(() => {
         const sendStats = (stats) => {
@@ -22,20 +25,20 @@ export default function Statistics() {
     }, []);
 
     const handleStatClick = (event) => {
-        setTargetStat(stats[event.target.innerText]);
+        setTargetStat(stats[event.target.id]);
     }
 
     return (
         <>
             <div className="StatisticFilter">
                 {Object.keys(stats).map((statCategory) => (
-                    <button className="StatisticChoice" style={{backgroundColor: targetStat == stats[statCategory]? "rgb(60, 60, 60)": ""}} onClick={handleStatClick}>{statCategory}</button>
+                    <button id={statCategory} className="StatisticChoice" style={{ backgroundColor: targetStat == stats[statCategory] ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t(`Parameters.Statistics.Games.${statCategory}`)}</button>
                 ))}
             </div>
             {targetStat && (
                 <div className="Statistic">
                     {Object.keys(targetStat).map((key) => (
-                        <text className="StatisticInfo" style={{ color: "white" }}>{key.toUpperCase()}: {targetStat[key]}</text>
+                        <text className="StatisticInfo" style={{ color: "white" }}>{t(`Parameters.Statistics.${key}`)} {targetStat[key]}</text>
                     ))}
                 </div>
             )}

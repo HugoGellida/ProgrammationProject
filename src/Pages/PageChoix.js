@@ -1,5 +1,4 @@
 import './PageChoix.css';
-import Trieur from './../Composants/Trieur';
 import { useNavigate } from "react-router-dom";
 import { socket } from './socket';
 import Boutton from './../Composants/Boutton';
@@ -63,28 +62,33 @@ export default function PageChoix() {
 
   return (
     <div className="PageChoix">
-      <h5>Choix de la Partie</h5>
-      {Boutton("Parameters", goToParameters)}
-      {Boutton("Reprendre une partie", goToResumeGames)}
-      <main>
-        {Boutton("Créer une Partie", Choix)}
-        <select className="Select" id="Select" onChange={sortGames}>
-          <option value="All">Tous les jeux</option>
-          <option value="jeu-de-bataille">Jeu de Bataille</option>
-          <option value="6-qui-prend">6-qui-prend</option>
-          <option value="crazy8">crazy8</option>
-        </select>
-        <div><br></br><input type='text' id='zoneIDPartiePrivée' placeholder="Tapez l'id d'une partie"></input><br></br>
-          <br></br></div>
-        {Boutton("Entrer", RejoindrePartieParID)}
-        <div id="contenu-Parties" className="contenu-partie">
+      <div className='filter'>
+        <button className='choice' onClick={goToParameters}>Parametres</button>
+        <button className='choice' onClick={goToResumeGames}>Reprendre une partie</button>
+        <button className='choice' onClick={Choix}>Créer une partie</button>
+      </div>
+      <div className='container'>
+        <div className='topCointainerPageChoix'>
+          <h1 className='h1'>Choix de la Partie</h1>
+          <div className='perIDZone'>
+            <input type='text' id='zoneIDPartiePrivée' placeholder="Tapez l'id d'une partie"></input>
+            <button className='buttonPerID' onClick={RejoindrePartieParID}>Entrer</button>
+          </div>
+        </div>
+        <div className="bottomCointainerPageChoix">
+          <select className="Select" onChange={sortGames}>
+            <option value="All">Tous les jeux</option>
+            <option value="jeu-de-bataille">Jeu de Bataille</option>
+            <option value="6-qui-prend">6-qui-prend</option>
+            <option value="crazy8">crazy8</option>
+          </select>
           {gameShown.map(game => {
             if (filter === "All" || game.type === filter) {
-              return (<button id={game.id} onClick={clickGame}>Game {`${game.id}\n${game.actualPlayerAmount}/${game.maxPlayerAmount}\n${game.type}`}</button>);
+              return (<button className='joinableGame' id={game.id} onClick={clickGame}>Game {`${game.id}\n${game.actualPlayerAmount}/${game.maxPlayerAmount}\n${game.type}`}</button>);
             }
           })}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

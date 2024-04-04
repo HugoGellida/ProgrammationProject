@@ -83,7 +83,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
         }
 
         const endTake6 = (winners) => {
-            setEndBackgroundAmbiance(false);
+            setEndBackgroundAmbiance(true);
             if (winners.includes(sessionStorage.getItem('pseudo'))) {
                 setMessageEnd("Vous avez gagné la partie (+750g)");
                 setPlayWinMusic(true);
@@ -137,32 +137,17 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
         return Math.atan2(y, x) * (180 / Math.PI);
     }
 
-    const timerStyle = {
-        backgroundColor: currentTimer % 2 === 0 ? 'rgb(90, 15, 15)' : '',
-        transition: '0.75s',
-        color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`,
-        top: '20%',
-        left: '90%',
-        border: '2px inset rgb(90, 15, 15)',
-        borderRadius: '5px',
-        alignContent: 'center',
-        position: 'absolute',
-        width: '40px',
-        height: '25px',
-        flexWrap: 'wrap',
-        display: 'flex',
-        flexDirection: 'column',
-        textShadow: '0 0 4px #FF0000, 0 0 50px #FF0000, 0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000'
-    }
-
     return (
         <>
-            <div className="timer" style={timerStyle}>{currentTimer}</div>
+            <div className="timer" style={{
+                backgroundColor: currentTimer % 2 === 0 && launchTimer ? 'rgb(90, 15, 15)' : '',
+                color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`
+            }}>{currentTimer}</div>
             <div className="opponentContainer">
                 {opponents.map((opponent, index) => (
-                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: 'rgb(0, 0, 0, 75)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100 / (opponents.length + 1)) * (index + 1)}%`, position: 'absolute' }}>
+                    <div className="opponent" id={opponent.username}>
                         {opponent.card && (
-                            <div className="cardPlayed" style={{ backgroundImage: showCard ? `url('./images2/${opponent.card.value}.svg')` : `url('./imagesTest/Verso-Cartes.png')`, ...cardStyle, position: 'relative' }}></div>
+                            <div className="card" style={{ backgroundImage: showCard ? `url('./images2/${opponent.card.value}.svg')` : `url('./imagesTest/Verso-Cartes.png')`, position: 'relative' }}></div>
                         )}
                         <label>{opponent.username}</label>
                         <label>{opponent.pointAmount} points</label>
@@ -173,7 +158,7 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
                 {Object.keys(cardBoard).map(index => (
                     <>
                         {cardBoard[index].map((card, index2) => (
-                            <div className="card" style={{ ...cardStyle, left: `${5 + 50 * index2}px`, top: `${75 + 75 * index}px`, width: '50px', height: '75px', position: 'absolute', backgroundImage: `url(./images2/${card.value}.svg)` }}></div>
+                            <div className="card" style={{ left: `${5 + 50 * index2}px`, top: `${75 + 75 * index}px`, width: '50px', height: '75px', backgroundImage: `url(./images2/${card.value}.svg)` }}></div>
                         ))}
                     </>
                 ))}
@@ -186,7 +171,6 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
                 {handCard.map((card, index) => (
                     <div style={{
                         backgroundImage: `url('./images2/${card.value}.svg')`,
-                        ...cardStyle,
                         left: '50%',
                         transformOrigin: 'bottom right',
                         transform: mustClick ? `rotate(${rotation(index)}deg) ${index === targetCard ? `translateY(-${2 * handCard.length + 20}px)` : `translateY(-${2 * handCard.length}px)`}` : `rotate(${rotation(index)}deg)`,
@@ -195,9 +179,9 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
                 ))}
             </div>
             {showEnd && (
-                <div style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
-                    <label>{messageEnd}</label>
-                    <button onClick={handleEndClick}>Retour</button>
+                <div className="end" style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
+                    <label className="simpleText">{messageEnd}</label>
+                    <button className="endButton" onClick={handleEndClick}>Retour</button>
                 </div>
             )}
             {!endBackgroundAmbiance && (

@@ -1,48 +1,66 @@
-body {
-
-  background: url('./images/Arrière-plan-cartes.jpg');
-  width: auto;
-  height: auto;
-  background-size: 16.5% auto;
+.Inscription {
+  background: url('./images/ParametersBackground.jpg');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  left: 0%;
+  position: absolute;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  min-height: 100vh;
   font-family: 'Roboto', sans-serif;
 }
 
 a:link,
 a:visited {
-  appearance: none;
-  border: .3em inset #e91e1e;
-  background: black;
-  padding: .50em 1em;
-  color: #f8f1f1;
-  border-radius: 2em;
+  border: 2px inset red;
+  padding: 10px 10px;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  border-radius: 10px;
   transition: 0.5s;
 }
-
-a:hover,
-a:active {
-  background: #e90d0d;
-  color: #fff;
+a:hover {
+  background: red;
 }
 
-.connexionForm {
-  display: center;
+.h2 {
+  font-size: 45px;
+  font-weight: 900;
+  color: white;
+  text-shadow:
+    2px 2px rgb(60, 60, 60),
+    -2px 2px rgb(60, 60, 60),
+    2px -2px rgb(60, 60, 60),
+    -2px -2px rgb(60, 60, 60);
+  margin-top: auto;
+  position: relative;
+  background-color: transparent;
+}
+
+.inscriptionForm {
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  position: relative;
   width: 75px;
   min-width: 200px;
-  padding: 50px;
+  padding: 40px;
   text-align: center;
-  color: white;
-  font-size: 17px;
-  font-weight: 500;
   border-radius: 15px;
-  margin-bottom: 100%;
-  border: 9px inset rgb(90, 15, 15);
+  margin-bottom: auto;
+  border: 5px inset black;
   background-color: rgb(0, 0, 0, 0.75);
+  display: flex;
+}
+
+.simpleText {
+  color: white;
+  text-shadow:
+    1px 1px rgb(60, 60, 60),
+    -1px 1px rgb(60, 60, 60),
+    1px -1px rgb(60, 60, 60),
+    -1px -1px rgb(60, 60, 60);
 }

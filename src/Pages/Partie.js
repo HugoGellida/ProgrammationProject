@@ -5,6 +5,7 @@ import Prendqui6 from './InsideGames/6quiprend.js';
 import Crazy8 from './InsideGames/Crazy8.js';
 import { useNavigate } from "react-router-dom";
 import BackgroundAmbiance from "./BackgroundAmbiance.js";
+import "./Partie.css";
 
 
 export default function Partie() {
@@ -137,10 +138,10 @@ export default function Partie() {
     }
 
     return (
-        <div className="PageDeJeu">
+        <div className="Partie">
             {showChat && (
-                <div className='Chat' style={{ bottom: '5%', left: '1%', position: 'absolute', zIndex: '1' }}>
-                    <div id='messages' style={{ height: "300px", width: "200px", overflowY: 'auto', border: '2px inset rgb(90, 15, 15)', backgroundColor: 'rgb(0, 0, 0, 0.75)' }}>
+                <div className='Chat'>
+                    <div className='Messages' id='messages'>
                         {messages.map(message => {
                             if (message.title) {
                                 return (
@@ -163,18 +164,18 @@ export default function Partie() {
                         })}
                         <div ref={messageEndRef}></div>
                     </div>
-                    <input id='messageToSend' type='text' placeholder='Ecrivez votre message...' value={messageSentValue} onChange={writeValue} onKeyDown={handleKeyPress}></input>
-                    <button onClick={sendMessage}>▸</button>
+                    <input className="messageToSend" id='messageToSend' type='text' placeholder='Ecrivez votre message...' value={messageSentValue} onChange={writeValue} onKeyDown={handleKeyPress}></input>
+                    <button className="buttonMessageToSend" onClick={sendMessage}>▸</button>
                 </div>
             )}
-            <button onClick={clickChat} style={{width: '30px', height: '30px', bottom: '0%', left: '1%', position: 'absolute', fontSize: '5px', borderRadius: '12.5px', backgroundColor: unreadMessage? 'rgb(90, 15, 15)': '', transition: '1s'}}>...</button>
+            <button className="showChat" onClick={clickChat} style={{ left: showChat ? '200px' : '0px', backgroundColor: unreadMessage? "rgb(60, 60, 60)": "" }}>...</button>
             {!launchGame && showLaunchButton && (
-                <button id='LaunchButton' onClick={startGame} style={{ position: 'absolute', top: '50%', left: '50%' }}>Commencer</button>
+                <button className="LaunchButton" id='LaunchButton' onClick={startGame}>Commencer</button>
             )}
             {launchGame && (
                 <>
                     {showLaunchButton && (
-                        <button id='pause' onClick={PauseGame} style={{ top: '5%', left: '85%', position: 'absolute' }}>Enregistrer</button>
+                        <button className='pause' onClick={PauseGame}>Enregistrer</button>
                     )}
                     {gameType === "jeu-de-bataille" && (
                         <Bataille opponentInfos={opponents} cards={cardsGiven} time={timer} cardPlayed={cardPlayed}></Bataille>
@@ -188,7 +189,7 @@ export default function Partie() {
                 </>
             )}
             {!launchGame && (
-                <BackgroundAmbiance source={"./OST/LoadingTheme2.mp3"} volume={0.5}/>
+                <BackgroundAmbiance source={"./OST/LoadingTheme2.mp3"} volume={0.5} />
             )}
         </div>
     );

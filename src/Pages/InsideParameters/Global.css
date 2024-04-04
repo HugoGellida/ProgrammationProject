@@ -1,0 +1,45 @@
+.leaderBoard {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.leaderBoardCategory {
+    border: 2px inset black;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.leaderBoardCategoryTitle {
+    border: 2px inset black;
+    width: 100%;
+    color: white;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.pageSwitcher {
+    position: absolute;
+    border: 2px inset red;
+    border-radius: 0px;
+}
+
+.leaderBoardPlacement {
+    position: absolute;
+    color: white;
+    right: 0%;
+    top: 50%;
+    border-top: 2px inset blueviolet;
+    border-left: 2px inset blueviolet;
+    border-bottom: 2px inset blueviolet;
+    transform: translate(0%, -50%);
+    padding: 10px;
+
+}

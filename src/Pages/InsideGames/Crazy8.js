@@ -41,6 +41,9 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                 socket.emit('timeOutCrazy8', sessionStorage.getItem('idPartie'), sessionStorage.getItem('pseudo'));
                 setLaunchTimer(false);
                 setCurrentTimer(timer);
+                setShowChoice(false);
+                setShowTypeChoice(false);
+                setWaitingCard();
                 setMustClick(false);
                 setPlayableCards([]);
             }
@@ -96,6 +99,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
         const placeOrPickCrazy8 = (cardPicked) => {
             setCurrentEmitter('placeOrPickCrazy8');
             setWaitingCard(cardPicked);
+            setLaunchTimer(true);
             setShowChoice(true);
         }
 
@@ -215,7 +219,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
         setCurrentWinTimer(winTimer);
     }
 
-    const test = () => {
+    const stopCardSound = () => {
         setPlayCardSound(false);
     }
 
@@ -227,7 +231,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
             }}>{currentTimer}</div>
             <div className="opponentContainer">
                 {opponents.map((opponent, index) => (
-                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: (opponent.username !== opponentTarget)?'rgb(0, 0, 0, 75)': 'rgb(90, 15, 15)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100 / (opponents.length + 1)) * (index + 1)}%`, position: 'absolute' }}>
+                    <div className="opponent" id={opponent.username} style={{ backgroundColor: (opponent.username !== opponentTarget)?'rgb(0, 0, 0, 75)': 'rgb(90, 15, 15)' }}>
                         <label>{opponent.username}</label>
                         <label>{opponent.cardAmount} cartes</label>
                     </div>
@@ -247,25 +251,25 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                 ))}
             </div>
             {showEnd && (
-                <div style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
-                    <label>{messageEnd}</label>
-                    <button onClick={handleEndClick}>Retour</button>
+                <div className="end" style={{ bottom: '10%', left: '50%', position: 'absolute' }}>
+                    <label className="simpleText">{messageEnd}</label>
+                    <button className="endButton" onClick={handleEndClick}>Retour</button>
                 </div>
             )}
             {showTypeChoice && (
-                <div style={{ left: '20%', top: '0%', position: 'absolute', width: '50%', height: '50%' }}>
-                    <button style={{ left: '10%', top: '10%', position: 'absolute' }} onClick={() => chooseType('spade')}>spade</button>
-                    <button style={{ left: '10%', top: '90%', position: 'absolute' }} onClick={() => chooseType('clover')}>clover</button>
-                    <button style={{ left: '90%', top: '10%', position: 'absolute' }} onClick={() => chooseType('heart')}>heart</button>
-                    <button style={{ left: '90%', top: '90%', position: 'absolute' }} onClick={() => chooseType('tile')}>tile</button>
-                    <div style={{ left: '50%', top: '50%',backgroundImage: `url('./imagesCrazy8/8-${waitingCard.type}.png')` }}></div>
+                <div className="choiceCrazy8">
+                    <button style={{ left: '10%', top: '10%', position: 'absolute', transform: 'translate(-50%, -50%)', border: '2px inset red', borderRadius: '0px' }} onClick={() => chooseType('spade')}>spade</button>
+                    <button style={{ left: '10%', top: '90%', position: 'absolute', transform: 'translate(-50%, -50%)', border: '2px inset red', borderRadius: '0px' }} onClick={() => chooseType('clover')}>clover</button>
+                    <button style={{ left: '90%', top: '10%', position: 'absolute', transform: 'translate(-50%, -50%)', border: '2px inset red', borderRadius: '0px' }} onClick={() => chooseType('heart')}>heart</button>
+                    <button style={{ left: '90%', top: '90%', position: 'absolute', transform: 'translate(-50%, -50%)', border: '2px inset red', borderRadius: '0px' }} onClick={() => chooseType('tile')}>tile</button>
+                    <div className="card" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', backgroundImage: `url('./imagesCrazy8/8-${waitingCard.type}.png')` }}></div>
                 </div>
             )}
             {showChoice && (
-                <div style={{ left: '20%', top: '0%', position: 'absolute', width: '50%', height: '50%' }}>
-                    <button style={{ left: '10%', top: '50%', position: 'absolute' }} onClick={() => chooseChoice('pick')}>pick</button>
-                    <button style={{ left: '90%', top: '50%', position: 'absolute' }} onClick={() => chooseChoice('place')}>place</button>
-                    <div style={{ left: '50%', top: '50%', backgroundImage: `url('./imagesCrazy8/${waitingCard.value}-${waitingCard.type}.png')` }}></div>
+                <div className="choiceCrazy8">
+                    <button style={{ left: '10%', top: '50%', position: 'absolute', transform: 'translate(-50%, -50%)' }} onClick={() => chooseChoice('pick')}>pick</button>
+                    <button style={{ left: '90%', top: '50%', position: 'absolute', transform: 'translate(-50%, -50%)' }} onClick={() => chooseChoice('place')}>place</button>
+                    <div className="card" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', backgroundImage: `url('./imagesCrazy8/${waitingCard.value}-${waitingCard.type}.png')` }}></div>
                 </div>
             )}
             {showWinButton && (
@@ -278,7 +282,7 @@ export default function Crazy8({ opponentInfos, cards, time, infosSup }) {
                 <BackgroundAmbiance source={"./OST/victoryTheme.mp3"} volume={1}/>
             )}
             {playCardSound && (
-                <BackgroundAmbiance source={"./OST/CardNoise.mp3"} volume={0.01} noloop onEnded={test}/>
+                <BackgroundAmbiance source={"./OST/CardNoise.mp3"} volume={0.05} noloop onEnded={stopCardSound}/>
             )}
         </>
     );

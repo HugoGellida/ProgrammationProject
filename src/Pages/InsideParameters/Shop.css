@@ -71,12 +71,12 @@
 }
 
 .buyableTitle {
-    border: 2px inset black;
+    border: 2px inset white;
     border-radius: inherit;
 }
 
 .buyableColor {
-    border: 2px inset black;
+    border: 2px inset white;
     border-radius: inherit;
 }
 
@@ -89,6 +89,7 @@
     position: absolute;
     border-bottom: 2px inset blueviolet;
     border-left: 2px outset blueviolet;
+    top: 0%;
 }
 
 .shopInfo {

@@ -1,33 +1,44 @@
-/**
-* Eléments génériques
-*/
-
-.contenu-partie {
+.PageChoix {
+  background: url('./images/ParametersBackground.jpg');
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  left: 0%;
+  position: absolute;
+  background-size: cover;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  font-family: 'Roboto', sans-serif;
+}
 
-  padding: 50px;
-  text-align: center;
-  color: white;
-  font-size: 13px;
+.bottomCointainerPageChoix {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  position: absolute;
+  border-top: 2px outset rgb(90, 15, 15);
+  bottom: 0%;
+  left: 0%;
+  width: 100%;
+  height: 50%;
   font-weight: 500;
-  border-radius: 30px;
-  background-color: transparent;
-  margin-top: 10%;
+  background-color: rgba(0, 0, 0, 0.75);
 }
 
 .Select {
-  margin-top: 10%;
-  width: 100%;
+  width: auto;
   padding: 10px;
-  font-size: 11.6px;
-  border: .3em inset #e91e1e;
+  position: absolute;
+  transform: translate(0%, -100%);
+  top: 0%;
+  border: 2px inset black;
   border-radius: 4px;
-  background-color: rgba(214, 82, 82, 0.1);
-  box-shadow: 0 2px 4px rgba(214, 82, 82, 0.1);
-  color: #ccc6c6;
+  background-color: rgb(60, 60, 60);
+  color: white;
   outline: none;
   /* Supprime la bordure de mise au point par défaut */
 }
@@ -41,20 +52,58 @@
   /* Couleur grise pour indiquer que c'est un texte de placeholder */
 }
 
-h5 {
-  margin: 10px;
+.h1 {
   font-size: 32px;
   font-weight: 900;
-  color: #0a0909;
-  margin-top: 20%;
-  text-shadow: 0 0 4px #FF0000, 0 0 50px #FF0000, 0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000;
-  color: #0f0f0d;
+  text-shadow: 
+    2px 2px rgb(60, 60, 60),
+    -2px 2px rgb(60, 60, 60),
+    2px -2px rgb(60, 60, 60),
+    -2px -2px rgb(60, 60, 60);
+  color: white;
   background-color: transparent;
 }
 
-#Scores {
+.topCointainerPageChoix {
+  width: 100%;
+  height: 50%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   position: absolute;
-  top: 10%;
-  right: 10%;
+  top: 0%;
+  left: 0%;
+  border-bottom: 2px inset rgb(90, 15, 15);
+}
+
+.perIDZone {
+  border: 2px inset black;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.buttonPerID {
+  border-radius: 0px;
+  border: 2px inset green;
+  padding: 10px 5px;
+  color: white;
+  width: 50%;
+  transition: 0.5s;
+}
+.buttonPerID:hover {
+  background-color: green;
+}
+
+.joinableGame {
+  border: 2px inset black;
+  border-radius: 0px;
+  transition: 0.5s;
+}
+.joinableGame:hover {
+  background-color: rgb(60, 60, 60);
 }

@@ -18,6 +18,7 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
     const [showEnd, setShowEnd] = useState(false);
     const [messageEnd, setMessageEnd] = useState('');
     const [endBackgroundAmbiance, setEndBackgroundAmbiance] = useState(false);
+    const [playCardSound, setPlayCardSound] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -115,6 +116,7 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
 
     const selectCard = (cardChosen) => {
         if (mustClick) {
+            setPlayCardSound(true);
             setHandCard(handCard.filter(card => card.value !== cardChosen.value || card.type !== cardChosen.type));
             socket.emit(currentEmitter, sessionStorage.getItem('idPartie'), cardChosen, sessionStorage.getItem('pseudo'));
             if (currentEmitter === 'chooseCardWar') {
@@ -132,15 +134,6 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
         return navigate('/PageChoix');
     }
 
-    const cardStyle = {
-        height: '150px',
-        width: '100px',
-        backgroundSize: 'cover',
-        boxShadow: '0px, 0px, 10px, rgba(0, 0, 0, 0.75)',
-        position: 'absolute',
-        border: '1px inset rgb(90, 15, 15)'
-    }
-
     const rotation = (index) => {
         const angle = (Math.PI / handCard.length) * index;
         const x = Math.cos((Math.PI / 2) - angle) * 100;
@@ -148,32 +141,21 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
         return Math.atan2(y, x) * (180 / Math.PI);
     }
 
-    const timerStyle = {
-        backgroundColor: currentTimer % 2 === 0 ? 'rgb(90, 15, 15)' : '',
-        transition: '0.75s',
-        color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`,
-        top: '20%',
-        left: '90%',
-        border: '2px inset rgb(90, 15, 15)',
-        borderRadius: '5px',
-        alignContent: 'center',
-        position: 'absolute',
-        width: '40px',
-        height: '25px',
-        flexWrap: 'wrap',
-        display: 'flex',
-        flexDirection: 'column',
-        textShadow: '0 0 4px #FF0000, 0 0 50px #FF0000, 0px 0px 14px #FF0000, 0 0 100px #FF0000, 0 0 150px #FF0000, 0 0 150px #FF0000, 0 0 550px #CA0000, 0 0 250px #CA0000, 0 0 350px #CA0000, 0 0 250px #CA0000'
+    const stopCardSound = () => {
+        setPlayCardSound(false);
     }
 
     return (
         <>
-            <div className="timer" style={timerStyle}>{currentTimer}</div>
+            <div className="timer" style={{
+                backgroundColor: currentTimer % 2 === 0 && launchTimer ? 'rgb(90, 15, 15)' : '',
+                color: `rgb(255, ${255 - ((timer - currentTimer) / timer) * 255}, ${255 - ((timer - currentTimer) / timer) * 255})`
+            }}>{currentTimer}</div>
             <div className="opponentContainer">
-                {opponents.map((opponent, index) => (
-                    <div className="opponent" id={opponent.username} style={{ color: "white", backgroundColor: 'rgb(0, 0, 0, 75)', border: '3px inset rgb(90, 15, 15)', backgroundSize: 'cover', left: `${(100/(opponents.length+1)) * (index + 1)}%` , position: 'absolute'}}>
+                {opponents.map((opponent) => (
+                    <div className="opponent" id={opponent.username}>
                         {opponent.card && (
-                            <div className="cardPlayed" style={{ backgroundImage: showCard ? `url('./imagesTest/${opponent.card.value}-${opponent.card.type}.png')` : `url('./imagesTest/Verso-Cartes.png')`, ...cardStyle, position: 'relative' }}></div>
+                            <div className="card" style={{ backgroundImage: showCard ? `url('./imagesTest/${opponent.card.value}-${opponent.card.type}.png')` : `url('./imagesTest/Verso-Cartes.png')`, position: 'relative' }}></div>
                         )}
                         <label>{opponent.username}</label>
                         <label>{opponent.cardAmount} cartes</label>
@@ -181,14 +163,13 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
                 ))}
             </div>
             {hasPlayedCard && (
-                <div className="card" style={{ backgroundImage: `url('./imagesTest/${playedCard.value}-${playedCard.type}.png')`, ...cardStyle, left: '85%', top: '40%' }}></div>
+                <div className="card" style={{ backgroundImage: `url('./imagesTest/${playedCard.value}-${playedCard.type}.png')`, left: '85%', top: '40%' }}></div>
             )}
             <div></div>
             <div className="cardsContainer" style={{ justifyContent: 'center', position: 'absolute', flexDirection: 'row', top: '50%', width: '90%', display: 'flex', left: '0%' }}>
                 {handCard.map((card, index) => (
                     <div style={{
                         backgroundImage: `url('./imagesTest/${card.value}-${card.type}.png')`,
-                        ...cardStyle,
                         left: '50%',
                         transformOrigin: 'bottom right',
                         transform: mustClick ? `rotate(${rotation(index)}deg) ${index === targetCard ? `translateY(-${2 * handCard.length + 20}px)` : `translateY(-${2 * handCard.length}px)`}` : `rotate(${rotation(index)}deg)`,
@@ -197,13 +178,16 @@ export default function Bataille({ opponentInfos, cards, time, cardPlayed }) {
                 ))}
             </div>
             {showEnd && (
-                <div style={{bottom: '10%', left: '50%', position: 'absolute'}}>
-                    <label>{messageEnd}</label>
-                    <button onClick={handleEndClick}>Retour</button>
+                <div className="end" style={{bottom: '10%', left: '50%', position: 'absolute'}}>
+                    <label className="simpleText">{messageEnd}</label>
+                    <button className="endButton" onClick={handleEndClick}>Retour</button>
                 </div>
             )}
             {!endBackgroundAmbiance && (
                 <BackgroundAmbiance source={"./OST/backgroundAmbiance.mp3"} volume={0.05}/>
+            )}
+            {playCardSound && (
+                <BackgroundAmbiance source={"./OST/CardNoise.mp3"} volume={0.05} noloop onEnded={stopCardSound}/>
             )}
         </>
     );

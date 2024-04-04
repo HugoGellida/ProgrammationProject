@@ -1,50 +1,30 @@
-/**
- * Reset
- */
+.Connexion {
+  background: url('./images/ParametersBackground.jpg');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  left: 0%;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto', sans-serif;
+}
 
-
-/**
- * Eléments génériques
- */
-
- body {
-    --color-primary: red;
-    --color-secondary: red;
-    --color-tertiary: #ffeee6;    
-  }
-  
-  
-  
-  
-  
-  /**
-  * Eléments principaux
-  */
-  body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 100vh;
-    font-family: 'Roboto', sans-serif; 
-  }
-  
-  
-  .connexionForm {
-    display: center;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 75px;
-    min-width: 200px;
-    padding: 50px;
-    text-align: center;
-    color: white;
-    font-size: 17px;
-    font-weight: 500;
-    border-radius: 15px;
-    margin-bottom: 100%;
-    border: 9px inset rgb(90, 15, 15);
-    background-color: rgb(0, 0, 0, 0.75);
-  }
-  
+.connexionForm {
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 75px;
+  min-width: 200px;
+  padding: 40px;
+  text-align: center;
+  border-radius: 15px;
+  margin-bottom: auto;
+  border: 5px inset black;
+  background-color: rgb(0, 0, 0, 0.75);
+  display: flex;
+}
