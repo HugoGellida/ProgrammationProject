@@ -46,10 +46,10 @@ function Connexion() {
                 <label className='simpleText'>Vous n'avez pas de compte?</label><br></br><Link id="lcl" to="/">Inscription</Link>
             </div>
             {showWarning && (
-                <>
+                <div>
                     <label>Connection refusée</label>
                     <button onClick={removeWarning}>Continuer</button>
-                </>
+                </div>
             )}
         </div>
     );

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { socket } from "./socket";
 import { useNavigate } from "react-router-dom";
 import './Parameters.css';
 import ChatColors from "./InsideParameters/ChatColors";

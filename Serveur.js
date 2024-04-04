@@ -62,6 +62,10 @@ server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
 });
 
+//db.all("SELECT * FROM User", (rows, err) => {
+//    rows.forEach(row => console.log(row));
+//})
+
 
 const rooms = {};
 
@@ -171,6 +175,28 @@ io.on("connection", (socket) => {
                 } else {
                     resolve(row);
                 }
+            });
+        });
+    }
+
+    async function getAllStats() {
+        return new Promise((resolve, reject) => {
+            let infos = [];
+            db.all('SELECT * FROM User', (err, rows) => {
+                let promises = [];
+                rows.forEach((row) => {
+                    let promise = new Promise(async (resolve, reject) => {
+                        const rowWar = await getStats("StatWar", row.username);
+                        const rowTake6 = await getStats("StatTake6", row.username);
+                        const rowCrazy8 = await getStats("StatCrazy8", row.username);
+                        infos.push({username: row.username, all: rowWar.winAmount + rowTake6.winAmount + rowCrazy8.winAmount, war: rowWar.winAmount, take6: rowTake6.winAmount, crazy8: rowCrazy8.winAmount});
+                        resolve(true);
+                    });
+                    promises.push(promise);
+                });
+                Promise.all(promises).then(() => {
+                    resolve(infos);
+                });
             });
         });
     }
@@ -806,6 +832,7 @@ io.on("connection", (socket) => {
                         nextTurnWar(game);
                     } else {
                         game.isLaunched = false;
+                        gameList.filter(g => g.idGame != game.idGame);
                         io.to(playerWinnerRound.socketid).emit("winWar");
                     }
                 });
