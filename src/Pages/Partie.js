@@ -170,7 +170,7 @@ export default function Partie() {
                     <button className="buttonMessageToSend" onClick={sendMessage}>▸</button>
                 </div>
             )}
-            <button className="showChat" onClick={clickChat} style={{ left: showChat ? '200px' : '0px', backgroundColor: unreadMessage? "rgb(60, 60, 60)": "" }}>...</button>
+            <button className="showChat" onClick={clickChat} style={{ left: showChat ? '200px' : '0px', backgroundColor: unreadMessage? "rgb(255, 255, 255, 0.5)": "" }}></button>
             {!launchGame && showLaunchButton && (
                 <button className="LaunchButton" id='LaunchButton' onClick={startGame}>{t('Partie.Start')}</button>
             )}

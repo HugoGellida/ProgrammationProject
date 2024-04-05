@@ -29,9 +29,7 @@ const db = new sql.Database("./Database.db");
 
 let gameList = [];
 
-db.run("CREATE TABLE IF NOT EXIST User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20), money INTEGER)", (err) => {
-    db.run("UPDATE User SET isConnected = false");
-});
+db.run("CREATE TABLE IF NOT EXISTS User(username VARCHAR(10) PRIMARY KEY, password VARCHAR(10), isConnected BOOLEAN, socketid VARCHAR(50), chatColor VARCHAR(10), title VARCHAR(20), money INTEGER)");
 db.run("CREATE TABLE IF NOT EXISTS StatWar(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, tieAmount INTEGER)");
 db.run("CREATE TABLE IF NOT EXISTS StatTake6(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER, best INTEGER, average FLOAT)");
 db.run("CREATE TABLE IF NOT EXISTS StatCrazy8(username REFERENCES User(username), loseAmount INTEGER, winAmount INTEGER)");
@@ -45,7 +43,6 @@ function insertShop(username) {
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 10000, 'silver', false)`);
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 10000, 'cyan', false)`);
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 25000, 'gold', false)`);
-
     db.run(`INSERT INTO BuyableTitle VALUES('${username}', 2500, 'RELAX', false)`);
     db.run(`INSERT INTO BuyableTitle VALUES('${username}', 3000, 'GAMER', false)`);
     db.run(`INSERT INTO BuyableTitle VALUES('${username}', 3500, 'SUN', false)`);
@@ -189,7 +186,7 @@ io.on("connection", (socket) => {
                         const rowWar = await getStats("StatWar", row.username);
                         const rowTake6 = await getStats("StatTake6", row.username);
                         const rowCrazy8 = await getStats("StatCrazy8", row.username);
-                        infos.push({username: row.username, all: rowWar.winAmount + rowTake6.winAmount + rowCrazy8.winAmount, war: rowWar.winAmount, take6: rowTake6.winAmount, crazy8: rowCrazy8.winAmount});
+                        infos.push({ username: row.username, all: rowWar.winAmount + rowTake6.winAmount + rowCrazy8.winAmount, war: rowWar.winAmount, take6: rowTake6.winAmount, crazy8: rowCrazy8.winAmount });
                         resolve(true);
                     });
                     promises.push(promise);
@@ -211,7 +208,7 @@ io.on("connection", (socket) => {
                         const rowWar = await getStats("StatWar", row.username);
                         const rowTake6 = await getStats("StatTake6", row.username);
                         const rowCrazy8 = await getStats("StatCrazy8", row.username);
-                        infos.push({username: row.username, all: rowWar.winAmount + rowTake6.winAmount + rowCrazy8.winAmount, war: rowWar.winAmount, take6: rowTake6.winAmount, crazy8: rowCrazy8.winAmount});
+                        infos.push({ username: row.username, all: rowWar.winAmount + rowTake6.winAmount + rowCrazy8.winAmount, war: rowWar.winAmount, take6: rowTake6.winAmount, crazy8: rowCrazy8.winAmount });
                         resolve(true);
                     });
                     promises.push(promise);
@@ -253,10 +250,14 @@ io.on("connection", (socket) => {
 
     socket.emit("goToPreLobby");
 
+    socket.on('disconnection', username => {
+        db.run('UPDATE User SET isConnected = false WHERE username = ?', [username]);
+    });
+
     socket.on("disconnect", () => {
         db.run(`UPDATE User SET isConnected = false WHERE socketid = '${socket.id}'`, (err) => {
             console.log(`the player with socket ${socket.id} has been disconnected`);
-            const roomKeys = Object.keys(rooms)
+            const roomKeys = Object.keys(rooms);
             const socketLastRoom = roomKeys.filter(key => rooms[key].includes(socket.id))[0];
             socket.leave(socketLastRoom);
             if (rooms[socketLastRoom]) rooms[socketLastRoom] = rooms[socketLastRoom].filter(socketid => socketid != socket.id);
@@ -380,7 +381,8 @@ io.on("connection", (socket) => {
         affectPlayer(newIdGame, gameInfo.creator, true);
     });
     //Page Choix
-    socket.on("loadGame", () => {
+    socket.on("loadGame", (username) => {
+        db.run("UPDATE User SET isConnected = true WHERE username = ?", [username]);
         loadGames();
     });
 

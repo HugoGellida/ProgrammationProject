@@ -22,13 +22,13 @@ export default function Inscription() {
       sessionStorage.setItem("pseudo", pseudo);
       return navigate('/PageChoix');
     }
-
+    if (sessionStorage.getItem('pseudo')) navigate('/PageChoix');
     socket.on("registrationAllowed", registrationAllowed);
 
     return () => {
       socket.off("registrationAllowed", registrationAllowed);
     }
-  });
+  }, []);
 
   return (
     <div className='Inscription'>

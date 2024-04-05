@@ -17,7 +17,7 @@ export default function PageChoix() {
   }
 
   useEffect(() => {
-    socket.emit('loadGame');
+    socket.emit('loadGame', sessionStorage.getItem('pseudo'));
   }, []);
 
   useEffect(() => {
@@ -71,6 +71,7 @@ export default function PageChoix() {
       </div>
       <div className='container'>
         <div className='topCointainerPageChoix'>
+          <div className='pseudo'><label className='simpleText'>{sessionStorage.getItem("pseudo")}</label></div>
           <h1 className='h1'>{t('PageChoix.Name')}</h1>
           <div className='perIDZone'>
             <input type='text' id='zoneIDPartiePrivée' placeholder={t('PageChoix.IDPlaceHolder')}></input>
@@ -86,7 +87,7 @@ export default function PageChoix() {
           </select>
           {gameShown.map(game => {
             if (filter === "All" || game.type === filter) {
-              return (<button className='joinableGame' id={game.id} onClick={clickGame}>{t('PageChoix.Game', {id: game.id, actualPlayerAmount: game.actualPlayerAmount, playerAmount: game.maxPlayerAmount})} {t(`PageChoix.GameType.${game.type}`)}</button>);
+              return (<button className='joinableGame' id={game.id} onClick={clickGame}>{t('PageChoix.Game', { id: game.id, actualPlayerAmount: game.actualPlayerAmount, playerAmount: game.maxPlayerAmount })} {t(`PageChoix.GameType.${game.type}`)}</button>);
             }
           })}
         </div>
