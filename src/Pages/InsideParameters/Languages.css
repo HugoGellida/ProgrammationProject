@@ -1,0 +1,13 @@
+.LanguageChanger {
+    border: 2px inset aqua;
+    width: 100%;
+    border-radius: inherit;
+}
+.LanguageChanger:hover {
+    background-color: aqua;
+}
+
+.LanguagesContainer {
+    flex-direction: column;
+    display: flex;
+}

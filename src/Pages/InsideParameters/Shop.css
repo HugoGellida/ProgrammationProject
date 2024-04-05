@@ -4,11 +4,11 @@
     transform: translate(-50%, -50%);
     position: absolute;
     top: 50%;
-    border: 5px inset black;
+    border: 5px inset red;
     height: 30%;
     width: 40%;
     border-radius: 7.5px;
-    background-color: rgba(60, 60, 60, 0.75);
+    background-color: rgba(0, 0, 0, 0.75);
     align-items: center;
     justify-content: center;
     display: flex;
@@ -38,8 +38,8 @@
     position: relative;
     height: auto;
     width: 100%;
-    border-bottom: 2px inset rgb(90, 15, 15);
-    border-top: 2px outset rgb(90, 15, 15);
+    border-bottom: 2px inset green;
+    border-top: 2px inset green;
     padding-top: 10px;
     padding-bottom: 10px;
     align-items: center;
@@ -52,8 +52,8 @@
     position: relative;
     height: auto;
     width: 100%;
-    border-bottom: 2px inset rgb(90, 15, 15);
-    border-top: 2px outset rgb(90, 15, 15);
+    border-bottom: 2px inset green;
+    border-top: 2px inset green;
     padding-top: 10px;
     padding-bottom: 10px;
     align-items: center;
@@ -74,9 +74,12 @@
     border: 2px inset white;
     border-radius: inherit;
 }
+.buyableTitle:hover {
+    background-color: whitesmoke;
+    color: black;
+}
 
 .buyableColor {
-    border: 2px inset white;
     border-radius: inherit;
 }
 
@@ -87,8 +90,8 @@
     height: auto;
     right: 0%;
     position: absolute;
-    border-bottom: 2px inset blueviolet;
-    border-left: 2px outset blueviolet;
+    border-bottom: 2px inset greenyellow;
+    border-left: 2px inset greenyellow;
     top: 0%;
 }
 
@@ -97,9 +100,6 @@
     transform: translate(-50%, 0%);
     position: absolute;
     padding: 10px;
-    border-bottom: 2px inset blueviolet;
-    border-left: 2px outset blueviolet;
-    border-top: 2px outset blueviolet;
-    border-right: 2px inset blueviolet;
+    border: 2px inset greenyellow;
     bottom: 100%;
 }

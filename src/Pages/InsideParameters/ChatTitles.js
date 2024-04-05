@@ -25,31 +25,29 @@ export default function ChatTitles() {
 
     const clickTitle = (event) => {
         socket.emit("chooseChatTitle", sessionStorage.getItem("pseudo"), event.target.innerText);
-        alert(t('Parameters.ChatTitles.Equip', {title: event.target.innerText}));
+        alert(t('Parameters.ChatTitles.Equip', { title: event.target.innerText }));
     }
 
     return (
-        <div style={{backgroundImage: "url('./Backgrounds/ParametersBackground.jpg')"}}>
+        <div style={{ backgroundImage: "url('./Backgrounds/ParametersBackground.jpg')" }}>
             <div className="unlockedTitles">
-                <h10 className="unlockedTitlesTitle" style={{color: 'white'}}>{t('Parameters.ChatTitles.Unlocked')}</h10>
+                <h10 className="unlockedTitlesTitle" style={{ color: 'white' }}>{t('Parameters.ChatTitles.Unlocked')}</h10>
                 {unlockedTitles.map(title => (
                     <button className="unlockedTitle" onClick={clickTitle}>{t(`Parameters.Titles.${title.replace(/\s/g, "")}.Price`)}</button>
                 ))}
             </div>
-            <div className="titleInfo">
-                {target !== -1 && (
-                    <>
-                        <text style={{color: 'white'}}>{t(`Parameters.Titles.${lockedTitles[target].title.replace(/\s/g, "")}.Name`)}</text>
-                        <text style={{color: 'white'}}>{t(`Parameters.Titles.${lockedTitles[target].title.replace(/\s/g, "")}.Difficulty`)}</text>
-                        <text style={{color: 'white'}}>{t(`Parameters.Titles.${lockedTitles[target].title.replace(/\s/g, "")}.Description`)}</text>
-                    </>
-                )}
-            </div>
+            {target !== -1 && (
+                <div className="titleInfo">
+                    <text style={{ color: 'white' }}>{t(`Parameters.Titles.${lockedTitles[target].title.replace(/\s/g, "")}.Name`)}</text>
+                    <text style={{ color: 'white' }}>{t(`Parameters.Titles.${lockedTitles[target].title.replace(/\s/g, "")}.Difficulty`)}</text>
+                    <text style={{ color: 'white' }}>{t(`Parameters.Titles.${lockedTitles[target].title.replace(/\s/g, "")}.Description`)}</text>
+                </div>
+            )}
             <div className="lockedTitles">
-                <h10 className="lockedTitlesTitle" style={{color: 'white'}}>{t('Parameters.ChatTitles.Locked')}</h10>
+                <h10 className="lockedTitlesTitle" style={{ color: 'white' }}>{t('Parameters.ChatTitles.Locked')}</h10>
                 {lockedTitles.map((achievement, index) => (
-                    <div className="lockedTitle" style={{ color: "white" }} onMouseEnter={() => {setTarget(index)}} onMouseLeave={() => {setTarget(-1)}}>
-                        <text>{t(`Parameters.Titles.${achievement.title.replace(/\s/g, "")}.Price`)}</text>
+                    <div className="lockedTitle" onMouseEnter={() => { setTarget(index) }} onMouseLeave={() => { setTarget(-1) }}>
+                        <label>{t(`Parameters.Titles.${achievement.title.replace(/\s/g, "")}.Price`)}</label>
                     </div>
                 ))}
             </div>

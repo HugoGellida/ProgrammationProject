@@ -5,7 +5,7 @@
     background-color: rgba(0, 0, 0, 0.75);
     z-index: 1;
     position: absolute;
-    border-right: 2px inset rgb(90, 15, 15);
+    border-right: 2px inset red;
     align-items: flex-end;
     display: flex;
     flex-direction: column;
@@ -13,8 +13,8 @@
 
 .choice {
     border: 0px;
-    border-bottom: 2px inset rgb(90, 15, 15);
-    border-top: 2px outset rgb(90, 15, 15);
+    border-bottom: 2px inset red;
+    border-top: 2px inset red;
     border-radius: inherit;
     font-size: 80%;
     height: fit-content;

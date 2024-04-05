@@ -5,7 +5,7 @@
     left: 0%;
     background-color: rgba(0, 0, 0, 0.5);
     position: absolute;
-    border-bottom: 2px inset rgb(90, 15, 15);
+    border-bottom: 2px outset royalblue;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -25,20 +25,17 @@
     position: relative;
     height: auto;
     width: auto;
-    border: 2px inset black;
     border-radius: inherit;
 }
 
 .colorInfo {
-    height: 20%;
-    top: 40%;
-    left: 0%;
+    padding: 10px;
     position: absolute;
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    background-color: black;
 }
 
 .lockedColors {
@@ -48,7 +45,7 @@
     left: 0%;
     background-color: rgba(0, 0, 0, 0.5);
     position: absolute;
-    border-top: 2px outset rgb(90, 15, 15);
+    border-top: 2px outset royalblue;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -69,5 +66,11 @@
     height: auto;
     width: auto;
     padding: 10px;
-    border: 2px inset black;
+}
+
+.unlockedColor:hover {
+    color: black;
+}
+.lockedColor:hover {
+    color: black
 }

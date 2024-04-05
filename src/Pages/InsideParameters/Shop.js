@@ -76,12 +76,12 @@ export default function Shop() {
             <div className="buyables">
                 <div className="buyableTitles">
                     {shopTitles.map(infoTitle => (
-                        <button className="buyableTitle" onClick={clickBuy} style={{ backgroundColor: shopTarget == infoTitle ? "rgb(60, 60, 60)" : "black" }} onMouseEnter={!showShopWarning ? () => { setShopTarget(infoTitle) } : null} onMouseLeave={!showShopWarning ? () => { setShopTarget() } : null}>{t(`Parameters.Titles.${infoTitle.title}.Price`)}</button>
+                        <button className="buyableTitle" onClick={clickBuy} onMouseEnter={!showShopWarning ? () => { setShopTarget(infoTitle) } : null} onMouseLeave={!showShopWarning ? () => { setShopTarget() } : null}>{t(`Parameters.Titles.${infoTitle.title}.Price`)}</button>
                     ))}
                 </div>
                 <div className="buyableColors">
                     {shopColors.map(infoColor => (
-                        <button className="buyableColor" onClick={clickBuy} style={{ backgroundColor: shopTarget == infoColor ? infoColor.color : "black", color: shopTarget == infoColor ? "black" : "white" }} onMouseEnter={!showShopWarning ? () => { setShopTarget(infoColor) } : null} onMouseLeave={!showShopWarning ? () => { setShopTarget() } : null}>{t(`Parameters.Colors.${infoColor.color}.Price`)}</button>
+                        <button className="buyableColor" onClick={clickBuy} style={{ backgroundColor: shopTarget == infoColor ? infoColor.color : "black",border: `2px inset ${infoColor.color}`, color: shopTarget == infoColor ? "black" : "white" }} onMouseEnter={!showShopWarning ? () => { setShopTarget(infoColor) } : null} onMouseLeave={!showShopWarning ? () => { setShopTarget() } : null}>{t(`Parameters.Colors.${infoColor.color}.Price`)}</button>
                     ))}
                 </div>
                 {shopTarget && (

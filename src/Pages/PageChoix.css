@@ -46,10 +46,9 @@
 /* Style pour les options du select */
 .Select option {
   font-size: 13px;
-  background-color: rgba(214, 82, 82, 0.1);
+  background-color: rgb(90, 90, 90);
   font-style: italic;
-  color: #030303;
-  /* Couleur grise pour indiquer que c'est un texte de placeholder */
+  color: white;
 }
 
 .h1 {
