@@ -8,6 +8,11 @@ const Formulaire = {
         Username: 'Pseudo',
         Password: 'Mot de passe',
         Submit: 'Soumettre',
+    },
+    ESP: {
+        Username: 'Seudónimo',
+        Password: 'Contraseña',
+        Submit: 'Enviar',
     }
 }
 

@@ -15,6 +15,14 @@ const Shop = {
         PurchaseDeclined: "Il vous manque {{ money }} afin d'acheter {{ item }}",
         PurchaseAccepted: "Votre achat a été éffectué avec succès"
     },
+    ESP: {
+        Cost: 'Costo',
+        Bank: 'Moneda en el banco:',
+        Warning: "¿Estás seguro de ue quieres comprarlo al precio de",
+        Name: 'Tienda',
+        PurchaseDeclined: "Te faltan {{ money }} para comprar {{ item }}",
+        PurchaseAccepted: "Tú compra se ha realizado con éxito"
+    }
 }
 
 export default Shop;

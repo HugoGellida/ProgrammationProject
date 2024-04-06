@@ -12,6 +12,13 @@ const Connection = {
         ChangeLocation: "S'inscrire",
         FailedAttempt: 'Votre tentative de connection a échouée',
         FailedAttemptButton: 'Continuer'
+    },
+    ESP: {
+        Name: 'Conexión',
+        ChangeLocationText: "¿No tienes une cuenta?",
+        ChangeLocation: "Inscribirse",
+        FailedAttempt: 'Tú intendo de conexión ha fallado',
+        FailedAttemptButton: 'Continuar'
     }
 }
 

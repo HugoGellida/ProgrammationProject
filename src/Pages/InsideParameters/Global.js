@@ -58,7 +58,7 @@ export default function Global() {
             {targetStat && (
                 <div className="leaderBoard">
                     <div className="leaderBoardCategory">
-                        <div className="leaderBoardCategoryTitle">Placement</div>
+                        <div className="leaderBoardCategoryTitle">{t('Parameters.Global.GlobalPlacement')}</div>
                         {global.map((player, index) => {
                             if (index < globalShownMax && index >= globalShownMin) {
                                 if (targetStat === 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>#{index + 1}</label>);
@@ -80,7 +80,7 @@ export default function Global() {
                         })}
                     </div>
                     <div className="leaderBoardCategory">
-                        <div className="leaderBoardCategoryTitle">Points</div>
+                        <div className="leaderBoardCategoryTitle">{t('Parameters.Global.GlobalPoints')}</div>
                         {global.map((player, index) => {
                             if (index < globalShownMax && index >= globalShownMin) {
                                 if (targetStat === 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.all}</label>);

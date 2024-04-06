@@ -43,7 +43,7 @@ const Titles = {
         }
     },
     FR: {
-        RELAX: { Price: 'RELAX' },
+        RELAX: { Price: 'DÉTENDU' },
         GAMER: { Price: 'JOUEUR' },
         SUN: { Price: 'SOLEIL' },
         WING: { Price: 'AILE' },
@@ -56,35 +56,78 @@ const Titles = {
         NOOBY: { Price: 'NOOBY' },
         WARGENERAL: {
             Price: 'GENERAL DE BATAILLE',
-            Name: 'Name: Addict de Bataille',
+            Name: 'Nom: Addict de Bataille',
             Description: 'Description: Gagnes 30 fois à la Bataille',
             Difficulty: 'Difficulté: Difficile'
         },
         MANIPULATOR: {
             Price: 'MANIPULATEUR',
-            Name: 'Name: Engendre leur défaite',
+            Name: 'Nom: Engendre leur défaite',
             Description: 'Description: Gagnes 30 fois au 6 qui prend',
             Difficulty: 'Difficulté: Difficile'
         },
         MANIAC: {
             Price: 'MANIAQUE',
-            Name: 'Name: De plus en plus fou',
+            Name: 'Nom: De plus en plus fou',
             Description: 'Description: Gagnes 30 fois au 8 Américain',
             Difficulty: 'Difficulté: Difficile'
         },
         STARTER: {
             Price: 'DEBUTANT',
-            Name: "Name: Ce n'est que le début",
+            Name: "Nom: Ce n'est que le début",
             Description: 'Description: Gagnes tous les jeux au moins 1 fois',
             Difficulty: 'Difficulté: Moyenne'
         },
         ULTIMATE: {
             Price: 'ULTIME',
-            Name: 'Name: Eradicateur de joueurs',
+            Name: 'Nom: Eradicateur de joueurs',
             Description: 'Description: Gagnes tous les jeux au moins 50 fois',
             Difficulty: 'Difficulté: Extreme'
         }
     },
+    ESP: {
+        RELAX: { Price: 'RELAJADO' },
+        GAMER: { Price: 'JUGADOR' },
+        SUN: { Price: 'SOL' },
+        WING: { Price: 'ALA' },
+        SLEEP: { Price: 'SUEÑO' },
+        ANGEL: { Price: 'ÁNGEL' },
+        DEMON: { Price: 'DEMONIO' },
+        DOOM: { Price: 'RUINA' },
+        PREDATOR: { Price: 'DEPREDADOR' },
+        TESTER: { Price: 'PROBADOR' },
+        NOOBY: { Price: 'NOOBY' },
+        WARGENERAL: {
+            Price: 'GENERAL DE BATALLA',
+            Name: 'Nombre: Adicto a la Batalla',
+            Description: 'Descripción: Gana 30 veces en la Batalla',
+            Difficulty: 'Dificultad: Difícil'
+        },
+        MANIPULATOR: {
+            Price: 'MANIPULADOR',
+            Name: 'Nombre: Genera sus derrotas',
+            Description: 'Descripción: Gana 30 veces en el 6 que toma',
+            Difficulty: 'Dificultad: Difícil'
+        },
+        MANIAC: {
+            Price: 'MANÍACO',
+            Name: 'Nombre: Cada vez más loco',
+            Description: 'Descripción: Gana 30 veces en el 8 Americano',
+            Difficulty: 'Dificultad: Difícil'
+        },
+        STARTER: {
+            Price: 'PRINCIPIANTE',
+            Name: "Nombre: Esto es solo el comienzo",
+            Description: 'Descripción: Gana todos los juegos al menos 1 vez',
+            Difficulty: 'Dificultad: Media'
+        },
+        ULTIMATE: {
+            Price: 'ÚLTIMO',
+            Name: 'Nombre: Erradicador de jugadores',
+            Description: 'Descripción: Gana todos los juegos al menos 50 veces',
+            Difficulty: 'Dificultad: Extrema'
+        }
+    }
 }
 
 export default Titles;

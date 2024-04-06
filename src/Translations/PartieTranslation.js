@@ -18,6 +18,16 @@ const Partie = {
             RageQuit: '{{username}} jouait comme un noob et a décidé de quitter'
         },
         Save: 'Sauvegarder la partie'
+    },
+    ESP: {
+        MessagePlaceHolder: 'Escribe tu mensaje...',
+        Start: 'Comenzar el juego',
+        Server: {
+            Join: '{{username}} se uniо́ al juego',
+            Leave: '{{username}} dejо́ el juego',
+            RageQuit: '{{username}} tenía un problema de habilidad y se enfureciо́'
+        },
+        Save: 'Guarder el juego'
     }
 }
 

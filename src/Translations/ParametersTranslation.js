@@ -31,6 +31,17 @@ const Parameters = {
         Colors: Colors.FR,
         Titles: Titles.FR,
         Exit: 'Quitter'
+    },
+    ESP: {
+        Languages: Languages.ESP,
+        ChatColors: ChatColors.ESP,
+        ChatTitles: ChatTitles.ESP,
+        Shop: Shop.ESP,
+        Statistics: Statistics.ESP,
+        Global: Global.ESP,
+        Colors: Colors.ESP,
+        Titles: Titles.ESP,
+        Exit: 'Dejar'
     }
 }
 

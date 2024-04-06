@@ -9,8 +9,14 @@ const ChatColors = {
         Name: 'Couleurs du chat',
         Locked: 'Couleurs Bloquées:',
         Unlocked: 'Couleurs Débloquées:',
-        Equip: 'Vous avez equippez la couleur {{color}}'
+        Equip: 'Vous avez equipez la couleur {{color}}'
     },
+    ESP: {
+        Name: 'Colores del chat',
+        Locked: 'Colores Bloqueados:',
+        Unlocked: 'Colores Desbloqueados:',
+        Equip: 'Has equipado el color {{color}}'
+    }
 }
 
 export default ChatColors;

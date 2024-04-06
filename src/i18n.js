@@ -54,6 +54,22 @@ i18n
                     Crazy8: Crazy8.FR,
                     PagePause: PagePause.FR
                 }
+            },
+            esp: {
+                translation: {
+                    description: {},
+                    Parameters: Parameters.ESP,
+                    Inscription: Inscription.ESP,
+                    Connection: Connection.ESP,
+                    PageChoix: PageChoix.ESP,
+                    CreationPartie: CreationPartie.ESP,
+                    Formulaire: Formulaire.ESP,
+                    Partie: Partie.ESP,
+                    Bataille: Bataille.ESP,
+                    '6quiprend': quiprend.ESP,
+                    Crazy8: Crazy8.ESP,
+                    PagePause: PagePause.ESP
+                }
             }
         }
     });

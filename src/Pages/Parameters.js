@@ -80,7 +80,7 @@ export default function Parameters() {
                 <button className="choice" onClick={handleClickTitles} style={{ backgroundColor: showTitles ? 'rgb(255, 0, 0)' : '' }}>{t('Parameters.ChatTitles.Name')}</button>
                 <button className="choice" onClick={handleClickShop} style={{ marginBottom: 'auto', backgroundColor: showShop ? 'rgb(255, 0, 0)' : '' }}>{t('Parameters.Shop.Name')}</button>
                 <button className="choice" onClick={handleClickStats} style={{ backgroundColor: showStats ? 'rgb(255, 0, 0)' : '' }}>{t('Parameters.Statistics.Name')}</button>
-                <button className="choice" onClick={handleClickGlobal} style={{ backgroundColor: showGlobal ? 'rgb(255, 0, 0)' : '', marginBottom: 'auto' }}>Global</button>
+                <button className="choice" onClick={handleClickGlobal} style={{ backgroundColor: showGlobal ? 'rgb(255, 0, 0)' : '', marginBottom: 'auto' }}>{t('Parameters.Global.Name')}</button>
                 <button className="choice" onClick={handleClickLanguage} style={{ backgroundColor: showLanguage ? 'rgb(255, 0, 0)' : '' }}>{t('Parameters.Languages.Name')}</button>
                 <button className="choice" onClick={handleClickProfile}>Se déconnecter (non traduis)</button>
             </div>

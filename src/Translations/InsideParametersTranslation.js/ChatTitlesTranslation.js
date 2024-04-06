@@ -9,8 +9,14 @@ const ChatTitles = {
         Name: 'Titres de chat',
         Locked: 'Titres Bloquées:',
         Unlocked: 'Titres Débloquées:',
-        Equip: 'Vous avez equippez le titre {{title}}'
+        Equip: 'Vous avez equipez le titre {{title}}'
     },
+    ESP: {
+        Name: 'Títulos de chat',
+        Locked: 'Títulos Bloqueados:',
+        Unlocked: 'Títulos Desbloqueados:',
+        Equip: 'Has equipado el título {{title}}'
+    }
 }
 
 export default ChatTitles;

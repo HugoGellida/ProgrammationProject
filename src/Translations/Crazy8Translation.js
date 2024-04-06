@@ -12,6 +12,13 @@ const Crazy8 = {
         Win: "Vous avez gagné la partie (+750g)",
         Lose: "{{username}} a gagné la partie",
         WinButton: "GAGNER"
+    },
+    ESP: {
+        CardAmount: 'Número de puntos:',
+        End: 'Volver',
+        Win: "Has ganado el juego (+750g)",
+        Lose: "{{username}} ganó el juego",
+        WinButton: "GANAR"
     }
 }
 

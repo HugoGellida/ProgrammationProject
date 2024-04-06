@@ -75,6 +75,44 @@ const Colors = {
             Difficulty: "Difficulté: Facile"
         }
     },
+    ESP: {
+        white: {Price: 'Blanco'},
+        gold: {Price: 'Dorado'},
+        cyan: {Price: 'Cian'},
+        silver: {Price: 'Plata'},
+        yellow: {Price: 'marillo'},
+        gray: {Price: 'Gris'},
+        blue: {
+            Price: 'Azul',
+            Name: "Nombre: Veterano de guerra",
+            Description: "Descripción: Gana 10 veces en la Batalla",
+            Difficulty: "Dificultad: Media"
+        },
+        red: {
+            Price: 'Rojo',
+            Name: "Nombre: Una sed de victoria",
+            Description: "Descripción: Gana en todos los juegos al menos 10 veces",
+            Difficulty: "Difficulté: Difícil"
+        },
+        purple: {
+            Price: 'Biolet',
+            Name: "Nombre: Muu",
+            Description: "Descripción: Gana 10 veces en el 6 que toma",
+            Difficulty: "Dificultad: Media"
+        },
+        pink: {
+            Price: 'Rosa',
+            Name: "Nombre: Volverse loco",
+            Description: "Descripción: Gana 10 veces en el 8 Americano",
+            Difficulty: "Dificultad: Media"
+        },
+        brown: {
+            Price: 'Marrón',
+            Name: "Nombre: El comienzo de todo",
+            Description: "Descripción: Gana tu primer juego",
+            Difficulty: "Dificultad: Fácil"
+        }
+    }
 }
 
 export default Colors;

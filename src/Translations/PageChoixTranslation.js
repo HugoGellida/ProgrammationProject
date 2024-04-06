@@ -42,6 +42,28 @@ const PageChoix = {
             '6-qui-prend': '6 qui prend',
             crazy8: '8 Américain'
         }
+    },
+    ESP: {
+        Options: {
+            Parameters: 'Parámetros',
+            Resume: 'Reanudar un juego',
+            Create: 'Crear un juego'
+        },
+        Name: 'Salón',
+        IDPlaceHolder: "Escriba el ID del juego",
+        IDSubmit: 'Entrar',
+        Filter: {
+            All: 'Todos',
+            War: 'Batalla',
+            Take6: '6 que toma',
+            Crazy8: '8 Americano'
+        },
+        Game: 'Juego {{id}} {{actualPlayerAmount}}/{{playerAmount}}',
+        GameType: {
+            'jeu-de-bataille': 'Batalla',
+            '6-qui-prend': '6 que toma',
+            crazy8: '8 Americano'
+        }
     }
 }
 

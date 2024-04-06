@@ -25,6 +25,19 @@ const Statistics = {
         best: 'Meilleur score:',
         average: 'Score moyen:'
     },
+    ESP: {
+        Name: 'Estadísticas',
+        Games: {
+            War: 'Batalla',
+            Take6: '6 que toma',
+            Crazy8: '8 Americano'
+        },
+        winAmount: 'Número de victorias:',
+        loseAmount: 'Número de derrotas:',
+        tieAmount: "Número de igualdad:",
+        best: 'Mejor puntuaciо́n:',
+        average: 'Puntuaciо́n promedio:'
+    }
 }
 
 export default Statistics;

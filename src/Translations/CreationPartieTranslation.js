@@ -19,7 +19,7 @@ const CreationPartie = {
         Submit: 'Submit your game'
     },
     FR: {
-        Name: 'Création  de la partie',
+        Name: 'Création de la partie',
         Labels: {
             PlayerAmount: 'Nombre de joueurs',
             Type: 'Type',
@@ -36,6 +36,25 @@ const CreationPartie = {
             Private: 'Partie privée'
         },
         Submit: 'Soumettre votre partie'
+    },
+    ESP: {
+        Name: 'Creación del juego',
+        Labels: {
+            PlayerAmount: 'Número de jugadores',
+            Type: 'Tipo',
+            Timer: 'Tiempo'
+        },
+        GameType: {
+            War: 'Batalla',
+            Take6: '6 que toma',
+            Crazy8: '8 Americano'
+        },
+        Next: 'Siguiente',
+        GameVisual: {
+            Public: 'Juego público',
+            Private: 'Juego privado'
+        },
+        Submit: 'Presentar su juego'
     }
 }
 

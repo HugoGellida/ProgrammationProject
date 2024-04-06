@@ -36,6 +36,7 @@ db.run("CREATE TABLE IF NOT EXISTS StatCrazy8(username REFERENCES User(username)
 db.run("CREATE TABLE IF NOT EXISTS BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
 db.run("CREATE TABLE IF NOT EXISTS BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
 
+//db.run('UPDATE User SET isConnected = false'); //In case something bad happened
 
 function insertShop(username) {
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'yellow', false)`);
@@ -380,7 +381,7 @@ io.on("connection", (socket) => {
     });
     //Page Choix
     socket.on("loadGame", (username) => {
-        db.run("UPDATE User SET isConnected = true WHERE username = ?", [username]);
+        db.run("UPDATE User SET isConnected = true, socketid = ? WHERE username = ?", [socket.id, username]);
         loadGames();
     });
 

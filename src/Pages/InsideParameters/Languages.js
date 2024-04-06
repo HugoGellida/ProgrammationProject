@@ -7,7 +7,8 @@ export default function Languages() {
 
     const lngs = {
         en: { nativeName: 'English' },
-        fr: { nativeName: 'Français' }
+        fr: { nativeName: 'Français' },
+        esp: { nativeName: 'Espagñol' }
     }
 
     return (
