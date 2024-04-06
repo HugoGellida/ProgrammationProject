@@ -3,11 +3,13 @@ import "./../Composants/Boutton.css"
 import Formulaire from './../Composants/Formulaire';
 import { socket } from "./socket.js";
 import { useNavigate, Link } from "react-router-dom";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
+import Alert from '../Composants/Alert.js';
 
 export default function Inscription() {
 
+  const [showWarning, setShowWarning] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -22,11 +24,17 @@ export default function Inscription() {
       sessionStorage.setItem("pseudo", pseudo);
       return navigate('/PageChoix');
     }
-    if (sessionStorage.getItem('pseudo')) navigate('/PageChoix');
-    socket.on("registrationAllowed", registrationAllowed);
+    const registrationDenied = () => {
+      setShowWarning(true);
+    }
 
+    if (sessionStorage.getItem('pseudo')) navigate('/PageChoix');
+
+    socket.on("registrationAllowed", registrationAllowed);
+    socket.on("registrationDenied", registrationDenied);
     return () => {
       socket.off("registrationAllowed", registrationAllowed);
+      socket.off("registrationDenied", registrationDenied);
     }
   }, []);
 
@@ -37,6 +45,9 @@ export default function Inscription() {
         {Formulaire("Inscription", DemandeInscription)}<br></br>
         <label className='simpleText'>{t('Inscription.ChangeLocationText')}</label><br></br><Link to="/Connex">{t('Inscription.ChangeLocation')}</Link>
       </div>
+      {showWarning && (
+        <Alert message={t('Inscription.FailedAttempt')} buttonMessage={t('Inscription.FailedAttemptButton')} onClick={() => {setShowWarning(false)}} />
+      )}
     </div>
   );
 }

@@ -340,9 +340,7 @@ io.on("connection", (socket) => {
                 console.log(`connection allowed for user ${username}`);
                 db.run(`UPDATE User SET isConnected = true, socketid = '${socket.id}' WHERE username = '${username}'`);
                 socket.emit("connectionAllowed", username);
-            } else {
-                socket.emit("connectionDenied");
-            }
+            } else socket.emit("connectionDenied");
         });
     });
     //Page Inscription
@@ -357,7 +355,7 @@ io.on("connection", (socket) => {
                     console.log(`registration allowed for user ${username}`);
                     socket.emit("registrationAllowed", username);
                 });
-            }
+            } else socket.emit("registrationDenied");
         });
     });
     //Page CreationPartie

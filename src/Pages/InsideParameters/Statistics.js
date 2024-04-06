@@ -38,7 +38,7 @@ export default function Statistics() {
             {targetStat && (
                 <div className="Statistic">
                     {Object.keys(targetStat).map((key) => (
-                        <text className="StatisticInfo" style={{ color: "white" }}>{t(`Parameters.Statistics.${key}`)} {targetStat[key]}</text>
+                        <label className="simpleText" style={{marginBottom: 'auto', marginTop: 'auto'}}>{t(`Parameters.Statistics.${key}`)} {targetStat[key]}</label>
                     ))}
                 </div>
             )}

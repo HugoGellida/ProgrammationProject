@@ -6,6 +6,7 @@
     position: absolute;
     border-bottom: 2px outset gold;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     left: 0%;

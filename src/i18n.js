@@ -1,17 +1,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from "i18next-browser-languagedetector"
-import ParametersEN from './Translations/EN/ParametersTranslation'; import ParametersFR from './Translations/FR/ParametersTranslation';
-import InscriptionEN from './Translations/EN/InscriptionTranslation'; import InscriptionFR from './Translations/FR/InscriptionTranslation';
-import FormulaireEN from './Translations/EN/FormulaireTranslation'; import FormulaireFR from './Translations/FR/FormulaireTranslation';
-import ConnexFR from './Translations/FR/ConnexTranslation'; import ConnexEN from './Translations/EN/ConnexTranslation';
-import PageChoixEN from './Translations/EN/PageChoixTranslation'; import PageChoixFR from './Translations/FR/PageChoixTranslation';
-import CreationPartieEN from './Translations/EN/CreationPartieTranslation'; import CreationPartieFR from './Translations/FR/CreationPartieTranslation';
-import PartieEN from './Translations/EN/PartieTranslation'; import PartieFR from './Translations/FR/PartieTranslation';
-import BatailleEN from './Translations/EN/BatailleTranslation'; import BatailleFR from './Translations/FR/BatailleTranslation';
-import quiprendEN from './Translations/EN/6quiprendTranslation'; import quiprendFR from './Translations/FR/6quiprendTranslation';
-import Crazy8EN from './Translations/EN/Crazy8Translation'; import Crazy8FR from './Translations/FR/Crazy8Translation';
-import PagePauseFR from './Translations/FR/PagePauseTranslation'; import PagePauseEN from './Translations/EN/PagePauseTranslation';
+import Inscription from './Translations/InscriptionTranslation';
+import Connection from './Translations/ConnectionTranslation';
+import PageChoix from './Translations/PageChoixTranslation';
+import Parameters from './Translations/ParametersTranslation';
+import CreationPartie from './Translations/CreationPartieTranslation';
+import Formulaire from './Translations/FormulaireTranslation';
+import PagePause from './Translations/PagePauseTranslation';
+import Partie from './Translations/PartieTranslation';
+import quiprend from './Translations/6quiprendTranslation';
+import Bataille from './Translations/BatailleTranslation';
+import Crazy8 from './Translations/Crazy8Translation';
 
 i18n
     .use(LanguageDetector)
@@ -26,33 +26,33 @@ i18n
             en: {
                 translation: {
                     description: {},
-                    Parameters: ParametersEN,
-                    Inscription: InscriptionEN,
-                    Connection: ConnexEN,
-                    PageChoix: PageChoixEN,
-                    CreationPartie: CreationPartieEN,
-                    Formulaire: FormulaireEN,
-                    Partie: PartieEN,
-                    Bataille: BatailleEN,
-                    '6quiprend': quiprendEN,
-                    Crazy8: Crazy8EN,
-                    PagePause: PagePauseEN
+                    Parameters: Parameters.EN,
+                    Inscription: Inscription.EN,
+                    Connection: Connection.EN,
+                    PageChoix: PageChoix.EN,
+                    CreationPartie: CreationPartie.EN,
+                    Formulaire: Formulaire.EN,
+                    Partie: Partie.EN,
+                    Bataille: Bataille.EN,
+                    '6quiprend': quiprend.EN,
+                    Crazy8: Crazy8.EN,
+                    PagePause: PagePause.EN
                 }
             },
             fr: {
                 translation: {
                     description: {},
-                    Parameters: ParametersFR,
-                    Inscription: InscriptionFR,
-                    Connection: ConnexFR,
-                    PageChoix: PageChoixFR,
-                    CreationPartie: CreationPartieFR,
-                    Formulaire: FormulaireFR,
-                    Partie: PartieFR,
-                    Bataille: BatailleFR,
-                    '6quiprend': quiprendFR,
-                    Crazy8: Crazy8FR,
-                    PagePause: PagePauseFR
+                    Parameters: Parameters.FR,
+                    Inscription: Inscription.FR,
+                    Connection: Connection.FR,
+                    PageChoix: PageChoix.FR,
+                    CreationPartie: CreationPartie.FR,
+                    Formulaire: Formulaire.FR,
+                    Partie: Partie.FR,
+                    Bataille: Bataille.FR,
+                    '6quiprend': quiprend.FR,
+                    Crazy8: Crazy8.FR,
+                    PagePause: PagePause.FR
                 }
             }
         }

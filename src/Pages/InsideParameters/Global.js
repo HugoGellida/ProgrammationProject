@@ -50,10 +50,10 @@ export default function Global() {
     return (
         <>
             <div className="StatisticFilter">
-                <button id='All' className="StatisticChoice" style={{ backgroundColor: targetStat == 'All' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.All')}</button>
-                <button id='War' className="StatisticChoice" style={{ backgroundColor: targetStat == 'War' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.War')}</button>
-                <button id='Take6' className="StatisticChoice" style={{ backgroundColor: targetStat == 'Take6' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.Take6')}</button>
-                <button id='Crazy8' className="StatisticChoice" style={{ backgroundColor: targetStat == 'Crazy8' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.Crazy8')}</button>
+                <button id='All' className="StatisticChoice" style={{ backgroundColor: targetStat === 'All' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.All')}</button>
+                <button id='War' className="StatisticChoice" style={{ backgroundColor: targetStat === 'War' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.War')}</button>
+                <button id='Take6' className="StatisticChoice" style={{ backgroundColor: targetStat === 'Take6' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.Take6')}</button>
+                <button id='Crazy8' className="StatisticChoice" style={{ backgroundColor: targetStat === 'Crazy8' ? "rgb(60, 60, 60)" : "" }} onClick={handleStatClick}>{t('Parameters.Global.Choices.Crazy8')}</button>
             </div>
             {targetStat && (
                 <div className="leaderBoard">
@@ -61,33 +61,33 @@ export default function Global() {
                         <div className="leaderBoardCategoryTitle">Placement</div>
                         {global.map((player, index) => {
                             if (index < globalShownMax && index >= globalShownMin) {
-                                if (targetStat == 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>#{index + 1}</label>);
-                                else if (targetStat == 'War') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>#{index + 1}</label>);
-                                else if (targetStat == 'Take6') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>#{index + 1}</label>);
-                                else return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>#{index + 1}</label>);
-                            }
+                                if (targetStat === 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>#{index + 1}</label>);
+                                else if (targetStat === 'War') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>#{index + 1}</label>);
+                                else if (targetStat === 'Take6') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>#{index + 1}</label>);
+                                else return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>#{index + 1}</label>);
+                            } else return (<></>);
                         })}
                     </div>
                     <div className="leaderBoardCategory">
                         <div className="leaderBoardCategoryTitle">{t('Parameters.Global.Username')}</div>
                         {global.map((player, index) => {
                             if (index < globalShownMax && index >= globalShownMin) {
-                                if (targetStat == 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
-                                else if (targetStat == 'War') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
-                                else if (targetStat == 'Take6') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
-                                else return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
-                            }
+                                if (targetStat === 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
+                                else if (targetStat === 'War') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
+                                else if (targetStat === 'Take6') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
+                                else return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.username === sessionStorage.getItem('pseudo') ? t('Parameters.Global.Self') : player.username}</label>);
+                            } else return (<></>);
                         })}
                     </div>
                     <div className="leaderBoardCategory">
                         <div className="leaderBoardCategoryTitle">Points</div>
                         {global.map((player, index) => {
                             if (index < globalShownMax && index >= globalShownMin) {
-                                if (targetStat == 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.all}</label>);
-                                else if (targetStat == 'War') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.war}</label>);
-                                else if (targetStat == 'Take6') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.take6}</label>);
-                                else return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : 'white' }}>{player.crazy8}</label>);
-                            }
+                                if (targetStat === 'All') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.all}</label>);
+                                else if (targetStat === 'War') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.war}</label>);
+                                else if (targetStat === 'Take6') return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.take6}</label>);
+                                else return (<label className="simpleText" style={{ color: player.username === sessionStorage.getItem('pseudo') ? 'blueviolet' : index === 0? 'gold': index === 1? 'silver': index === 2? 'rgb(205, 127, 50)': 'white'}}>{player.crazy8}</label>);
+                            } else return (<></>);
                         })}
                     </div>
 
@@ -100,7 +100,7 @@ export default function Global() {
                     <div className="leaderBoardPlacement">{global.map((player, index) => {
                         if (player.username === sessionStorage.getItem('pseudo')) {
                             return `${t(`Parameters.Global.Placement`)} #${index + 1}`;
-                        }
+                        } else return (<></>);
                     })}</div>
                 </div>
             )}

@@ -4,6 +4,7 @@ import { socket } from "./socket.js";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
+import Alert from '../Composants/Alert.js';
 
 
 function Connexion() {
@@ -49,10 +50,7 @@ function Connexion() {
                 <label className='simpleText'>{t('Connection.ChangeLocationText')}</label><br></br><Link id="lcl" to="/">{t('Connection.ChangeLocation')}</Link>
             </div>
             {showWarning && (
-                <div>
-                    <label>Connection refusée</label>
-                    <button onClick={removeWarning}>Continuer</button>
-                </div>
+                <Alert message={t('Connection.FailedAttempt')} buttonMessage={t('Connection.FailedAttemptButton')} onClick={() => {setShowWarning(false)}} />
             )}
         </div>
     );
