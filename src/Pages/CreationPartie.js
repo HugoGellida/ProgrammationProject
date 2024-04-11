@@ -41,7 +41,7 @@ function CreationPartie() {
 
   return (
     <div className="CreationPartie">
-      <h4>CreationPartie</h4>
+      <h4>{t('CreationPartie.Name')}</h4>
       <div className='creationOptions'>
         {!showPrivateOption && (
           <>

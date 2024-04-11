@@ -19,7 +19,8 @@ const Parameters = {
         Global: Global.EN,
         Colors: Colors.EN,
         Titles: Titles.EN,
-        Exit: 'Leave'
+        Exit: 'Leave',
+        Disconnect: 'Disconnect'
     },
     FR: {
         Languages: Languages.FR,
@@ -30,7 +31,8 @@ const Parameters = {
         Global: Global.FR,
         Colors: Colors.FR,
         Titles: Titles.FR,
-        Exit: 'Quitter'
+        Exit: 'Quitter',
+        Disconnect: 'Se deconnecter'
     },
     ESP: {
         Languages: Languages.ESP,
@@ -41,7 +43,8 @@ const Parameters = {
         Global: Global.ESP,
         Colors: Colors.ESP,
         Titles: Titles.ESP,
-        Exit: 'Dejar'
+        Exit: 'Dejar',
+        Disconnect: 'Desconnectar'
     }
 }
 

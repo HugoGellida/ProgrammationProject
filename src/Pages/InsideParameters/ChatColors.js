@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import './ChatColors.css';
 import { useTranslation } from "react-i18next";
+import Alert from "../../Composants/Alert";
 
 export default function ChatColors() {
     const [unlockedColors, setUnlockedColors] = useState([]);
     const [lockedColors, setLockedColors] = useState([]);
     const [target, setTarget] = useState(-1);
     const [unlockedTarget, setUnlockedTarget] = useState(-1);
+    const [showAlert, setShowAlert] = useState(false);
+    const [clickedColor, setClickedColor] = useState();
 
     const { t } = useTranslation();
 
@@ -26,7 +29,8 @@ export default function ChatColors() {
 
     const clickColor = (event) => {
         socket.emit("chooseChatColor", sessionStorage.getItem("pseudo"), event.target.innerText);
-        alert(t('Parameters.ChatColors.Equip', { color: event.target.innerText }));
+        setShowAlert(true);
+        setClickedColor(event.target.innerText);
     }
 
     return (
@@ -53,6 +57,9 @@ export default function ChatColors() {
                     </div>
                 ))}
             </div>
+            {showAlert && (
+                <Alert message={t('Parameters.ChatColors.Equip', { color: clickedColor })} buttonMessage={t('Connection.FailedAttemptButton')} onClick={() => { setShowAlert(false) }} />
+            )}
         </>
     );
 }

@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import "./ChatTitles.css";
 import { useTranslation } from "react-i18next";
+import Alert from "../../Composants/Alert";
 
 export default function ChatTitles() {
     const [unlockedTitles, setUnlockedTitles] = useState([]);
     const [lockedTitles, setLockedTitles] = useState([]);
     const [target, setTarget] = useState(-1);
+    const [showAlert, setShowAlert] = useState(false);
+    const [clickedTitle, setClickedTitle] = useState();
 
     const { t } = useTranslation();
 
@@ -25,11 +28,12 @@ export default function ChatTitles() {
 
     const clickTitle = (event) => {
         socket.emit("chooseChatTitle", sessionStorage.getItem("pseudo"), event.target.innerText);
-        alert(t('Parameters.ChatTitles.Equip', { title: event.target.innerText }));
+        setShowAlert(true);
+        setClickedTitle(event.target.innerText);
     }
 
     return (
-        <div style={{ backgroundImage: "url('./Backgrounds/ParametersBackground.jpg')" }}>
+        <>
             <div className="unlockedTitles">
                 <h10 className="unlockedTitlesTitle" style={{ color: 'white' }}>{t('Parameters.ChatTitles.Unlocked')}</h10>
                 {unlockedTitles.map(title => (
@@ -51,6 +55,9 @@ export default function ChatTitles() {
                     </div>
                 ))}
             </div>
-        </div>
+            {showAlert && (
+                <Alert message={t('Parameters.ChatTitles.Equip', { title: clickedTitle })} buttonMessage={t('Connection.FailedAttemptButton')} onClick={() => { setShowAlert(false) }} />
+            )}
+        </>
     )
 }
