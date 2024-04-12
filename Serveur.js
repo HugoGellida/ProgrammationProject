@@ -1038,6 +1038,4 @@ io.on("connection", (socket) => {
         else if (game instanceof Take6Game) return "6-qui-prend";
         else if (game instanceof Crazy8Game) return "crazy8";
     }
-
-
 });

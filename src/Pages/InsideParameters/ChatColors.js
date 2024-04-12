@@ -28,7 +28,7 @@ export default function ChatColors() {
     }, []);
 
     const clickColor = (event) => {
-        socket.emit("chooseChatColor", sessionStorage.getItem("pseudo"), event.target.innerText);
+        socket.emit("chooseChatColor", sessionStorage.getItem("pseudo"), event.target.id);
         setShowAlert(true);
         setClickedColor(event.target.innerText);
     }
@@ -38,7 +38,7 @@ export default function ChatColors() {
             <div className="unlockedColors">
                 <h10 className="unlockedColorsTitle" style={{ color: 'white' }}>{t('Parameters.ChatColors.Unlocked')}</h10>
                 {unlockedColors.map((color, index) => (
-                    <button className="unlockedColor" style={{ backgroundColor: unlockedTarget == index ? color : "black", border: `2px inset ${color}`, transition: '0.5s', color: unlockedTarget == index ? "black" : "white" }} onClick={clickColor} onMouseEnter={() => { setUnlockedTarget(index) }} onMouseLeave={() => { setUnlockedTarget(-1) }}>{t(`Parameters.Colors.${color}.Price`)}</button>
+                    <button className="unlockedColor" id={color} style={{ backgroundColor: unlockedTarget == index ? color : "black", border: `2px inset ${color}`, transition: '0.5s', color: unlockedTarget == index ? "black" : "white" }} onClick={clickColor} onMouseEnter={() => { setUnlockedTarget(index) }} onMouseLeave={() => { setUnlockedTarget(-1) }}>{t(`Parameters.Colors.${color}.Price`)}</button>
                 ))}
             </div>
             {target !== -1 && (
