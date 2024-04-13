@@ -36,7 +36,7 @@ db.run("CREATE TABLE IF NOT EXISTS StatCrazy8(username REFERENCES User(username)
 db.run("CREATE TABLE IF NOT EXISTS BuyableColor(username REFERENCES User(username), cost INTEGER, color VARCHAR(10), isBought BOOLEAN)");
 db.run("CREATE TABLE IF NOT EXISTS BuyableTitle(username REFERENCES User(username), cost INTEGER, title VARCHAR(20), isBought BOOLEAN)");
 
-//db.run('UPDATE User SET isConnected = false'); //In case something bad happened
+db.run('UPDATE User SET isConnected = false');
 
 function insertShop(username) {
     db.run(`INSERT INTO BuyableColor VALUES('${username}', 5000, 'yellow', false)`);
@@ -60,15 +60,31 @@ server.listen(3001, () => {
     console.log('Le serveur écoute sur le port 3001');
 });
 
-//db.all("SELECT * FROM User", (rows, err) => {
+//db.all("SELECT * FROM User", (err, rows) => {
 //    rows.forEach(row => console.log(row));
-//})
+//});
 
 
 const rooms = {};
 
 io.on("connection", (socket) => {
     console.log(`presence detected on site: ${socket.id}`);
+
+    socket.on('cmdDev', async (cmdName, username, value) => {
+        if (cmdName == ':sM') db.run('UPDATE User SET money = ? WHERE username = ?', [value, username]);
+        else if (cmdName == ':sWW') db.run('UPDATE StatWar SET winAmount = ? WHERE username = ?', [value, username]);
+        else if (cmdName == ':sWT6') db.run('UPDATE StatTake6 SET winAmount = ? WHERE username = ?', [value, username]);
+        else if (cmdName == ':sWC8') db.run('UPDATE StatCrazy8 SET winAmount = ? WHERE username = ?', [value, username]);
+        else if (cmdName == ':bi') {
+            if (value == '*'){
+                db.run('UPDATE BuyableTitle SET isBought = true WHERE username = ?', [username]);
+                db.run('UPDATE BuyableColor SET isBought = true WHERE username = ?', [username]);
+            } else {
+                db.run('UPDATE BuyableTitle SET isBought = true WHERE username = ? AND title = ?', [username, value]);
+                db.run('UPDATE BuyableColor SET isBought = true WHERE username = ? AND color = ?', [username, value]);
+            }
+        }
+    });
 
     socket.on("askChatTitles", async (username) => {
         const rowWar = await getStats("StatWar", username);
