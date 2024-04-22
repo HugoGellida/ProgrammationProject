@@ -11,7 +11,7 @@ class Bot1Player(Player):
         minOfLine = -1
         for index, row in enumerate(table):
             total = game.total_cows(row)
-            if (total < minOfLine or minOfLine != -1):
+            if (total < minOfLine or minOfLine == -1):
                 minIndexLine = index + 1
                 minOfLine = total
         print('the bot chose to remove line', minIndexLine)
@@ -26,7 +26,5 @@ class Bot1Player(Player):
         return response
     
     def player_turn(self, game):
-        self.info(game.display_scores())
-        self.info(game.display_table())
         carteChoisie = Card(self.getCardToPlay())
         return carteChoisie
