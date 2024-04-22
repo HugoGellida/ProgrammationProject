@@ -1,9 +1,9 @@
 from players.player import Player
 from game.card import Card
 
-class Bot1Player(Player):
+class BotCustomPlayer(Player):
     def info(self, message):
-        print("@"+self.name+" : ",message)
+        print("bot "+self.name+" : ",message)
 
     def getLineToRemove(self, game):
         table = game.table
@@ -17,14 +17,19 @@ class Bot1Player(Player):
         print('the bot chose to remove line', minIndexLine)
         return minIndexLine
 
-
     def getCardToPlay(self):
-        hand = [getattr(card, "value") for card in self.hand]
-        hand.sort()
-        response = hand[0]
-        print("The bot played", response)
-        return response
-    
+        pass
+
     def player_turn(self, game):
-        carteChoisie = Card(self.getCardToPlay())
-        return carteChoisie
+        table = game.table
+        minimalGap = -1
+        minimalCardGap = 0
+        print("Cards of bot:", self.hand)
+        for index, row in enumerate(table):
+            for card in self.hand:
+                gap = abs(row[len(row) - 1].value - card.value)
+                if gap < minimalGap or minimalGap == -1:
+                    minimalGap = gap
+                    minimalCardGap = card
+        print("The bot chose", minimalCardGap)
+        return minimalCardGap
