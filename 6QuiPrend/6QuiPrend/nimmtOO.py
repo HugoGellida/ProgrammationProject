@@ -1,5 +1,6 @@
 from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
+from players.bot1Player import Bot1Player
 
 def interactiveRun():
     print("Bienvenue sur le jeu 6 qui prend !")
@@ -9,7 +10,10 @@ def interactiveRun():
             players=[]
             for i in range(num_players):
                 name=input("Nom du joueur : ")
-                players.append(HumanPlayer(name))
+                if name == "1":
+                    botName = input('Name of the bot : ')
+                    players.append(Bot1Player(botName))
+                else: players.append(HumanPlayer(name))
             game=NimmtGame(players)
             scores, winners=game.play()
 
