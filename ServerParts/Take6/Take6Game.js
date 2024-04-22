@@ -123,7 +123,7 @@ class Take6Game extends Game {
     }
 
     needOtherRound(){
-        return this.playerList[0].handCard.length == 0;
+        return this.playerList[0].handCard.length == 0; 
     }
 }
 
