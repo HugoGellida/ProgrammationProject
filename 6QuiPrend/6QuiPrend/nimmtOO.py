@@ -2,6 +2,7 @@ from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
 from players.bot1Player import Bot1Player
 from players.botCustomPlayer import BotCustomPlayer
+from players.botEchantillonagePlayer import BotEchantillonagePlayer
 
 def interactiveRun():
     print("Bienvenue sur le jeu 6 qui prend !")
@@ -17,6 +18,9 @@ def interactiveRun():
                 elif name == "4":
                     botName = input('Name of the bot : ')
                     players.append(BotCustomPlayer(botName))
+                elif name == "5":
+                    botName = input('Name of the bot : ')
+                    players.append(BotEchantillonagePlayer(botName))
                 else: players.append(HumanPlayer(name))
             game=NimmtGame(players)
             scores, winners=game.play()
