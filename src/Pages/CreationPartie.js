@@ -9,6 +9,7 @@ function CreationPartie() {
 
   const [infoGame, setInfoGame] = useState({});
   const [showPrivateOption, setShowPrivateOption] = useState(false);
+  const [showBotOption, setShowBotOption] = useState(false);
 
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -23,6 +24,11 @@ function CreationPartie() {
 
   function stockGameStatus() {
     const gameStatus = document.getElementById("gameStatus").options[document.getElementById("gameStatus").selectedIndex].value;
+    setInfoGame({ ...infoGame, gameStatus: gameStatus });
+    setShowBotOption(true);
+  }
+
+  function bots() {
     socket.emit("createGame", { ...infoGame, gameStatus: gameStatus });
   }
 
@@ -70,7 +76,11 @@ function CreationPartie() {
             </select>
             <button className='button' onClick={stockGameStatus}>{t('CreationPartie.Submit')}</button>
           </>
-
+        )}
+        {showBotOption && (
+          <>
+            <input type='number' max={infoGame.playerAmount - 1} min={0}>Bot Amount (not translated)</input>
+          </>
         )}
       </div>
     </div>

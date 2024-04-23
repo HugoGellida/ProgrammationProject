@@ -1,6 +1,7 @@
 from random import shuffle
 from game.card import Card
 
+
 class NimmtGame:
     """
     Représente une partie du jeu 6 qui prend.
@@ -117,6 +118,7 @@ class NimmtGame:
                 player.hand.remove(card)
             plays.sort(key=lambda x: x[1])
             self.update_table(plays)
+
     def play(self):
         """
         lance le jeu

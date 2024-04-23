@@ -39,4 +39,3 @@ class Card:
         :param other: La carte à comparer.
         """
         return self.value == other.value
-    

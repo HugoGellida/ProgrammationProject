@@ -4,7 +4,7 @@ const WarGame = require("./ServerParts/War/WarGame.js");
 const WarPlayer = require("./ServerParts/War/WarPlayer.js");
 const Take6Game = require("./ServerParts/Take6/Take6Game.js");
 const Take6Player = require("./ServerParts/Take6/Take6Player.js");
-
+const Take6BotRandom = require("./ServerPart/Take6/Take6BotRandom.js");
 
 const express = require('express');
 const app = express();
@@ -911,6 +911,10 @@ io.on("connection", (socket) => {
                 cardBoard[index] = game.cardBoard[index].map(card => ({ value: card.value, pointAmount: card.pointAmount }));
             });
             io.to(player.socketid).emit("fourthGameTest", handCard, cardBoard);
+            if (player instanceof Take6BotRandom){
+                let card = player.makeBotMove();
+                socket.broadcast.to(parseInt(idGame)).emit("firstGameTest", player.username, { value: card.value, pointAmount: card.pointAmount });
+            }
         }
     }
 
