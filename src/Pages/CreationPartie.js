@@ -25,11 +25,15 @@ function CreationPartie() {
   function stockGameStatus() {
     const gameStatus = document.getElementById("gameStatus").options[document.getElementById("gameStatus").selectedIndex].value;
     setInfoGame({ ...infoGame, gameStatus: gameStatus });
-    setShowBotOption(true);
+    if (infoGame.type !== '6-qui-prend') socket.emit("createGame", infoGame);
+    else {
+      setShowBotOption(true);
+      setShowPrivateOption(false);
+    }
   }
 
   function bots() {
-    socket.emit("createGame", { ...infoGame, gameStatus: gameStatus });
+    socket.emit("createGame", { ...infoGame, RBotAmount: document.getElementById('RBots').value });
   }
 
   useEffect(() => {
@@ -49,7 +53,7 @@ function CreationPartie() {
     <div className="CreationPartie">
       <h4>{t('CreationPartie.Name')}</h4>
       <div className='creationOptions'>
-        {!showPrivateOption && (
+        {!showPrivateOption && !showBotOption && (
           <>
             <label className='simpleText' htmlFor="playerAmount">{t('CreationPartie.Labels.PlayerAmount')}</label>
             <input id='nbrJoueur' className='numberInput' type='number' max="10" min="2" defaultValue='2' required />
@@ -79,7 +83,9 @@ function CreationPartie() {
         )}
         {showBotOption && (
           <>
-            <input type='number' max={infoGame.playerAmount - 1} min={0}>Bot Amount (not translated)</input>
+            <label className='simpleText'>{t("CreationPartie.Bots.Random")}</label>
+            <input type='number' id='RBots'  max={infoGame.playerAmount - 1} min={0} defaultValue={0}/>
+            <button className='button' onClick={bots}>{t('CreationPartie.Submit')}</button>
           </>
         )}
       </div>

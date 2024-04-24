@@ -16,7 +16,10 @@ const CreationPartie = {
             Public: 'Public game',
             Private: 'Private game'
         },
-        Submit: 'Submit your game'
+        Submit: 'Submit your game',
+        Bots: {
+            Random: "Number of R type Bots"
+        }
     },
     FR: {
         Name: 'Création de la partie',
@@ -35,7 +38,10 @@ const CreationPartie = {
             Public: 'Partie publique',
             Private: 'Partie privée'
         },
-        Submit: 'Soumettre votre partie'
+        Submit: 'Soumettre votre partie',
+        Bots: {
+            Random: "Nombre de Robots de type R"
+        }
     },
     ESP: {
         Name: 'Creación del juego',
@@ -54,7 +60,10 @@ const CreationPartie = {
             Public: 'Juego público',
             Private: 'Juego privado'
         },
-        Submit: 'Presentar su juego'
+        Submit: 'Presentar su juego',
+        Bots: {
+            Random: "Número de Robots de tipo R"
+        }
     }
 }
 

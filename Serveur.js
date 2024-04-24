@@ -4,7 +4,7 @@ const WarGame = require("./ServerParts/War/WarGame.js");
 const WarPlayer = require("./ServerParts/War/WarPlayer.js");
 const Take6Game = require("./ServerParts/Take6/Take6Game.js");
 const Take6Player = require("./ServerParts/Take6/Take6Player.js");
-const Take6BotRandom = require("./ServerPart/Take6/Take6BotRandom.js");
+const Take6BotRandom = require("./ServerParts/Take6/Take6BotRandom.js");
 
 const express = require('express');
 const app = express();
@@ -308,10 +308,14 @@ io.on("connection", (socket) => {
                         });
                         if (game.playerAmount == 1) {
                             db.get(`SELECT * FROM StatTake6 WHERE username = '${game.playerList[0].username}'`, (err, row) => {
-                                db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)} WHERE username = '${game.playerList[0].username}'`);
+                                if (row){
+                                    db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)} WHERE username = '${game.playerList[0].username}'`);
+                                }
                             });
                             db.get(`SELECT * FROM User WHERE username = '${game.playerList[0].username}'`, (err, row) => {
-                                db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${game.playerList[0].username}'`);
+                                if (row){
+                                    db.run(`UPDATE User SET money = ${(row.money + 750)} WHERE username = '${game.playerList[0].username}'`);
+                                }
                             });
                             game.isLaunched = false;
                             io.to(game.playerList[0].socketid).emit("endTake6", [game.playerList[0].username]);
@@ -394,6 +398,11 @@ io.on("connection", (socket) => {
         gameList.push(newGame);
         rooms[newIdGame] = [];
         affectPlayer(newIdGame, gameInfo.creator, true);
+        if (gameInfo.RBotAmount){
+            for (let i = 0; i < gameInfo.RBotAmount; i++){
+                affectBot(newIdGame, Take6BotRandom, String(i));
+            }
+        }
     });
     //Page Choix
     socket.on("loadGame", (username) => {
@@ -427,7 +436,7 @@ io.on("connection", (socket) => {
     //Page de jeu
     socket.on("launchGame", idGame => {
         const game = getGameById(idGame);
-        const playerAmountInRoom = io.sockets.adapter.rooms.get(parseInt(idGame)).size;
+        const playerAmountInRoom = rooms[idGame].length;
         if (game.isPaused && game.playerAmount == playerAmountInRoom) {
             game.isPaused = false;
             const players = game.playerList;
@@ -496,7 +505,9 @@ io.on("connection", (socket) => {
         const game = getGameById(idGame);
         game.isLaunched = false;
         game.isPaused = true;
-        rooms[idGame] = [];
+        for (let s of rooms[idGame]){
+            if (game.playerList.filter(player => player.socketid == s)[0] instanceof Take6Player) rooms[idGame] = rooms[idGame].filter(S => S != s);
+        }
         io.to(parseInt(idGame)).emit("pauseAllowed");
         io.socketsLeave(parseInt(idGame));
     });
@@ -913,7 +924,7 @@ io.on("connection", (socket) => {
             io.to(player.socketid).emit("fourthGameTest", handCard, cardBoard);
             if (player instanceof Take6BotRandom){
                 let card = player.makeBotMove();
-                socket.broadcast.to(parseInt(idGame)).emit("firstGameTest", player.username, { value: card.value, pointAmount: card.pointAmount });
+                io.to(parseInt(game.idGame)).emit("firstGameTest", player.username, { value: card.value, pointAmount: card.pointAmount });
             }
         }
     }
@@ -956,20 +967,22 @@ io.on("connection", (socket) => {
         const winners = game.getWinners();
         for (let i = 0; i < game.playerList.length; i++) {
             db.get(`SELECT * FROM StatTake6 WHERE username = '${game.playerList[i].username}'`, (err, row) => {
-                const totalGamePlayed = row.winAmount + row.loseAmount;
-                row.average = (row.average * totalGamePlayed + game.playerList[i].totalPoint) / (totalGamePlayed + 1);
-                if (row.best > game.playerList[i].totalPoint || row.best == -1) {
-                    row.best = game.playerList[i].totalPoint;
-                }
-                if (winners.includes(game.playerList[i])) {
-                    db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
-                    db.get("SELECT * FROM User WHERE username = ?", [game.playerList[i].username], (err, rowUser) => {
-                        db.run(`UPDATE User SET money = ${(rowUser.money + 750)} WHERE username = '${game.playerList[i].username}'`);
-                    });
-                    console.log(`the player ${game.playerList[i].username} has won`);
-                } else {
-                    db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
-                    console.log(`the player ${game.playerList[i].username} has lost`);
+                if (row){
+                    const totalGamePlayed = row.winAmount + row.loseAmount;
+                    row.average = (row.average * totalGamePlayed + game.playerList[i].totalPoint) / (totalGamePlayed + 1);
+                    if (row.best > game.playerList[i].totalPoint || row.best == -1) {
+                        row.best = game.playerList[i].totalPoint;
+                    }
+                    if (winners.includes(game.playerList[i])) {
+                        db.run(`UPDATE StatTake6 SET winAmount = ${(row.winAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
+                        db.get("SELECT * FROM User WHERE username = ?", [game.playerList[i].username], (err, rowUser) => {
+                            db.run(`UPDATE User SET money = ${(rowUser.money + 750)} WHERE username = '${game.playerList[i].username}'`);
+                        });
+                        console.log(`the player ${game.playerList[i].username} has won`);
+                    } else {
+                        db.run(`UPDATE StatTake6 SET loseAmount = ${(row.loseAmount + 1)}, best = ${row.best}, average = ${row.average} WHERE username = '${game.playerList[i].username}'`);
+                        console.log(`the player ${game.playerList[i].username} has lost`);
+                    }
                 }
             });
         }
@@ -1047,6 +1060,15 @@ io.on("connection", (socket) => {
         game.addPlayer(newPlayer);
         loadGames();
         console.log(`user ${username} is now a player of ${idGame}`);
+    }
+
+    function affectBot(idGame, type, username) { // Fonction générale
+        rooms[idGame].push('nothing');
+        const game = getGameById(idGame);
+        let newBot = new type(username, game, 'nothing');
+        game.addPlayer(newBot);
+        loadGames();
+        console.log(`bot created for game ${idGame}`);
     }
 
     function getGameById(idGame) {

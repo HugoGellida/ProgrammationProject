@@ -19,16 +19,15 @@ class Take6BotRandom extends Player {
     }
 
     chooseCard(cardChosen){
-        const cardClass = this.handCard.filter(card => card.value == cardChosen.value)[0];
-        this.cardPlayed = cardClass;
+        this.cardPlayed = cardChosen;
         this.handCard = this.handCard.filter(card => card.value != cardChosen.value);
-        return cardClass;
+        return cardChosen;
     }
 
     makeBotMove(){
-        const randomIndex = Math.random() * this.handCard.length;
+        const randomIndex = Math.floor(Math.random() * this.handCard.length);
         const randomCard = this.handCard[randomIndex];
-        return this.chooseCard(randomCard.value);
+        return this.chooseCard(randomCard);
     }
 
     removeCardPlayed(){
