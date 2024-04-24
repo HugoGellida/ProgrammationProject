@@ -14,7 +14,7 @@ class BotCustomPlayer(Player):
             if (total < minOfLine or minOfLine == -1):
                 minIndexLine = index + 1
                 minOfLine = total
-        print('the bot chose to remove line', minIndexLine)
+        print('Le bot a choisit de supprimer la ligne : ', minIndexLine)
         return minIndexLine
 
     def getCardToPlay(self):
@@ -24,12 +24,12 @@ class BotCustomPlayer(Player):
         table = game.table
         minimalGap = -1
         minimalCardGap = 0
-        print("Cards of bot:", self.hand)
+        print("Cartes du bot Custom :", self.hand)
         for index, row in enumerate(table):
             for card in self.hand:
                 gap = abs(row[len(row) - 1].value - card.value)
                 if gap < minimalGap or minimalGap == -1:
                     minimalGap = gap
                     minimalCardGap = card
-        print("The bot chose", minimalCardGap)
+        print("Le bot Custom a joué :", minimalCardGap)
         return minimalCardGap

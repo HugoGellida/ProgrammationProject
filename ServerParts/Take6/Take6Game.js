@@ -5,6 +5,7 @@ class Take6Game extends Game {
     constructor(playerAmount, timer, idGame, status){
         super(playerAmount, timer, idGame, status);
         this.cardBoard = {1: [], 2:[], 3:[], 4:[]};
+        this.alreadyPlayedCard = [];
     }
 
     eliminatePlayer(player){
@@ -33,6 +34,7 @@ class Take6Game extends Game {
 
     prepareRound(){
         let generatedCards = [];
+        this.alreadyPlayedCard = [];
         for (let i = 1; i < 105; i++){
             const card = new Take6Card(i);
             generatedCards.push(card);
@@ -48,12 +50,14 @@ class Take6Game extends Game {
         }
         Object.keys(this.cardBoard).forEach(lineNumber => {
             this.cardBoard[lineNumber].push(generatedCards[currentCard]);
+            this.alreadyPlayedCard.push(generatedCards[currentCard]);
             currentCard++;
         });
     }
 
     addCard(card, lineNumber){
         this.cardBoard[lineNumber].push(card);
+        this.alreadyPlayedCard.push(card);
     }
 
     isLength6(lineNumber){

@@ -24,6 +24,7 @@ const io = new require("socket.io")(server, {
 
 
 const fs = require("fs");
+const Take6BotEchantillon = require("./ServerParts/Take6/Take6BotEchantillon.js");
 const sql = require("sqlite3").verbose();
 const db = new sql.Database("./Database.db");
 
@@ -400,7 +401,12 @@ io.on("connection", (socket) => {
         affectPlayer(newIdGame, gameInfo.creator, true);
         if (gameInfo.RBotAmount){
             for (let i = 0; i < gameInfo.RBotAmount; i++){
-                affectBot(newIdGame, Take6BotRandom, String(i));
+                affectBot(newIdGame, Take6BotRandom, `R${i}`);
+            }
+        }
+        if (gameInfo.EBotAmount){
+            for (let i = 0; i < gameInfo.EBotAmount; i++){
+                affectBot(newIdGame, Take6BotEchantillon, `E${i}`);
             }
         }
     });
@@ -922,7 +928,7 @@ io.on("connection", (socket) => {
                 cardBoard[index] = game.cardBoard[index].map(card => ({ value: card.value, pointAmount: card.pointAmount }));
             });
             io.to(player.socketid).emit("fourthGameTest", handCard, cardBoard);
-            if (player instanceof Take6BotRandom){
+            if (player instanceof Take6BotEchantillon || player instanceof Take6BotRandom){
                 let card = player.makeBotMove();
                 io.to(parseInt(game.idGame)).emit("firstGameTest", player.username, { value: card.value, pointAmount: card.pointAmount });
             }

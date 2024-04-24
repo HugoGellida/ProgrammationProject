@@ -33,7 +33,7 @@ function CreationPartie() {
   }
 
   function bots() {
-    socket.emit("createGame", { ...infoGame, RBotAmount: document.getElementById('RBots').value });
+    socket.emit("createGame", { ...infoGame, RBotAmount: document.getElementById('RBots').value, EBotAmount: document.getElementById('EBots').value });
   }
 
   useEffect(() => {
@@ -85,6 +85,8 @@ function CreationPartie() {
           <>
             <label className='simpleText'>{t("CreationPartie.Bots.Random")}</label>
             <input type='number' id='RBots'  max={infoGame.playerAmount - 1} min={0} defaultValue={0}/>
+            <label className='simpleText'>New: Type E Bots</label>
+            <input type='number' id='EBots'  max={infoGame.playerAmount - 1} min={0} defaultValue={0}/>
             <button className='button' onClick={bots}>{t('CreationPartie.Submit')}</button>
           </>
         )}

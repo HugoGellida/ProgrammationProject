@@ -1,8 +1,11 @@
 from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
-from players.bot1Player import Bot1Player
+from players.botFaible import botFaible
+from players.botFort import botFort
 from players.botCustomPlayer import BotCustomPlayer
-from players.botEchantillonagePlayer import BotEchantillonagePlayer
+from players.botRandom import botRandom
+from players.botEchantillon import botEchantillon
+from players.botMinMax import botMinMax
 
 def interactiveRun():
     print("Bienvenue sur le jeu 6 qui prend !")
@@ -12,16 +15,26 @@ def interactiveRun():
             players=[]
             for i in range(num_players):
                 name=input("Nom du joueur : ")
-                if name == "1":
-                    botName = input('Name of the bot : ')
-                    players.append(Bot1Player(botName))
-                elif name == "4":
-                    botName = input('Name of the bot : ')
+                if name == "botFaible":
+                    botName = input('Nom du bot faible : ')
+                    players.append(botFaible(botName))
+                elif name == "botFort":
+                    botName = input('Nom du bot fort : ')
+                    players.append(botFort(botName))
+                elif name == "BotCustomPlayer":
+                    botName = input('Nom du bot Custom : ')
                     players.append(BotCustomPlayer(botName))
-                elif name == "5":
-                    botName = input('Name of the bot : ')
-                    players.append(BotEchantillonagePlayer(botName))
-                else: players.append(HumanPlayer(name))
+                elif name == "botRandom":
+                    botName = input('Nom du bot Random : ')
+                    players.append(botRandom(botName))
+                elif name == "Echantillon":
+                    botName = input('Nom du bot Echantillon : ')
+                    players.append(botEchantillon(botName))
+                elif name == "MinMax":
+                    botName = input('Nom du bot MinMax : ')
+                    players.append(botMinMax(botName))
+                else: 
+                    players.append(HumanPlayer(name))
             game=NimmtGame(players)
             scores, winners=game.play()
 
@@ -37,3 +50,4 @@ def interactiveRun():
 
 if __name__ == "__main__":
     interactiveRun()
+    
