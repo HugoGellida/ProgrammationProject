@@ -130,14 +130,13 @@ def generate_plot(number, repetition):
         (score, winners) = interactiveRun(number)
         liste += score
     liste_m = moyenne(liste)
-    nom, m = zip(*liste_m)
-    
-    #plt.plot(nom, m, marker="x", linestyle="")
+    sorted_liste_m = sorted(liste_m, key=lambda x: x[1])
+    nom, m = zip(*sorted_liste_m)
     nameColor = []
-    colors = ['red', 'blue', 'gray', 'purple', 'orange', 'yellow', 'black', 'pink']
+    colors = ['yellow', 'orange', 'red', 'pink', 'purple', 'blue', 'green', 'black']
     for i in range(len(nom)):
-        nameColor.append(colors[random.randint(0, 7)])
-    plt.bar(nom, m, color=nameColor, width=0.5)
+        nameColor.append(colors[i])
+    plt.bar(nom, m, color=nameColor, align='edge')
     plt.xlabel('Bots')
     plt.ylabel("Average")
 
