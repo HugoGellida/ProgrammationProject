@@ -119,7 +119,6 @@ def interactiveRun(number):
             print("La partie est terminée!")
             print("Scores finaux :")
             return scores.items(),winners
-            return scores.items(),winners
         except ValueError:
             print("Veuillez entrer un nombre entier.")
 
