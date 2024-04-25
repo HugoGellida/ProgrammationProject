@@ -1,5 +1,4 @@
 const Player = require("../Player");
-const combinations = require("combinations-js");
 const Take6Card = require("./Take6Card");
 
 class Take6BotEchantillon extends Player {
@@ -31,14 +30,13 @@ class Take6BotEchantillon extends Player {
         const HandCard = this.handCard.map(card => card.value);
         const allCards = [];
         for (let i = 1; i < 105; i++) allCards.push(i);
+        let Plateau = JSON.parse(JSON.stringify(this.game.cardBoard));
         let NotPlayedCards = allCards.filter(value => !allPlayedCards.includes(value) && !HandCard.includes(value));
-        let ScoreFinal = this.Emulator(HandCard, NotPlayedCards, this.game.cardBoard, this.game.playerList.length);
-        console.log('Echantillon obtenu : ', ScoreFinal)
+        let ScoreFinal = this.Emulator(HandCard, NotPlayedCards, Plateau, this.game.playerList.length);
         for (let i in ScoreFinal){
             let total = 0;
             for (let j of ScoreFinal[i]) total += j;
             ScoreFinal[i] = total/ScoreFinal[i].length;
-            console.log('Carte : ', i,' Moyenne :',ScoreFinal[i]);
         }
         const response = Object.keys(ScoreFinal).filter(key => ScoreFinal[key] == Math.min(...Object.values(ScoreFinal)))[0];
         return this.chooseCard(this.handCard.filter(card => card.value == response)[0]);
@@ -47,14 +45,13 @@ class Take6BotEchantillon extends Player {
     Emulator(hand, ListOfCards, Plateau, NbJoueurs){
         let NotPlayedCards = ListOfCards;
         let Retour={};
-        let newPlateau = Plateau;
         for (let i of hand){
             Retour[i] = [];
         }
-        for (let j = 0; j < 50; j++){
+        for (let j = 0; j < 500; j++){
             const Comb =  this.Combinaison(NotPlayedCards,NbJoueurs)
             for (let i of hand){
-                Retour[i].push(this.Simulate_update_table(newPlateau, i, [...Comb, i]));
+                Retour[i].push(this.Simulate_update_table(Plateau, i, [...Comb, i]));
             }
         }
         return Retour;
@@ -96,7 +93,7 @@ class Take6BotEchantillon extends Player {
                     }
                 }
                 Valeurs[val].push(Table[minIndex].map(card => card.value).reduce((acc, value) => acc + value, 0));
-                Table[minIndex - 1] = [new Take6Card(val)];
+                Table[minIndex] = [new Take6Card(val)];
             }
         }
         return Valeurs[handCard][0];
