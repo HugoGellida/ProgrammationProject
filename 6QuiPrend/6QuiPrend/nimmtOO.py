@@ -1,6 +1,7 @@
 from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
 from players.botFaible import botFaible #bot1
+from players.botFort import botFort
 from players.botCustomPlayer import BotCustomPlayer
 from players.botEchantillon import botEchantillon
 from players.botMinMax import botMinMax
@@ -11,7 +12,6 @@ import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
-def interactiveRun(number):
 def interactiveRun(number):
     print("Bienvenue sur le jeu 6 qui prend !")
     while True:
