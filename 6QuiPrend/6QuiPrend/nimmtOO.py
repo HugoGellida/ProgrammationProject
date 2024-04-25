@@ -1,9 +1,7 @@
 from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
-from players.botFaible import botFaible
-from players.botFort import botFort
+from players.botFaible import botFaible #bot1
 from players.botCustomPlayer import BotCustomPlayer
-from players.botRandom import botRandom
 from players.botEchantillon import botEchantillon
 from players.botMinMax import botMinMax
 from flask import Flask, render_template, request, redirect, url_for, send_file
@@ -13,6 +11,7 @@ import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
+def interactiveRun(number):
 def interactiveRun(number):
     print("Bienvenue sur le jeu 6 qui prend !")
     while True:
@@ -117,6 +116,7 @@ def interactiveRun(number):
 
             print("La partie est terminée!")
             print("Scores finaux :")
+            return scores.items(),winners
             return scores.items(),winners
         except ValueError:
             print("Veuillez entrer un nombre entier.")
