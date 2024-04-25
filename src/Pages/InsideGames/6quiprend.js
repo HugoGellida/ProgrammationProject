@@ -78,10 +78,10 @@ export default function Prendqui6({ opponentInfos, cards, time, infosSup, cardPl
         }
 
         const fourthGameTest = (handCard, cardBoard) => {
+            setShowCard(false);
             setMustClick(true);
             setLaunchTimer(true);
             setHandCard(handCard);
-            setShowCard(false);
             setCardBoard(cardBoard);
         }
 

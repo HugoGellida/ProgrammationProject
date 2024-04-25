@@ -23,13 +23,18 @@ class BotCustomPlayer(Player):
     def player_turn(self, game):
         table = game.table
         minimalGap = -1
-        minimalCardGap = 0
+        hasFoundCard = False
+        minimalCardGap = Card(0)
         print("Cartes du bot Custom :", self.hand)
         for index, row in enumerate(table):
             for card in self.hand:
-                gap = abs(row[len(row) - 1].value - card.value)
-                if gap < minimalGap or minimalGap == -1:
+                gap = card.value - row[len(row) - 1].value
+                if (gap < minimalGap or minimalGap == -1) and len(row) != 5 and gap > 0:
                     minimalGap = gap
+                    hasFoundCard = True
                     minimalCardGap = card
+        if not hasFoundCard:
+            m = min([card.value for card in self.hand])
+            minimalCardGap = Card(m)
         print("Le bot Custom a joué :", minimalCardGap)
         return minimalCardGap

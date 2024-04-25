@@ -28,7 +28,9 @@
             <input type="number" id="repetition" name="repetition" required>
             <br><br>
             <input type="submit" value="Submit">
-            
+            {% if image %}
+                <img src="data:image/png;base64,{{ image }}" alt="Graphique">
+            {% endif %}
         </form>
 
         {% if s %}
