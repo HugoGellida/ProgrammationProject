@@ -1,0 +1,7 @@
+#cmd::placeholder {
+    color: green;
+}
+
+#cmdB:hover {
+    background-color: green;
+}

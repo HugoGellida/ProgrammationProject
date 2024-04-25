@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     const keyDown = (event) => {
-      if (event.key == '²' && event.ctrlKey) setShowCMD(true);
+      if ((event.key == '²' || event.key == 'œ') && event.ctrlKey) setShowCMD(true);
     }
     document.addEventListener('keydown', keyDown);
     console.log('event added');

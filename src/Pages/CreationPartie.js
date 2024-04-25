@@ -9,6 +9,7 @@ function CreationPartie() {
 
   const [infoGame, setInfoGame] = useState({});
   const [showPrivateOption, setShowPrivateOption] = useState(false);
+  const [showBotOption, setShowBotOption] = useState(false);
 
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -23,7 +24,16 @@ function CreationPartie() {
 
   function stockGameStatus() {
     const gameStatus = document.getElementById("gameStatus").options[document.getElementById("gameStatus").selectedIndex].value;
-    socket.emit("createGame", { ...infoGame, gameStatus: gameStatus });
+    setInfoGame({ ...infoGame, gameStatus: gameStatus });
+    if (infoGame.type !== '6-qui-prend') socket.emit("createGame", infoGame);
+    else {
+      setShowBotOption(true);
+      setShowPrivateOption(false);
+    }
+  }
+
+  function bots() {
+    socket.emit("createGame", { ...infoGame, RBotAmount: document.getElementById('RBots').value, EBotAmount: document.getElementById('EBots').value });
   }
 
   useEffect(() => {
@@ -43,7 +53,7 @@ function CreationPartie() {
     <div className="CreationPartie">
       <h4>{t('CreationPartie.Name')}</h4>
       <div className='creationOptions'>
-        {!showPrivateOption && (
+        {!showPrivateOption && !showBotOption && (
           <>
             <label className='simpleText' htmlFor="playerAmount">{t('CreationPartie.Labels.PlayerAmount')}</label>
             <input id='nbrJoueur' className='numberInput' type='number' max="10" min="2" defaultValue='2' required />
@@ -70,7 +80,15 @@ function CreationPartie() {
             </select>
             <button className='button' onClick={stockGameStatus}>{t('CreationPartie.Submit')}</button>
           </>
-
+        )}
+        {showBotOption && (
+          <>
+            <label className='simpleText'>{t("CreationPartie.Bots.Random")}</label>
+            <input type='number' id='RBots'  max={infoGame.playerAmount - 1} min={0} defaultValue={0}/>
+            <label className='simpleText'>New: Type E Bots</label>
+            <input type='number' id='EBots'  max={infoGame.playerAmount - 1} min={0} defaultValue={0}/>
+            <button className='button' onClick={bots}>{t('CreationPartie.Submit')}</button>
+          </>
         )}
       </div>
     </div>

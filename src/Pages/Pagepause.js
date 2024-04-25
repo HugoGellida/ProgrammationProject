@@ -48,7 +48,7 @@ function Pagepause() {
       </div>
       <div className="container" style={{ justifyContent: 'flex-start', flexWrap: "wrap" }}>
         {gamePaused.map(game => {
-          if (game.type === actualNavigation) return (<button className="pagePauseButton" onClick={handleClickGame}>{t('PagePause.Game', {id: game.id, playerAmount: game.playerAmount})}</button>);
+          if (game.type === actualNavigation) return (<button className="pagePauseButton" id={game.id} onClick={handleClickGame}>{t('PagePause.Game', {id: game.id, playerAmount: game.playerAmount})}</button>);
           else return (<></>);
         })}
       </div>

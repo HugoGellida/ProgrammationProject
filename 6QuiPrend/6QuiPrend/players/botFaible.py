@@ -1,7 +1,7 @@
 from players.player import Player
 from game.card import Card
 
-class Bot1Player(Player):
+class botFaible(Player):
     def info(self, message):
         print("@"+self.name+" : ",message)
 
@@ -14,17 +14,16 @@ class Bot1Player(Player):
             if (total < minOfLine or minOfLine == -1):
                 minIndexLine = index + 1
                 minOfLine = total
-        print('the bot chose to remove line', minIndexLine)
+        print('Le bot a choisit de supprimer la ligne : ', minIndexLine)
         return minIndexLine
 
-
     def getCardToPlay(self):
+        pass
+
+    def player_turn(self, game):
         hand = [getattr(card, "value") for card in self.hand]
         hand.sort()
         response = hand[0]
-        print("The bot played", response)
-        return response
-    
-    def player_turn(self, game):
-        carteChoisie = Card(self.getCardToPlay())
+        print("Le bot Faible a joué : ", response)
+        carteChoisie = Card(response)
         return carteChoisie

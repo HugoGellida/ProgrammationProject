@@ -109,20 +109,24 @@ class NimmtGame:
         """
         Effectue un round de jeu complet.
         """
+        
         for _ in range(10):
             plays = []
+
             for player in self.players:
                 card = player.player_turn(self)
                 plays.append((player, card))
                 player.hand.remove(card)
             plays.sort(key=lambda x: x[1])
             self.update_table(plays)
+           
     def play(self):
         """
         lance le jeu
         """
         while not any(map(lambda player:player.score>=66,self.players)):
             try:
+                self.alreadyPlayedCards=[]
                 self.distribute_cards()
             except ValueError as e:
                 print(e)
