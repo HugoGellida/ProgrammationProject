@@ -1,9 +1,11 @@
 from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
 from players.botFaible import botFaible #bot1
+from players.botFort import botFort
 from players.botCustomPlayer import BotCustomPlayer
 from players.botEchantillon import botEchantillon
 from players.botMinMax import botMinMax
+from players.botRandom import botRandom
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from io import BytesIO
 import base64
@@ -12,103 +14,102 @@ import matplotlib.pyplot as plt
 app = Flask(__name__)
 
 def interactiveRun(number):
-def interactiveRun(number):
     print("Bienvenue sur le jeu 6 qui prend !")
     while True:
         try:
             players=[]
             if number == "1":
-                players.append(BotCustomPlayer("bot1"))
-                players.append(BotCustomPlayer("bot2"))
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(botEchantillon("botEchantillon"))
 
             if number == "2":
-                players.append(botFort("bot21"))
-                players.append(botFort("bot22"))
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(botFaible("botFaible"))
 
             if number == "3":
-                players.append(botFort("bot1"))
-                players.append(botFaible("bot2"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(botFort("botFort"))
 
+            if number == "4":
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(botMinMax("botMinMax"))
 
-            if number =="4":
-                players.append(botFort("bot1"))
-                players.append(botFaible("bot2"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
-                players.append(HumanPlayer("player3"))
+            if number == "5":
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(botRandom("botRandom"))
 
-            
-            if number =="5":
-                players.append(botFort("bot1"))
-                players.append(botFaible("bot2"))
-                players.append(botRandom("bot3"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
+            if number == "6":
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(HumanPlayer("HumanPlayer"))
 
-            
-            if number =="6":
-                players.append(botFort("bot1"))
-                players.append(botFort("bot2"))
-                players.append(BotCustomPlayer("bot3"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
-                players.append(HumanPlayer("player3"))
+            if number == "7":
+                players.append(botFaible("botFaible"))
+                players.append(botEchantillon("botEchantillon"))
 
+            if number == "7":
+                players.append(botFort("botFort"))
+                players.append(botEchantillon("botEchantillon"))
 
-            if number =="7":
-                players.append(BotCustomPlayer("bot1"))
-                players.append(botFort("bot2"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
+            if number == "8":
+                players.append(botMinMax("botMinMax"))
+                players.append(botEchantillon("botEchantillon"))
 
-            if number =="8":
-                players.append(BotEchantillonagePlayer("bot1"))
-                players.append(Bot3Player("bot2"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
+            if number == "9":
+                players.append(botRandom("botRandom"))
+                players.append(botEchantillon("botEchantillon"))
 
-            if number =="9":
-                players.append(BotCustomPlayer("bot1"))
-                players.append(botFort("bot2"))
-                players.append(Bot3Player("bot3"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
+            if number == "10":
+                players.append(HumanPlayer("HumanPlayer"))
+                players.append(botEchantillon("botEchantillon"))
 
-            if number =="10":            
-                players.append(BotEchantillonagePlayer("bot1"))
-                players.append(botFort("bot2"))
-                players.append(Bot3Player("bot3"))
-                players.append(Bot3Player("bot1"))
-                players.append(HumanPlayer("player1"))
-                players.append(HumanPlayer("player2"))
+            if number == "11":
+                players.append(botFaible("botFaible"))
+                players.append(botFort("botFort"))
 
-            if number =="11":
-                players.append(BotCustomPlayer("bot1"))
-                players.append(botFort("bot2"))
-                
-            if number =="12":
-                players.append(BotCustomPlayer("bot1"))
-                players.append(botFort("bot2")) 
-                players.append(Bot3Player("bot3"))  
+            if number == "12":
+                players.append(botFaible("botFaible"))
+                players.append(botMinMax("botMinMax"))
 
-            if number =="13":
-                players.append(BotEchantillonagePlayer("bot1"))
-                players.append(botFaible("bot2")) 
-                players.append(Bot3Player("bot3")) 
+            if number == "13":
+                players.append(botFaible("botFaible"))
+                players.append(botRandom("botRandom"))
 
-            if number =="14":
-                players.append(BotCustomPlayer("bot1"))
-                players.append(botFort("bot2")) 
-                players.append(Bot3Player("bot3")) 
-                players.append(botFaible("bot4")) 
+            if number == "14":
+                players.append(botFaible("botFaible"))
+                players.append(HumanPlayer("HumanPlayer"))
 
+            if number == "15 ":
+                players.append(botMinMax("botMinMax"))
+                players.append(botFort("botFort"))
 
-            if number =="15":
-                players.append(Bot3Player("bot1")) 
-                players.append(Bot3Player("bot2")) 
+            if number == "16 ":
+                players.append(botRandom("botRandom"))
+                players.append(botFort("botFort"))
 
+            if number == "17 ":
+                players.append(HumanPlayer("HumanPlayer"))
+                players.append(botFort("botFort"))
+
+            if number == "18 ":
+                players.append(botMinMax("botMinMax"))
+                players.append(botRandom("botRandom"))
+
+            if number == "19 ":
+                players.append(botMinMax("botMinMax"))
+                players.append(HumanPlayer("HumanPlayer"))
+
+            if number == "20 ":
+                players.append(botRandom("botRandom"))
+                players.append(HumanPlayer("HumanPlayer"))
+
+            if number =="21":
+                players.append(botFort("botFort"))
+                players.append(botRandom("botRandom"))
+                players.append(BotCustomPlayer("BotCustomPlayer"))
+                players.append(HumanPlayer("HumanPlayer"))
+                players.append(botFaible("botFaible"))
+                players.append(botEchantillon("botEchantillon"))
+                players.append(botMinMax("botMinMax"))
             
 
             game=NimmtGame(players)
