@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Choix de la combinaison et du nombre de répétitions</title>
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .score {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .winners {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Choix de la combinaison et du nombre de répétitions</h1>
+        <form method="post" action="/">
+            <label for="number">Combinaison :</label>
+            <input type="text" id="number" name="number" required>
+            <br><br>
+            <label for="repetition">Nombre de répétitions :</label>
+            <input type="number" id="repetition" name="repetition" required>
+            <br><br>
+            <input type="submit" value="Submit">
+            
+        </form>
+
+        {% if s %}
+        <div class="score">
+            <h2>Scores Moyens :</h2>
+            {% for (player, score) in s %}
+                <p>Joueur {{ player }} : {{ "%.2f" % score }} points</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
