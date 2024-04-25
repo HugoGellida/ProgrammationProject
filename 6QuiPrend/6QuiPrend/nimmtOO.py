@@ -2,6 +2,10 @@ from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
 from players.botFaible import botFaible #bot1
 from players.botFort import botFort
+<<<<<<< HEAD
+=======
+from players.botRandom import botRandom
+>>>>>>> 8f498c4607665f8eaa72b484299ebe5810054fe6
 from players.botCustomPlayer import BotCustomPlayer
 from players.botEchantillon import botEchantillon
 from players.botMinMax import botMinMax
@@ -10,6 +14,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
+import random
 
 app = Flask(__name__)
 
@@ -54,6 +59,7 @@ def interactiveRun(number):
                 players.append(botMinMax("botMinMax"))
                 players.append(botEchantillon("botEchantillon"))
 
+<<<<<<< HEAD
             if number == "9":
                 players.append(botRandom("botRandom"))
                 players.append(botEchantillon("botEchantillon"))
@@ -77,14 +83,62 @@ def interactiveRun(number):
             if number == "14":
                 players.append(botFaible("botFaible"))
                 players.append(HumanPlayer("HumanPlayer"))
+=======
+            if number =="8":
+                players.append(BotEchantillonagePlayer("bot1"))
+                players.append(botRandom("bot2"))
+                players.append(HumanPlayer("player1"))
+                players.append(HumanPlayer("player2"))
+
+            if number =="9":
+                players.append(BotCustomPlayer("bot1"))
+                players.append(botFort("bot2"))
+                players.append(botRandom("bot3"))
+                players.append(HumanPlayer("player1"))
+                players.append(HumanPlayer("player2"))
+
+            if number =="10":            
+                players.append(BotEchantillonagePlayer("bot1"))
+                players.append(botFort("bot2"))
+                players.append(botRandom("bot3"))
+                players.append(botRandom("bot1"))
+                players.append(HumanPlayer("player1"))
+                players.append(HumanPlayer("player2"))
+
+            if number =="11":
+                players.append(BotCustomPlayer("bot1"))
+                players.append(botFort("bot2"))
+                
+            if number =="12":
+                players.append(BotCustomPlayer("bot1"))
+                players.append(botFort("bot2")) 
+                players.append(botRandom("bot3"))  
+
+            if number =="13":
+                players.append(BotEchantillonagePlayer("bot1"))
+                players.append(botFaible("bot2")) 
+                players.append(botRandom("bot3")) 
+
+            if number =="14":
+                players.append(BotCustomPlayer("bot1"))
+                players.append(botFort("bot2")) 
+                players.append(botRandom("bot3")) 
+                players.append(botFaible("bot4")) 
+>>>>>>> 8f498c4607665f8eaa72b484299ebe5810054fe6
 
             if number == "15 ":
                 players.append(botMinMax("botMinMax"))
                 players.append(botFort("botFort"))
 
+<<<<<<< HEAD
             if number == "16 ":
                 players.append(botRandom("botRandom"))
                 players.append(botFort("botFort"))
+=======
+            if number =="15":
+                players.append(botRandom("bot1")) 
+                players.append(botRandom("bot2")) 
+>>>>>>> 8f498c4607665f8eaa72b484299ebe5810054fe6
 
             if number == "17 ":
                 players.append(HumanPlayer("HumanPlayer"))
@@ -129,9 +183,13 @@ def generate_plot(number, repetition):
         (score, winners) = interactiveRun(number)
         liste += score
     liste_m = moyenne(liste)
-    nom, m = zip(*liste_m)
-    
-    plt.plot(nom, m, marker="x", linestyle="")
+    sorted_liste_m = sorted(liste_m, key=lambda x: x[1])
+    nom, m = zip(*sorted_liste_m)
+    nameColor = []
+    colors = ['yellow', 'orange', 'red', 'pink', 'purple', 'blue', 'green', 'black']
+    for i in range(len(nom)):
+        nameColor.append(colors[i])
+    plt.bar(nom, m, color=nameColor, align='edge')
     plt.xlabel('Bots')
     plt.ylabel("Average")
 
