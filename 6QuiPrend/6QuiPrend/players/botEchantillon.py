@@ -30,11 +30,10 @@ class botEchantillon(Player):
         NotPlayedCards = [element for element in NotPlayedCards if element not in HandCard ]
         hand = [getattr(card, "value") for card in self.hand]
         ScoreFinal=self.Emulator(hand,NotPlayedCards,game.table,len(game.players))
-        print('Echantillon obtenu : ', ScoreFinal)
         for i in ScoreFinal:
             ScoreFinal[i]=(sum(ScoreFinal[i])/len(ScoreFinal[i]))
-            print('Carte : ', i,' Moyenne :',ScoreFinal[i])
         response = min(ScoreFinal, key=lambda k: ScoreFinal[k])
+        print("Le bot Echantillonage à joué :", response)
         return Card(response)
 
 
@@ -55,7 +54,6 @@ class botEchantillon(Player):
 
 
     def Simulate_update_table(self,Table,handCard,Combinations,ListWithoutComb,NbJoueurs,ListeMain):
-        print("En cours .....",type(handCard),Combinations)
         if (len(ListeMain)==0):
             return 0
         else:
@@ -87,7 +85,6 @@ class botEchantillon(Player):
                     Table[minIndex - 1] = [Card(val)]
                     Table = sorted(Table, key=lambda x: x[-1].value)
             Comb , ListeSansComb=  self.Combinaison(ListWithoutComb,NbJoueurs)
-            print("Comb :",Comb)    
             i=choice(ListeMain)
             ListeMain=[element for element in ListeMain if element != i]
             return Valeurs[handCard][0]+self.Simulate_update_table(Table,i.value,Comb+(i.value,),ListeSansComb,NbJoueurs,ListeMain)

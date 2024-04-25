@@ -38,19 +38,15 @@ def interactiveRun(number):
 
             if number == "5":
                 players.append(BotCustomPlayer("BotCustomPlayer"))
-                players.append(botRandom("botRandom"))
+                players.append(BotCustomPlayer("botRandom"))
 
             if number == "6":
                 players.append(BotCustomPlayer("BotCustomPlayer"))
                 players.append(HumanPlayer("HumanPlayer"))
 
             if number == "7":
-                players.append(botFaible("botFaible"))
-                players.append(botEchantillon("botEchantillon"))
-
-            if number == "7":
                 players.append(botFort("botFort"))
-                players.append(botEchantillon("botEchantillon"))
+                players.append(botFort("botEchantillon"))
 
             if number == "8":
                 players.append(botMinMax("botMinMax"))
@@ -79,6 +75,7 @@ def interactiveRun(number):
             if number == "14":
                 players.append(botFaible("botFaible"))
                 players.append(HumanPlayer("HumanPlayer"))
+
             if number == "15 ":
                 players.append(botMinMax("botMinMax"))
                 players.append(botFort("botFort"))
@@ -111,6 +108,10 @@ def interactiveRun(number):
                 players.append(botFaible("botFaible"))
                 players.append(botEchantillon("botEchantillon"))
                 players.append(botMinMax("botMinMax"))
+
+            if number == "22":
+                players.append(botFaible("botFaible"))
+                players.append(botEchantillon("botEchantillon"))
             
 
             game=NimmtGame(players)
@@ -118,6 +119,7 @@ def interactiveRun(number):
 
             print("La partie est terminée!")
             print("Scores finaux :")
+            return scores.items(),winners
             return scores.items(),winners
         except ValueError:
             print("Veuillez entrer un nombre entier.")

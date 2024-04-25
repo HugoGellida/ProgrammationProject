@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Choix de la combinaison et du nombre de répétitions</title>
+    <title>Tableau avec 2 colonnes et 14 lignes</title>
     <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: auto;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
         .container {
             text-align: center;
             margin-top: 50px;
@@ -18,6 +28,101 @@
     </style>
 </head>
 <body>
+    <table>
+        <tr>
+            <th>Numéro de la combinaison</th>
+            <th>Adversaires</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>botCustom vs botEchantillon</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>botCustom vs botFaible</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>botCustom vs botFort</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>BotCustomPlayer vs botMinMax </td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>BotCustomPlayer vs BotRandomPlayer  </td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>BotCustomPlayer vs HumanPlayer</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>botFort vs botEchantillon </td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>botMinMax vs botEchantillon </td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>botRandom vs botEchantillon </td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>HumanPlayer vs botEchantillon </td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>botFaible vs botFort </td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>botFaible vs botMinMax</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>botFaible vs botRandom </td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>botFaible vs HumanPlayer</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>botMinMax vs botFort </td>
+        </tr>
+        <tr>
+            <td>16</td>
+            <td>botRandom vs botFort</td>
+        </tr>
+        <tr>
+            <td>17</td>
+            <td>HumanPlayer vs botFort </td>
+        </tr>
+        <tr>
+            <td>18</td>
+            <td>botMinMax vs botRandom </td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>botMinMax vs HumanPlayer </td>
+        </tr>
+        <tr>
+            <td>20</td>
+            <td>HumanPlayer vs botRandom </td>
+        </tr>
+        <tr>
+            <td>21</td>
+            <td>botFaible vs botRandom vs HumanPlayer vs botFort vs BotCustomPlayer vs botEchantillon vs botMinMax </td>
+        </tr>
+        <tr>
+            <td>22</td>
+            <td>botFaible vs botEchantillon </td>
+        </tr>
+    </table>
+    
     <div class="container">
         <h1>Choix de la combinaison et du nombre de répétitions</h1>
         <form method="post" action="/">
@@ -28,14 +133,19 @@
             <input type="number" id="repetition" name="repetition" required>
             <br><br>
             <input type="submit" value="Submit">
+            <br/>
             {% if image %}
                 <img src="data:image/png;base64,{{ image }}" alt="Graphique">
             {% endif %}
         </form>
+        
 
         {% if s %}
         <div class="score">
+            <p>Combinaison : {{ combinaison }}</p>
+            <p>Nombre de répétitions : {{ repetition }}</p>
             <h2>Scores Moyens :</h2>
+            
             {% for (player, score) in s %}
                 <p>Joueur {{ player }} : {{ "%.2f" % score }} points</p>
             {% endfor %}
@@ -44,4 +154,3 @@
     </div>
 </body>
 </html>
-
