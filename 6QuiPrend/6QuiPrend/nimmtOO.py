@@ -2,6 +2,7 @@ from players.humanPlayer import HumanPlayer
 from game.nimmtGame import NimmtGame
 from players.botFaible import botFaible #bot1
 from players.botFort import botFort
+from players.botRandom import botRandom
 from players.botCustomPlayer import BotCustomPlayer
 from players.botEchantillon import botEchantillon
 from players.botMinMax import botMinMax
@@ -9,6 +10,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
+import random
 
 app = Flask(__name__)
 
@@ -65,22 +67,22 @@ def interactiveRun(number):
 
             if number =="8":
                 players.append(BotEchantillonagePlayer("bot1"))
-                players.append(Bot3Player("bot2"))
+                players.append(botRandom("bot2"))
                 players.append(HumanPlayer("player1"))
                 players.append(HumanPlayer("player2"))
 
             if number =="9":
                 players.append(BotCustomPlayer("bot1"))
                 players.append(botFort("bot2"))
-                players.append(Bot3Player("bot3"))
+                players.append(botRandom("bot3"))
                 players.append(HumanPlayer("player1"))
                 players.append(HumanPlayer("player2"))
 
             if number =="10":            
                 players.append(BotEchantillonagePlayer("bot1"))
                 players.append(botFort("bot2"))
-                players.append(Bot3Player("bot3"))
-                players.append(Bot3Player("bot1"))
+                players.append(botRandom("bot3"))
+                players.append(botRandom("bot1"))
                 players.append(HumanPlayer("player1"))
                 players.append(HumanPlayer("player2"))
 
@@ -91,23 +93,23 @@ def interactiveRun(number):
             if number =="12":
                 players.append(BotCustomPlayer("bot1"))
                 players.append(botFort("bot2")) 
-                players.append(Bot3Player("bot3"))  
+                players.append(botRandom("bot3"))  
 
             if number =="13":
                 players.append(BotEchantillonagePlayer("bot1"))
                 players.append(botFaible("bot2")) 
-                players.append(Bot3Player("bot3")) 
+                players.append(botRandom("bot3")) 
 
             if number =="14":
                 players.append(BotCustomPlayer("bot1"))
                 players.append(botFort("bot2")) 
-                players.append(Bot3Player("bot3")) 
+                players.append(botRandom("bot3")) 
                 players.append(botFaible("bot4")) 
 
 
             if number =="15":
-                players.append(Bot3Player("bot1")) 
-                players.append(Bot3Player("bot2")) 
+                players.append(botRandom("bot1")) 
+                players.append(botRandom("bot2")) 
 
             
 
@@ -130,7 +132,12 @@ def generate_plot(number, repetition):
     liste_m = moyenne(liste)
     nom, m = zip(*liste_m)
     
-    plt.plot(nom, m, marker="x", linestyle="")
+    #plt.plot(nom, m, marker="x", linestyle="")
+    nameColor = []
+    colors = ['red', 'blue', 'gray', 'purple', 'orange', 'yellow', 'black', 'pink']
+    for i in range(len(nom)):
+        nameColor.append(colors[random.randint(0, 7)])
+    plt.bar(nom, m, color=nameColor, width=0.5)
     plt.xlabel('Bots')
     plt.ylabel("Average")
 
