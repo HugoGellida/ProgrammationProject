@@ -17,13 +17,11 @@
             text-align: center;
             margin-top: 50px;
         }
-        .score {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        .winners {
-            font-size: 24px;
-            font-weight: bold;
+        #graphs {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            
         }
     </style>
 </head>
@@ -135,22 +133,12 @@
             <input type="submit" value="Submit">
             <br/>
             {% if image %}
+            <div id="graphs">
                 <img src="data:image/png;base64,{{ image }}" alt="Graphique">
+                <img src="data:image/png;base64,{{ image2 }}" alt="Graphique">
+            </div>
             {% endif %}
         </form>
-        
-
-        {% if s %}
-        <div class="score">
-            <p>Combinaison : {{ combinaison }}</p>
-            <p>Nombre de répétitions : {{ repetition }}</p>
-            <h2>Scores Moyens :</h2>
-            
-            {% for (player, score) in s %}
-                <p>Joueur {{ player }} : {{ "%.2f" % score }} points</p>
-            {% endfor %}
-        </div>
-        {% endif %}
     </div>
 </body>
 </html>

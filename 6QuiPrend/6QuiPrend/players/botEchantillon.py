@@ -49,10 +49,6 @@ class botEchantillon(Player):
                 Retour[i].append(self.Simulate_update_table(Plateau.copy(),i,Comb+(i,),ListeSansComb,NbJoueurs,ListeMain))    
         return Retour
 
-                    
-                
-
-
     def Simulate_update_table(self,Table,handCard,Combinations,ListWithoutComb,NbJoueurs,ListeMain):
         if (len(ListeMain)==0):
             return 0
@@ -88,14 +84,6 @@ class botEchantillon(Player):
             i=choice(ListeMain)
             ListeMain=[element for element in ListeMain if element != i]
             return Valeurs[handCard][0]+self.Simulate_update_table(Table,i.value,Comb+(i.value,),ListeSansComb,NbJoueurs,ListeMain)
-            
-
-
-
-
-
-
-
 
     def Combinaison(self,liste,taille):
         toutes_combinaisons = list(combinations(liste, taille))

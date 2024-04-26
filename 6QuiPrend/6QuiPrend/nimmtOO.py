@@ -7,7 +7,9 @@ from players.botCustomPlayer import BotCustomPlayer
 from players.botEchantillon import botEchantillon
 from players.botMinMax import botMinMax
 from players.botRandom import botRandom
+from players.G2_Eradicator_MKII_Custom import G2_Eradicator_MKII_Custom
 from flask import Flask, render_template, request, redirect, url_for, send_file
+from collections import Counter
 from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
@@ -20,6 +22,9 @@ def interactiveRun(number):
     while True:
         try:
             players=[]
+            if number == "0":
+                players.append(BotCustomPlayer("Eradicator MKI Custom"))
+                players.append(G2_Eradicator_MKII_Custom("Eradicator MKII Custom"))
             if number == "1":
                 players.append(BotCustomPlayer("BotCustomPlayer"))
                 players.append(botEchantillon("botEchantillon"))
@@ -127,21 +132,35 @@ def interactiveRun(number):
 
 def generate_plot(number, repetition):
     liste = []
+    liste2 = []
     for _ in range(repetition):
         (score, winners) = interactiveRun(number)
         liste += score
+        liste2 += [str(winner) for winner in winners]
     liste_m = moyenne(liste)
     sorted_liste_m = sorted(liste_m, key=lambda x: x[1])
     nom, m = zip(*sorted_liste_m)
+    liste2 += nom
+    countListe2 = list(Counter(liste2).items())
+    sorted_liste2 = sorted(countListe2, key=lambda x: x[1], reverse=True)
+    nameWin = [i[0] for i in sorted_liste2]
+    winAmount = [i[1] - 1 for i in sorted_liste2]
+    print(nameWin, winAmount)
     nameColor = []
     colors = ['yellow', 'orange', 'red', 'pink', 'purple', 'blue', 'green', 'black']
+
     for i in range(len(nom)):
         nameColor.append(colors[i])
-    plt.bar(nom, m, color=nameColor, align='edge')
-    plt.xlabel('Bots')
-    plt.ylabel("Average")
 
     img_bytesio = BytesIO()
+    plt.subplot(2, 1, 1)
+    plt.bar(nom, m, color=nameColor)
+    plt.xlabel('Bots')
+    plt.ylabel("Average")
+    plt.subplot(2, 1, 2)
+    plt.bar(nameWin, winAmount, color=nameColor)
+    plt.xlabel('Bots')
+    plt.ylabel("Win Amount")
     plt.savefig(img_bytesio, format='png')
     plt.close()
     img_bytesio.seek(0)
@@ -153,9 +172,9 @@ def index():
         number = request.form['number']
         repetition = int(request.form['repetition'])
         liste = []
-        image = generate_plot(number, repetition)
-        return render_template('index.html', image=image)
-    return render_template('index.html', s=None)
+        graph = generate_plot(number, repetition)
+        return render_template('index.html', image=graph)
+    return render_template('index.html')
 
 
 def moyenne(liste):
